@@ -3,7 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Puck : MonoBehaviour
 {
-    [SerializeField] private float _startForce = 5f;
+    [SerializeField] private float _startForce = 30f;
+    [SerializeField] private float _shakeForce = 8f;
 
     private Rigidbody2D _rb;
     private Vector2 _startPosition;
@@ -16,7 +17,7 @@ public class Puck : MonoBehaviour
 
     private void Start()
     {
-        LaunchRandom();
+        LaunchRandom(_startForce);
     }
 
     public void ResetPuck()
@@ -30,11 +31,11 @@ public class Puck : MonoBehaviour
         _rb.position = _startPosition;
     }
 
-    private void LaunchRandom()
+    public void LaunchRandom(float force)
     {
         var direction = Random.value > 0.5f ? Vector2.left : Vector2.right;
         direction.y = Random.Range(-0.4f, 0.4f);
 
-        _rb.AddForce(direction.normalized * _startForce, ForceMode2D.Impulse);
+        _rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
     }
 }

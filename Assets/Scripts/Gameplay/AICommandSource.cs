@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Assertions;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
@@ -18,13 +17,15 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     [Header("Strike Logic")]
     [SerializeField] private Vector2 attackDirection = Vector2.right;
-    [SerializeField] private float setupDistance = 0.9f;
+    [SerializeField] private float setupDistance = 0.55f;
+    [SerializeField] private float behindPuckTolerance = 0.25f;
     [SerializeField] private float strikeDistance = 0.75f;
     [SerializeField] private float sideStepDistance = 0.8f;
 
     [Header("Dash")]
     [SerializeField] private float dashDistance = 1.15f;
     [SerializeField] private float dashCooldown = 0.75f;
+    [SerializeField, Range(-1f, 1f)] private float dashDirectionThreshold = 0.4f;
 
     private float remainingDashCooldown;
     private Rigidbody2D body;
@@ -33,9 +34,15 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
-        attackDirection.Normalize();
-        
-        puckBody ??= GetPuck();
+        attackDirection = attackDirection.sqrMagnitude > 0.001f ? attackDirection.normalized : Vector2.right;
+        puckBody = puck;
+
+        ValidateReferences();
+    }
+
+    private void OnValidate()
+    {
+        ValidateReferences();
     }
 
     public MovementCommand ReadCommand()
@@ -44,7 +51,6 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
         if (!puckBody)
         {
-            Assert.IsTrue(!puckBody, "No puck found");
             return MoveToward(defensivePosition, false);
         }
 
@@ -65,15 +71,13 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
             return MoveToward(setupTarget, false);
         }
 
-        var distanceToPuck = Vector2.Distance(body.position, puckPosition);
-
-        if (distanceToPuck <= strikeDistance)
+        if (IsCloseEnoughToStrike(puckPosition))
         {
             var dashRequested = ShouldDash(puckPosition);
             return MoveToward(puckPosition, dashRequested);
         }
 
-        var approachTarget = GetSetupTarget(predictedPuckPosition);
+        var approachTarget = GetStrikeApproachTarget(predictedPuckPosition);
         return MoveToward(approachTarget, false);
     }
 
@@ -83,23 +87,6 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         {
             remainingDashCooldown -= Time.fixedDeltaTime;
         }
-    }
-
-    private Rigidbody2D GetPuck()
-    {
-        if (puck)
-        {
-            return puck;
-        }
-
-        var puckObject = GameObject.Find("Puck");
-
-        if (puckObject)
-        {
-            puck = puckObject.GetComponent<Rigidbody2D>();
-        }
-
-        return puck;
     }
 
     private bool ShouldEngagePuck(Rigidbody2D puckRb)
@@ -125,7 +112,9 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     private bool IsBehindPuck(Vector2 aiPosition, Vector2 puckPosition)
     {
         var fromPuckToAi = aiPosition - puckPosition;
-        return Vector2.Dot(fromPuckToAi, attackDirection) < 0f;
+        var distanceInAttackDirection = Vector2.Dot(fromPuckToAi, attackDirection);
+
+        return distanceInAttackDirection <= behindPuckTolerance;
     }
 
     private Vector2 GetSetupTarget(Vector2 puckPosition)
@@ -139,6 +128,15 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         setupTarget.y += yDirection * sideStepDistance;
 
         return setupTarget;
+    }
+
+    private Vector2 GetStrikeApproachTarget(Vector2 puckPosition)
+    {
+        var approachOffset = Mathf.Min(behindPuckTolerance, setupDistance * 0.5f);
+        var approachTarget = puckPosition - attackDirection * approachOffset;
+        approachTarget.x = Mathf.Min(approachTarget.x, centerX - 0.25f);
+
+        return approachTarget;
     }
 
     private bool IsPuckBetweenAiAndSetupTarget(Vector2 puckPosition, Vector2 setupTarget)
@@ -162,15 +160,29 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         }
 
         var toPuck = puckPosition - body.position;
-        var puckIsInAttackDirection = Vector2.Dot(toPuck.normalized, attackDirection) > 0.4f;
+        var sqrDistanceToPuck = toPuck.sqrMagnitude;
 
-        if (!puckIsInAttackDirection || toPuck.sqrMagnitude > dashDistance * dashDistance)
+        if (sqrDistanceToPuck <= 0.001f || sqrDistanceToPuck > dashDistance * dashDistance)
+        {
+            return false;
+        }
+
+        var directionToPuck = toPuck.normalized;
+        var puckIsInAttackDirection = Vector2.Dot(directionToPuck, attackDirection) >= dashDirectionThreshold;
+
+        if (!puckIsInAttackDirection)
         {
             return false;
         }
 
         remainingDashCooldown = dashCooldown;
         return true;
+    }
+
+    private bool IsCloseEnoughToStrike(Vector2 puckPosition)
+    {
+        var toPuck = puckPosition - body.position;
+        return toPuck.sqrMagnitude <= strikeDistance * strikeDistance;
     }
 
     private MovementCommand MoveToward(Vector2 target, bool dashRequested)
@@ -184,5 +196,13 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
         var move = Vector2.ClampMagnitude(toTarget, 1f) * aggression;
         return new MovementCommand(move, dashRequested);
+    }
+
+    private void ValidateReferences()
+    {
+        if (puck == null)
+        {
+            Debug.LogError($"{nameof(AICommandSource)} on {name} requires a puck Rigidbody2D reference.", this);
+        }
     }
 }

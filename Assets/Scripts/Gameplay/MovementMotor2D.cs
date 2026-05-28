@@ -30,7 +30,7 @@ public sealed class MovementMotor2D : MonoBehaviour
         dashAbility = GetComponent<DashAbility>();
         areaLimiter = GetComponent<HalfFieldAreaLimiter>();
         circleCollider = GetComponent<CircleCollider2D>();
-        commandSource = commandSourceBehaviour as IMovementCommandSource;
+        commandSource = GetCommandSource();
 
         ConfigureBody(body);
     }
@@ -85,6 +85,25 @@ public sealed class MovementMotor2D : MonoBehaviour
     private static bool IsMovingAcrossCenterLine(float xVelocity, PlayerSide side)
     {
         return side == PlayerSide.Left ? xVelocity > 0f : xVelocity < 0f;
+    }
+
+    private IMovementCommandSource GetCommandSource()
+    {
+        if (commandSourceBehaviour is IMovementCommandSource serializedSource)
+        {
+            return serializedSource;
+        }
+
+        foreach (var behaviour in GetComponents<MonoBehaviour>())
+        {
+            if (behaviour is IMovementCommandSource source)
+            {
+                commandSourceBehaviour = behaviour;
+                return source;
+            }
+        }
+
+        return null;
     }
 
     private static void ConfigureBody(Rigidbody2D targetBody)

@@ -8,6 +8,7 @@ public sealed class MatchManager : MonoBehaviour
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private RoundResetter roundResetter;
     [SerializeField] private TurnFlowController turnFlow;
+    [SerializeField] private StartGameMenu startGameMenu;
 
     [Header("Match")]
     [SerializeField] private float goalLockoutSeconds = 0.25f;
@@ -25,6 +26,22 @@ public sealed class MatchManager : MonoBehaviour
         ValidateReferences();
     }
 
+    private void OnEnable()
+    {
+        if (startGameMenu != null)
+        {
+            startGameMenu.AiOpponentSelected += StartGameVsAiOpponent;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (startGameMenu != null)
+        {
+            startGameMenu.AiOpponentSelected -= StartGameVsAiOpponent;
+        }
+    }
+
     private void Start()
     {
         if (matchView)
@@ -33,7 +50,8 @@ public sealed class MatchManager : MonoBehaviour
             matchView.SetScores(LeftScore, RightScore);
         }
 
-        PrepareNextTurn(string.Empty);
+        roundResetter?.DespawnGameItems();
+        ShowStartGameMenu();
     }
 
     private void OnValidate()
@@ -65,13 +83,28 @@ public sealed class MatchManager : MonoBehaviour
         scoreKeeper?.ResetScores();
         serveManager?.ResetMatch();
         nextGoalAllowedTime = Time.time + goalLockoutSeconds;
+        turnFlow?.EndTurn();
+        roundResetter?.DespawnGameItems();
 
         if (matchView != null)
         {
             matchView.SetScores(LeftScore, RightScore);
+            matchView.SetGoalInfoText(string.Empty);
         }
 
+        ShowStartGameMenu();
+    }
+
+    private void StartGameVsAiOpponent()
+    {
+        roundResetter?.SpawnGameItemsForAiOpponent();
         PrepareNextTurn(string.Empty);
+    }
+
+    private void ShowStartGameMenu()
+    {
+        turnFlow?.EndTurn();
+        startGameMenu?.ShowChoosingVsMenu();
     }
 
     private void PrepareNextTurn(string stateMessage)
@@ -129,6 +162,11 @@ public sealed class MatchManager : MonoBehaviour
         if (turnFlow == null)
         {
             Debug.LogError($"{nameof(MatchManager)} requires a TurnFlowController reference.", this);
+        }
+
+        if (startGameMenu == null)
+        {
+            Debug.LogError($"{nameof(MatchManager)} requires a StartGameMenu reference.", this);
         }
     }
 }

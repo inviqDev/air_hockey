@@ -142,7 +142,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2470998444364862894}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -191,8 +191,15 @@ MonoBehaviour:
   centerX: 0
   aggression: 0.85
   interceptDistance: 5
+  predictionTime: 0.35
+  attackDirection: {x: 1, y: 0}
+  setupDistance: 0.55
+  behindPuckTolerance: 0.25
+  strikeDistance: 0.75
+  sideStepDistance: 0.8
   dashDistance: 1.15
   dashCooldown: 0.75
+  dashDirectionThreshold: 0.4
 --- !u!114 &6200000000000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0

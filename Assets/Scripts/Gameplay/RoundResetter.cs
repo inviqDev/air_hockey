@@ -14,28 +14,29 @@ public sealed class RoundResetter : MonoBehaviour
     [SerializeField] private Transform rightStrikerDefaultPoint;
 
     [Header("Runtime Instances")]
-    [SerializeField] private Rigidbody2D puck;
-    [SerializeField] private Rigidbody2D leftStriker;
-    [SerializeField] private Rigidbody2D rightStriker;
     [SerializeField] private ServeManager serveManager;
 
+    private Rigidbody2D _puck;
+    private Rigidbody2D _leftStriker;
+    private Rigidbody2D _rightStriker;
+    
     public bool IsPuck(Rigidbody2D candidate)
     {
-        return candidate && candidate == puck;
+        return candidate && candidate == _puck;
     }
 
     public void SpawnGameItemsForAiOpponent()
     {
         DespawnGameItems();
 
-        puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
-        leftStriker = SpawnRigidbody(leftAiStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
-        rightStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(rightStrikerDefaultPoint));
+        _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
+        _leftStriker = SpawnRigidbody(leftAiStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
+        _rightStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(rightStrikerDefaultPoint));
 
-        if (leftStriker != null)
+        if (_leftStriker)
         {
-            var aiCommandSource = leftStriker.GetComponent<AICommandSource>();
-            aiCommandSource?.SetPuck(puck);
+            var aiCommandSource = _leftStriker.GetComponent<AICommandSource>();
+            aiCommandSource?.SetPuck(_puck);
         }
 
         ResetRound();
@@ -43,23 +44,23 @@ public sealed class RoundResetter : MonoBehaviour
 
     public void DespawnGameItems()
     {
-        DestroyBody(leftStriker);
-        DestroyBody(rightStriker);
-        DestroyBody(puck);
+        DestroyBody(_leftStriker);
+        DestroyBody(_rightStriker);
+        DestroyBody(_puck);
 
-        leftStriker = null;
-        rightStriker = null;
-        puck = null;
+        _leftStriker = null;
+        _rightStriker = null;
+        _puck = null;
     }
 
     public void ResetRound()
     {
-        ResetBody(leftStriker, GetPosition(leftStrikerDefaultPoint));
-        ResetBody(rightStriker, GetPosition(rightStrikerDefaultPoint));
+        ResetBody(_leftStriker, GetPosition(leftStrikerDefaultPoint));
+        ResetBody(_rightStriker, GetPosition(rightStrikerDefaultPoint));
 
         if (serveManager)
         {
-            ResetBody(puck, serveManager.GetPuckStartPosition(GetPosition(leftPuckDefaultPoint), GetPosition(rightPuckDefaultPoint)));
+            ResetBody(_puck, serveManager.GetPuckStartPosition(GetPosition(leftPuckDefaultPoint), GetPosition(rightPuckDefaultPoint)));
         }
     }
 
@@ -76,10 +77,7 @@ public sealed class RoundResetter : MonoBehaviour
 
     private static Rigidbody2D SpawnRigidbody(GameObject prefab, Vector2 position)
     {
-        if (prefab == null)
-        {
-            return null;
-        }
+        if (!prefab) return null;
 
         var instance = Instantiate(prefab, position, Quaternion.identity);
         return instance.GetComponent<Rigidbody2D>();
@@ -92,10 +90,7 @@ public sealed class RoundResetter : MonoBehaviour
 
     private static void DestroyBody(Rigidbody2D body)
     {
-        if (!body)
-        {
-            return;
-        }
+        if (!body) return;
 
         Destroy(body.gameObject);
     }
@@ -119,7 +114,7 @@ public sealed class RoundResetter : MonoBehaviour
     {
         if (puckPrefab == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a puck prefab reference.", this);
+            Debug.LogError($"{nameof(RoundResetter)} requires a _puck prefab reference.", this);
         }
 
         if (leftAiStrikerPrefab == null)
@@ -134,12 +129,12 @@ public sealed class RoundResetter : MonoBehaviour
 
         if (leftPuckDefaultPoint == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a left puck default point reference.", this);
+            Debug.LogError($"{nameof(RoundResetter)} requires a left _puck default point reference.", this);
         }
 
         if (rightPuckDefaultPoint == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a right puck default point reference.", this);
+            Debug.LogError($"{nameof(RoundResetter)} requires a right _puck default point reference.", this);
         }
 
         if (leftStrikerDefaultPoint == null)

@@ -93,7 +93,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             ""id"": ""df70fa95-8a34-4494-b137-73ab6b9c7d37"",
             ""actions"": [
                 {
-                    ""name"": ""Move"",
+                    ""name"": ""LeftPlayerMove"",
                     ""type"": ""Value"",
                     ""id"": ""15813dfa-3787-4218-92ea-ec79e4c0e83f"",
                     ""expectedControlType"": """",
@@ -102,9 +102,27 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Dash"",
+                    ""name"": ""LeftPlayerDash"",
                     ""type"": ""Button"",
                     ""id"": ""980e05e2-fd24-4930-a092-c1d1aaa1b8e4"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerMove"",
+                    ""type"": ""Value"",
+                    ""id"": ""f74e8e15-8999-4df6-b418-d0da01a6ee3e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""RightPlayerDash"",
+                    ""type"": ""Button"",
+                    ""id"": ""7ab9853f-9668-4628-b16a-0eda0d7a9344"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -119,7 +137,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""LeftPlayerMove"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -130,7 +148,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""LeftPlayerMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -141,7 +159,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""LeftPlayerMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -152,7 +170,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""LeftPlayerMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -163,7 +181,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""LeftPlayerMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -174,7 +192,73 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Dash"",
+                    ""action"": ""LeftPlayerDash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""d0843077-c98a-43bb-a4ea-f0c4e4ace888"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerMove"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""8b758dbc-2a6b-4b14-8f15-81b886cc5326"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""848d0859-49d8-4178-9bf5-7d1b648adf72"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""f353012c-8352-4da7-a962-3e35b44f4911"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""7a7ee7aa-0bba-4d5e-b1b9-048a08f14915"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4397b0b5-1767-4e89-a983-784d7a629751"",
+                    ""path"": ""<Keyboard>/rightShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerDash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -246,8 +330,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
 }");
         // Gameplay
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
-        m_Gameplay_Move = m_Gameplay.FindAction("Move", throwIfNotFound: true);
-        m_Gameplay_Dash = m_Gameplay.FindAction("Dash", throwIfNotFound: true);
+        m_Gameplay_LeftPlayerMove = m_Gameplay.FindAction("LeftPlayerMove", throwIfNotFound: true);
+        m_Gameplay_LeftPlayerDash = m_Gameplay.FindAction("LeftPlayerDash", throwIfNotFound: true);
+        m_Gameplay_RightPlayerMove = m_Gameplay.FindAction("RightPlayerMove", throwIfNotFound: true);
+        m_Gameplay_RightPlayerDash = m_Gameplay.FindAction("RightPlayerDash", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -328,8 +414,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     // Gameplay
     private readonly InputActionMap m_Gameplay;
     private List<IGameplayActions> m_GameplayActionsCallbackInterfaces = new List<IGameplayActions>();
-    private readonly InputAction m_Gameplay_Move;
-    private readonly InputAction m_Gameplay_Dash;
+    private readonly InputAction m_Gameplay_LeftPlayerMove;
+    private readonly InputAction m_Gameplay_LeftPlayerDash;
+    private readonly InputAction m_Gameplay_RightPlayerMove;
+    private readonly InputAction m_Gameplay_RightPlayerDash;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -342,13 +430,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public GameplayActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/Move".
+        /// Provides access to the underlying input action "Gameplay/LeftPlayerMove".
         /// </summary>
-        public InputAction @Move => m_Wrapper.m_Gameplay_Move;
+        public InputAction @LeftPlayerMove => m_Wrapper.m_Gameplay_LeftPlayerMove;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/Dash".
+        /// Provides access to the underlying input action "Gameplay/LeftPlayerDash".
         /// </summary>
-        public InputAction @Dash => m_Wrapper.m_Gameplay_Dash;
+        public InputAction @LeftPlayerDash => m_Wrapper.m_Gameplay_LeftPlayerDash;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/RightPlayerMove".
+        /// </summary>
+        public InputAction @RightPlayerMove => m_Wrapper.m_Gameplay_RightPlayerMove;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/RightPlayerDash".
+        /// </summary>
+        public InputAction @RightPlayerDash => m_Wrapper.m_Gameplay_RightPlayerDash;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -375,12 +471,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_GameplayActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_GameplayActionsCallbackInterfaces.Add(instance);
-            @Move.started += instance.OnMove;
-            @Move.performed += instance.OnMove;
-            @Move.canceled += instance.OnMove;
-            @Dash.started += instance.OnDash;
-            @Dash.performed += instance.OnDash;
-            @Dash.canceled += instance.OnDash;
+            @LeftPlayerMove.started += instance.OnLeftPlayerMove;
+            @LeftPlayerMove.performed += instance.OnLeftPlayerMove;
+            @LeftPlayerMove.canceled += instance.OnLeftPlayerMove;
+            @LeftPlayerDash.started += instance.OnLeftPlayerDash;
+            @LeftPlayerDash.performed += instance.OnLeftPlayerDash;
+            @LeftPlayerDash.canceled += instance.OnLeftPlayerDash;
+            @RightPlayerMove.started += instance.OnRightPlayerMove;
+            @RightPlayerMove.performed += instance.OnRightPlayerMove;
+            @RightPlayerMove.canceled += instance.OnRightPlayerMove;
+            @RightPlayerDash.started += instance.OnRightPlayerDash;
+            @RightPlayerDash.performed += instance.OnRightPlayerDash;
+            @RightPlayerDash.canceled += instance.OnRightPlayerDash;
         }
 
         /// <summary>
@@ -392,12 +494,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="GameplayActions" />
         private void UnregisterCallbacks(IGameplayActions instance)
         {
-            @Move.started -= instance.OnMove;
-            @Move.performed -= instance.OnMove;
-            @Move.canceled -= instance.OnMove;
-            @Dash.started -= instance.OnDash;
-            @Dash.performed -= instance.OnDash;
-            @Dash.canceled -= instance.OnDash;
+            @LeftPlayerMove.started -= instance.OnLeftPlayerMove;
+            @LeftPlayerMove.performed -= instance.OnLeftPlayerMove;
+            @LeftPlayerMove.canceled -= instance.OnLeftPlayerMove;
+            @LeftPlayerDash.started -= instance.OnLeftPlayerDash;
+            @LeftPlayerDash.performed -= instance.OnLeftPlayerDash;
+            @LeftPlayerDash.canceled -= instance.OnLeftPlayerDash;
+            @RightPlayerMove.started -= instance.OnRightPlayerMove;
+            @RightPlayerMove.performed -= instance.OnRightPlayerMove;
+            @RightPlayerMove.canceled -= instance.OnRightPlayerMove;
+            @RightPlayerDash.started -= instance.OnRightPlayerDash;
+            @RightPlayerDash.performed -= instance.OnRightPlayerDash;
+            @RightPlayerDash.canceled -= instance.OnRightPlayerDash;
         }
 
         /// <summary>
@@ -504,18 +612,32 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     public interface IGameplayActions
     {
         /// <summary>
-        /// Method invoked when associated input action "Move" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "LeftPlayerMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMove(InputAction.CallbackContext context);
+        void OnLeftPlayerMove(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Dash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "LeftPlayerDash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnDash(InputAction.CallbackContext context);
+        void OnLeftPlayerDash(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerMove(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerDash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerDash(InputAction.CallbackContext context);
     }
 }

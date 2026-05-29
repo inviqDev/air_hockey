@@ -7,7 +7,7 @@
             "id": "df70fa95-8a34-4494-b137-73ab6b9c7d37",
             "actions": [
                 {
-                    "name": "Move",
+                    "name": "LeftPlayerMove",
                     "type": "Value",
                     "id": "15813dfa-3787-4218-92ea-ec79e4c0e83f",
                     "expectedControlType": "",
@@ -16,9 +16,27 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Dash",
+                    "name": "LeftPlayerDash",
                     "type": "Button",
                     "id": "980e05e2-fd24-4930-a092-c1d1aaa1b8e4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerMove",
+                    "type": "Value",
+                    "id": "f74e8e15-8999-4df6-b418-d0da01a6ee3e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RightPlayerDash",
+                    "type": "Button",
+                    "id": "7ab9853f-9668-4628-b16a-0eda0d7a9344",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -33,7 +51,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -44,7 +62,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -55,7 +73,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -66,7 +84,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -77,7 +95,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -88,7 +106,73 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Dash",
+                    "action": "LeftPlayerDash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "2D Vector",
+                    "id": "d0843077-c98a-43bb-a4ea-f0c4e4ace888",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "8b758dbc-2a6b-4b14-8f15-81b886cc5326",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "848d0859-49d8-4178-9bf5-7d1b648adf72",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "f353012c-8352-4da7-a962-3e35b44f4911",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "7a7ee7aa-0bba-4d5e-b1b9-048a08f14915",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "4397b0b5-1767-4e89-a983-784d7a629751",
+                    "path": "<Keyboard>/rightShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerDash",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

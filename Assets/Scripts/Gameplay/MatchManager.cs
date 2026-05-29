@@ -31,6 +31,7 @@ public sealed class MatchManager : MonoBehaviour
         if (startGameMenu != null)
         {
             startGameMenu.AiOpponentSelected += StartGameVsAiOpponent;
+            startGameMenu.SecondPlayerSelected += StartGameVsSecondPlayer;
         }
     }
 
@@ -39,6 +40,7 @@ public sealed class MatchManager : MonoBehaviour
         if (startGameMenu != null)
         {
             startGameMenu.AiOpponentSelected -= StartGameVsAiOpponent;
+            startGameMenu.SecondPlayerSelected -= StartGameVsSecondPlayer;
         }
     }
 
@@ -101,6 +103,12 @@ public sealed class MatchManager : MonoBehaviour
         PrepareNextTurn(string.Empty);
     }
 
+    private void StartGameVsSecondPlayer()
+    {
+        roundResetter?.SpawnGameItemsForSecondPlayer();
+        PrepareNextTurn(string.Empty);
+    }
+
     private void ShowStartGameMenu()
     {
         turnFlow?.EndTurn();
@@ -127,7 +135,10 @@ public sealed class MatchManager : MonoBehaviour
         if (!result.HasWinner)
         {
             turnFlow?.PrepareTurnAfterGoalDelay(() => ResetRoundAndStatus(string.Empty));
+            return;
         }
+
+        roundResetter?.DespawnGameItems();
     }
 
     private static string GetGoalInfoMessage(GoalResult result)

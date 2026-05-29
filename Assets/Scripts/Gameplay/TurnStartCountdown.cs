@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,14 +10,22 @@ public sealed class TurnStartCountdown : MonoBehaviour
     [SerializeField] private Button startTurnButton;
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private int countdownSeconds = 3;
+    [SerializeField] private float startButtonAppearDelay = 2f;
+    
+    [SerializeField, Range(0.1f, 2f)] private float pulseDuration = 0.75f;
+    [SerializeField, Range(0.1f, 2f)] private float fadeToValue = 0.4f;
 
     private Coroutine countdownRoutine;
+    private Image startButtonImage;
+    private Tween startButtonDelayTween;
+    private Tween startButtonPulseTween;
 
     public event Action CountdownCompleted;
 
     private void Awake()
     {
         ValidateReferences();
+        ResolveStartButtonImage();
     }
 
     private void OnEnable()
@@ -31,6 +40,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
     private void OnDisable()
     {
         StopCountdown();
+        StopStartButtonAnimation();
 
         if (startTurnButton != null)
         {
@@ -46,17 +56,25 @@ public sealed class TurnStartCountdown : MonoBehaviour
     public void ShowStartButton()
     {
         StopCountdown();
+        StopStartButtonAnimation();
         SetCountdownText(string.Empty);
 
         if (startTurnButton != null)
         {
-            startTurnButton.gameObject.SetActive(true);
-            startTurnButton.interactable = true;
+            ResolveStartButtonImage();
+            startTurnButton.interactable = false;
+            startTurnButton.gameObject.SetActive(false);
+
+            startButtonDelayTween = DOVirtual
+                .DelayedCall(Mathf.Max(0f, startButtonAppearDelay), ShowDelayedStartButton)
+                .SetUpdate(true);
         }
     }
 
     public void HideStartButton()
     {
+        StopStartButtonAnimation();
+
         if (startTurnButton != null)
         {
             startTurnButton.gameObject.SetActive(false);
@@ -80,6 +98,28 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
         HideStartButton();
         countdownRoutine = StartCoroutine(CountdownRoutine());
+    }
+
+    private void ShowDelayedStartButton()
+    {
+        startButtonDelayTween = null;
+
+        if (!startTurnButton) return;
+
+        ResolveStartButtonImage();
+
+        startTurnButton.gameObject.SetActive(true);
+        startTurnButton.interactable = true;
+
+        if (!startButtonImage) return;
+
+        SetStartButtonImageAlpha(1f);
+
+        startButtonPulseTween = startButtonImage
+            .DOFade(fadeToValue, pulseDuration)
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo)
+            .SetUpdate(true);
     }
 
     private IEnumerator CountdownRoutine()
@@ -108,12 +148,52 @@ public sealed class TurnStartCountdown : MonoBehaviour
         countdownRoutine = null;
     }
 
+    private void StopStartButtonAnimation()
+    {
+        startButtonDelayTween?.Kill();
+        startButtonDelayTween = null;
+
+        startButtonPulseTween?.Kill();
+        startButtonPulseTween = null;
+
+        if (startButtonImage != null)
+        {
+            SetStartButtonImageAlpha(1f);
+        }
+    }
+
     private void SetCountdownText(string message)
     {
         if (countdownText != null)
         {
             countdownText.text = message;
         }
+    }
+
+    private void ResolveStartButtonImage()
+    {
+        if (startTurnButton == null)
+        {
+            startButtonImage = null;
+            return;
+        }
+
+        if (startButtonImage == null)
+        {
+            startButtonImage = startTurnButton.GetComponent<Image>();
+        }
+    }
+
+    private void SetStartButtonImageAlpha(float alpha)
+    {
+        if (startButtonImage == null)
+        {
+            return;
+        }
+
+        var color = startButtonImage.color;
+        color.a = alpha;
+        startButtonImage.color = color;
     }
 
     private void ValidateReferences()

@@ -36,8 +36,6 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         body = GetComponent<Rigidbody2D>();
         attackDirection = attackDirection.sqrMagnitude > 0.001f ? attackDirection.normalized : Vector2.right;
         puckBody = puck;
-
-        ValidateReferences();
     }
 
     private void OnValidate()
@@ -79,6 +77,12 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
         var approachTarget = GetStrikeApproachTarget(predictedPuckPosition);
         return MoveToward(approachTarget, false);
+    }
+
+    public void SetPuck(Rigidbody2D puckRigidbody)
+    {
+        puck = puckRigidbody;
+        puckBody = puckRigidbody;
     }
 
     private void TickCooldown()

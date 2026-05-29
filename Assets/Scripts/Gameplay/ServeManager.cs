@@ -2,9 +2,6 @@ using UnityEngine;
 
 public sealed class ServeManager : MonoBehaviour
 {
-    [SerializeField] private Vector2 tableCenterPosition = Vector2.zero;
-    [SerializeField] private float puckDistanceFromAttacker = 1.25f;
-
     private bool hasChosenFirstAttacker;
     private PlayerSide nextAttackingSide;
 
@@ -19,15 +16,11 @@ public sealed class ServeManager : MonoBehaviour
         hasChosenFirstAttacker = true;
     }
 
-    public Vector2 GetPuckStartPosition(Vector2 leftStrikerPosition, Vector2 rightStrikerPosition)
+    public Vector2 GetPuckStartPosition(Vector2 leftPuckDefaultPosition, Vector2 rightPuckDefaultPosition)
     {
-        var attackerPosition = GetNextAttackingSide() == PlayerSide.Left
-            ? leftStrikerPosition
-            : rightStrikerPosition;
-        var distanceToCenter = Vector2.Distance(attackerPosition, tableCenterPosition);
-        var offsetFromAttacker = Mathf.Min(puckDistanceFromAttacker, distanceToCenter * 0.5f);
-
-        return Vector2.MoveTowards(attackerPosition, tableCenterPosition, offsetFromAttacker);
+        return GetNextAttackingSide() == PlayerSide.Left
+            ? leftPuckDefaultPosition
+            : rightPuckDefaultPosition;
     }
 
     private PlayerSide GetNextAttackingSide()

@@ -8,6 +8,7 @@ public sealed class MatchUIView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI leftScoreText;
     [SerializeField] private TextMeshProUGUI rightScoreText;
     [SerializeField] private TextMeshProUGUI matchStateText;
+    [SerializeField] private Button readyButton;
     [SerializeField] private Button restartButton;
 
     private MatchManager matchManager;
@@ -21,6 +22,12 @@ public sealed class MatchUIView : MonoBehaviour
         {
             restartButton.onClick.RemoveListener(RestartMatch);
             restartButton.onClick.AddListener(RestartMatch);
+        }
+
+        if (readyButton != null)
+        {
+            readyButton.onClick.RemoveListener(BeginTurnCountdown);
+            readyButton.onClick.AddListener(BeginTurnCountdown);
         }
     }
 
@@ -45,6 +52,15 @@ public sealed class MatchUIView : MonoBehaviour
         }
     }
 
+    public void ShowReadyButton(bool show)
+    {
+        if (readyButton != null)
+        {
+            readyButton.gameObject.SetActive(show);
+            readyButton.interactable = show;
+        }
+    }
+
     private void Awake()
     {
         ValidateReferences();
@@ -58,6 +74,11 @@ public sealed class MatchUIView : MonoBehaviour
     private void RestartMatch()
     {
         matchManager?.RestartMatch();
+    }
+
+    private void BeginTurnCountdown()
+    {
+        matchManager?.BeginTurnCountdown();
     }
 
     private void ValidateReferences()
@@ -80,6 +101,11 @@ public sealed class MatchUIView : MonoBehaviour
         if (matchStateText == null)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a MatchStateText reference.", this);
+        }
+
+        if (readyButton == null)
+        {
+            Debug.LogError($"{nameof(MatchUIView)} on {name} requires a ReadyButton reference.", this);
         }
 
         if (restartButton == null)

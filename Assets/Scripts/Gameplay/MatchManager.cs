@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public sealed class MatchManager : MonoBehaviour
@@ -14,16 +15,22 @@ public sealed class MatchManager : MonoBehaviour
     [SerializeField] private Vector2 puckStartPosition = Vector2.zero;
     [SerializeField] private Vector2 leftStrikerStartPosition = new(-8f, 0f);
     [SerializeField] private Vector2 rightStrikerStartPosition = new(7.29f, 0f);
+    [SerializeField] private float puckStartDistanceFromAttacker = 1.25f;
 
     [Header("Match")]
     [SerializeField] private int winningScore = 7;
     [SerializeField] private float goalLockoutSeconds = 0.25f;
+    [SerializeField] private int turnCountdownSeconds = 3;
 
     private float nextGoalAllowedTime;
+    private Coroutine turnCountdownRoutine;
+    private bool hasChosenFirstAttacker;
+    private PlayerSide nextAttackingSide;
 
     public static MatchManager Instance { get; private set; }
     public int LeftScore { get; private set; }
     public int RightScore { get; private set; }
+    public bool IsTurnActive { get; private set; }
 
     private void Awake()
     {
@@ -38,8 +45,9 @@ public sealed class MatchManager : MonoBehaviour
         {
             matchView.Initialize(this);
             matchView.SetScores(LeftScore, RightScore);
-            matchView.SetStateText(string.Empty);
         }
+
+        PrepareNextTurn(string.Empty);
     }
 
     private void OnValidate()
@@ -72,7 +80,9 @@ public sealed class MatchManager : MonoBehaviour
             RightScore++;
         }
 
-        ResetRound();
+        nextAttackingSide = goalSide;
+        hasChosenFirstAttacker = true;
+
         UpdateViewAfterGoal(scoringSide);
     }
 
@@ -80,15 +90,25 @@ public sealed class MatchManager : MonoBehaviour
     {
         LeftScore = 0;
         RightScore = 0;
+        hasChosenFirstAttacker = false;
         nextGoalAllowedTime = Time.time + goalLockoutSeconds;
-
-        ResetRound();
 
         if (matchView != null)
         {
             matchView.SetScores(LeftScore, RightScore);
-            matchView.SetStateText(string.Empty);
         }
+
+        PrepareNextTurn(string.Empty);
+    }
+
+    public void BeginTurnCountdown()
+    {
+        if (IsTurnActive || turnCountdownRoutine != null)
+        {
+            return;
+        }
+
+        turnCountdownRoutine = StartCoroutine(TurnCountdownRoutine());
     }
 
     private void ConfigureGoals()
@@ -106,9 +126,78 @@ public sealed class MatchManager : MonoBehaviour
 
     private void ResetRound()
     {
-        ResetBody(puck, puckStartPosition);
         ResetBody(leftStriker, leftStrikerStartPosition);
         ResetBody(rightStriker, rightStrikerStartPosition);
+
+        ResetBody(puck, GetPuckStartPosition(GetNextAttackingSide()));
+    }
+
+    private void PrepareNextTurn(string stateMessage)
+    {
+        if (turnCountdownRoutine != null)
+        {
+            StopCoroutine(turnCountdownRoutine);
+            turnCountdownRoutine = null;
+        }
+
+        IsTurnActive = false;
+        ResetRound();
+
+        if (matchView != null)
+        {
+            matchView.SetStateText(stateMessage);
+            matchView.ShowReadyButton(true);
+        }
+    }
+
+    private IEnumerator TurnCountdownRoutine()
+    {
+        if (matchView != null)
+        {
+            matchView.ShowReadyButton(false);
+        }
+
+        var countdownSeconds = Mathf.Max(1, turnCountdownSeconds);
+
+        for (var secondsRemaining = countdownSeconds; secondsRemaining > 0; secondsRemaining--)
+        {
+            if (matchView != null)
+            {
+                matchView.SetStateText(secondsRemaining.ToString());
+            }
+
+            yield return new WaitForSeconds(1f);
+        }
+
+        IsTurnActive = true;
+        turnCountdownRoutine = null;
+
+        if (matchView != null)
+        {
+            matchView.SetStateText(string.Empty);
+        }
+    }
+
+    private PlayerSide GetNextAttackingSide()
+    {
+        if (!hasChosenFirstAttacker)
+        {
+            nextAttackingSide = Random.value < 0.5f ? PlayerSide.Left : PlayerSide.Right;
+            hasChosenFirstAttacker = true;
+        }
+
+        return nextAttackingSide;
+    }
+
+    private Vector2 GetPuckStartPosition(PlayerSide attackingSide)
+    {
+        var attackerPosition = attackingSide == PlayerSide.Left
+            ? leftStrikerStartPosition
+            : rightStrikerStartPosition;
+        var distanceToCenter = Vector2.Distance(attackerPosition, puckStartPosition);
+        var offsetFromAttacker = Mathf.Min(puckStartDistanceFromAttacker, distanceToCenter * 0.5f);
+
+        return Vector2.MoveTowards(attackerPosition, puckStartPosition, offsetFromAttacker);
     }
 
     private void ResetBody(Rigidbody2D body, Vector2 position)
@@ -126,20 +215,17 @@ public sealed class MatchManager : MonoBehaviour
 
     private void UpdateViewAfterGoal(PlayerSide scoringSide)
     {
-        if (matchView == null)
-        {
-            return;
-        }
-
-        matchView.SetScores(LeftScore, RightScore);
+        matchView?.SetScores(LeftScore, RightScore);
 
         if (winningScore > 0 && (LeftScore >= winningScore || RightScore >= winningScore))
         {
-            matchView.SetStateText($"{scoringSide} wins");
+            IsTurnActive = false;
+            matchView?.ShowReadyButton(false);
+            matchView?.SetStateText($"{scoringSide} wins");
             return;
         }
 
-        matchView.SetStateText($"Goal! {scoringSide} scores");
+        PrepareNextTurn($"Goal! {scoringSide} scores");
     }
 
     private void ValidateReferences()

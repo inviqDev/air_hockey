@@ -19,14 +19,12 @@ public sealed class HalfFieldAreaLimiter : MonoBehaviour
     {
         var allowedX = GetAllowedCenterLineX(side, worldRadius);
 
-        if (side == PlayerSide.Left && position.x > allowedX)
+        position.x = side switch
         {
-            position.x = allowedX;
-        }
-        else if (side == PlayerSide.Right && position.x < allowedX)
-        {
-            position.x = allowedX;
-        }
+            PlayerSide.Left when position.x > allowedX => allowedX,
+            PlayerSide.Right when position.x < allowedX => allowedX,
+            _ => position.x
+        };
 
         return position;
     }

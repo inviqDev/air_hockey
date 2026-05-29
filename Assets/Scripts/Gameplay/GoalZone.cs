@@ -5,6 +5,8 @@ public sealed class GoalZone : MonoBehaviour
 {
     [SerializeField] private PlayerSide goalSide;
     [SerializeField] private MatchManager matchManager;
+    
+    private Collider2D _collider;
 
     public PlayerSide GoalSide
     {
@@ -14,14 +16,15 @@ public sealed class GoalZone : MonoBehaviour
 
     private void Reset()
     {
-        var zoneCollider = GetComponent<Collider2D>();
-        zoneCollider.isTrigger = true;
+        _collider ??= GetComponent<Collider2D>();
+        _collider.isTrigger = true;
     }
 
     private void Awake()
     {
-        var zoneCollider = GetComponent<Collider2D>();
-        zoneCollider.isTrigger = true;
+        _collider ??= GetComponent<Collider2D>();
+        _collider.isTrigger = true;
+        
         ValidateReferences();
     }
 
@@ -32,17 +35,14 @@ public sealed class GoalZone : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (matchManager == null || !matchManager.IsPuck(other.attachedRigidbody))
-        {
-            return;
-        }
+        if (!matchManager || !matchManager.IsPuck(other.attachedRigidbody)) return;
 
         matchManager.HandleGoal(goalSide);
     }
 
     private void ValidateReferences()
     {
-        if (matchManager == null)
+        if (!matchManager)
         {
             Debug.LogError($"{nameof(GoalZone)} on {name} requires a MatchManager reference.", this);
         }

@@ -2,6 +2,10 @@ using UnityEngine;
 
 public sealed class RoundResetter : MonoBehaviour
 {
+    [Header("Scene Objects")]
+    [SerializeField] private GameObject tableRoot;
+    [SerializeField] private GameObject topUiRoot;
+
     [Header("Prefabs")]
     [SerializeField] private GameObject puckPrefab;
     [SerializeField] private GameObject leftAiStrikerPrefab;
@@ -28,6 +32,7 @@ public sealed class RoundResetter : MonoBehaviour
     public void SpawnGameItemsForAiOpponent()
     {
         DespawnGameItems();
+        ShowMatchSceneObjects();
 
         _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
         _leftStriker = SpawnRigidbody(leftAiStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
@@ -42,6 +47,21 @@ public sealed class RoundResetter : MonoBehaviour
         ResetRound();
     }
 
+    public void SpawnGameItemsForSecondPlayer()
+    {
+        DespawnGameItems();
+        ShowMatchSceneObjects();
+
+        _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
+        _leftStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
+        _rightStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(rightStrikerDefaultPoint));
+
+        ConfigurePlayerStriker(_leftStriker, PlayerSide.Left, PlayerInputCommandSource.KeyboardLayout.Wasd);
+        ConfigurePlayerStriker(_rightStriker, PlayerSide.Right, PlayerInputCommandSource.KeyboardLayout.Arrows);
+
+        ResetRound();
+    }
+
     public void DespawnGameItems()
     {
         DestroyBody(_leftStriker);
@@ -51,6 +71,8 @@ public sealed class RoundResetter : MonoBehaviour
         _leftStriker = null;
         _rightStriker = null;
         _puck = null;
+
+        HideMatchSceneObjects();
     }
 
     public void ResetRound()
@@ -83,6 +105,46 @@ public sealed class RoundResetter : MonoBehaviour
         return instance.GetComponent<Rigidbody2D>();
     }
 
+    private void ShowMatchSceneObjects()
+    {
+        if (tableRoot != null)
+        {
+            tableRoot.SetActive(true);
+        }
+
+        if (topUiRoot != null)
+        {
+            topUiRoot.SetActive(true);
+        }
+    }
+
+    private void HideMatchSceneObjects()
+    {
+        if (tableRoot != null)
+        {
+            tableRoot.SetActive(false);
+        }
+
+        if (topUiRoot != null)
+        {
+            topUiRoot.SetActive(false);
+        }
+    }
+
+    private static void ConfigurePlayerStriker(Rigidbody2D striker, PlayerSide side, PlayerInputCommandSource.KeyboardLayout layout)
+    {
+        if (!striker) return;
+
+        var sideOwner = striker.GetComponent<SideOwner>();
+        if (sideOwner != null)
+        {
+            sideOwner.Side = side;
+        }
+
+        var inputSource = striker.GetComponent<PlayerInputCommandSource>();
+        inputSource?.SetKeyboardLayout(layout);
+    }
+
     private static Vector2 GetPosition(Transform point)
     {
         return point ? point.position : Vector2.zero;
@@ -112,6 +174,16 @@ public sealed class RoundResetter : MonoBehaviour
 
     private void ValidateReferences()
     {
+        if (tableRoot == null)
+        {
+            Debug.LogError($"{nameof(RoundResetter)} requires a table root reference.", this);
+        }
+
+        if (topUiRoot == null)
+        {
+            Debug.LogError($"{nameof(RoundResetter)} requires a top UI root reference.", this);
+        }
+
         if (puckPrefab == null)
         {
             Debug.LogError($"{nameof(RoundResetter)} requires a _puck prefab reference.", this);

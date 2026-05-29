@@ -1912,6 +1912,7 @@ MonoBehaviour:
   winningScore: 3
   goalLockoutSeconds: 0.25
   turnCountdownSeconds: 3
+  goalDelayBeforeNextTurnSeconds: 3
 --- !u!114 &6400000000000000004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1927,9 +1928,13 @@ MonoBehaviour:
   canvas: {fileID: 559178394}
   leftScoreText: {fileID: 180622732}
   rightScoreText: {fileID: 1728668364}
-  matchStateText: {fileID: 1146422889}
+  countdownText: {fileID: 1146422889}
+  goalInfoText: {fileID: 724809468}
   readyButton: {fileID: 6500000000000000005}
   restartButton: {fileID: 465381066}
+  goalInfoStartAnchoredPosition: {x: 0, y: 0}
+  goalInfoMoveUpDistance: 220
+  goalInfoAnimationSeconds: 2.5
 --- !u!50 &6400000000000000101 stripped
 Rigidbody2D:
   m_CorrespondingSourceObject: {fileID: 7265830630652106188, guid: b99413a185c791f4b9dd58177564dc20, type: 3}

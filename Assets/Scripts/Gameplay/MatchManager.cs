@@ -21,9 +21,11 @@ public sealed class MatchManager : MonoBehaviour
     [SerializeField] private int winningScore = 7;
     [SerializeField] private float goalLockoutSeconds = 0.25f;
     [SerializeField] private int turnCountdownSeconds = 3;
+    [SerializeField] private float goalDelayBeforeNextTurnSeconds = 3f;
 
     private float nextGoalAllowedTime;
     private Coroutine turnCountdownRoutine;
+    private Coroutine goalDelayRoutine;
     private bool hasChosenFirstAttacker;
     private PlayerSide nextAttackingSide;
 
@@ -92,6 +94,7 @@ public sealed class MatchManager : MonoBehaviour
         RightScore = 0;
         hasChosenFirstAttacker = false;
         nextGoalAllowedTime = Time.time + goalLockoutSeconds;
+        StopGoalDelayRoutine();
 
         if (matchView != null)
         {
@@ -134,6 +137,8 @@ public sealed class MatchManager : MonoBehaviour
 
     private void PrepareNextTurn(string stateMessage)
     {
+        StopGoalDelayRoutine();
+
         if (turnCountdownRoutine != null)
         {
             StopCoroutine(turnCountdownRoutine);
@@ -145,9 +150,19 @@ public sealed class MatchManager : MonoBehaviour
 
         if (matchView != null)
         {
-            matchView.SetStateText(stateMessage);
+            matchView.SetCountdownText(string.Empty);
+            matchView.SetGoalInfoText(stateMessage);
             matchView.ShowReadyButton(true);
         }
+    }
+
+    private IEnumerator PrepareNextTurnAfterGoalDelay()
+    {
+        var delaySeconds = Mathf.Max(0f, goalDelayBeforeNextTurnSeconds);
+        yield return new WaitForSeconds(delaySeconds);
+
+        goalDelayRoutine = null;
+        PrepareNextTurn(string.Empty);
     }
 
     private IEnumerator TurnCountdownRoutine()
@@ -163,7 +178,7 @@ public sealed class MatchManager : MonoBehaviour
         {
             if (matchView != null)
             {
-                matchView.SetStateText(secondsRemaining.ToString());
+                matchView.SetCountdownText(secondsRemaining.ToString());
             }
 
             yield return new WaitForSeconds(1f);
@@ -174,7 +189,7 @@ public sealed class MatchManager : MonoBehaviour
 
         if (matchView != null)
         {
-            matchView.SetStateText(string.Empty);
+            matchView.SetCountdownText(string.Empty);
         }
     }
 
@@ -216,16 +231,33 @@ public sealed class MatchManager : MonoBehaviour
     private void UpdateViewAfterGoal(PlayerSide scoringSide)
     {
         matchView?.SetScores(LeftScore, RightScore);
+        matchView?.ShowReadyButton(false);
+        matchView?.SetCountdownText(string.Empty);
 
-        if (winningScore > 0 && (LeftScore >= winningScore || RightScore >= winningScore))
+        var hasWinner = winningScore > 0 && (LeftScore >= winningScore || RightScore >= winningScore);
+        var goalInfoMessage = hasWinner ? $"{scoringSide} wins" : $"Goal! {scoringSide} scores";
+        matchView?.PlayGoalInfo(goalInfoMessage);
+
+        if (hasWinner)
         {
             IsTurnActive = false;
-            matchView?.ShowReadyButton(false);
-            matchView?.SetStateText($"{scoringSide} wins");
             return;
         }
 
-        PrepareNextTurn($"Goal! {scoringSide} scores");
+        IsTurnActive = false;
+        StopGoalDelayRoutine();
+        goalDelayRoutine = StartCoroutine(PrepareNextTurnAfterGoalDelay());
+    }
+
+    private void StopGoalDelayRoutine()
+    {
+        if (goalDelayRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(goalDelayRoutine);
+        goalDelayRoutine = null;
     }
 
     private void ValidateReferences()

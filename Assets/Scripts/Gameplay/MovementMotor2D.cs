@@ -37,6 +37,12 @@ public sealed class MovementMotor2D : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (MatchManager.Instance != null && !MatchManager.Instance.IsTurnActive)
+        {
+            body.linearVelocity = Vector2.zero;
+            return;
+        }
+
         if (commandSource == null)
         {
             return;

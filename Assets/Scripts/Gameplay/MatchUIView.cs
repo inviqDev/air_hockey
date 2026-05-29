@@ -8,9 +8,7 @@ public sealed class MatchUIView : MonoBehaviour
     [SerializeField] private Canvas canvas;
     [SerializeField] private TextMeshProUGUI leftScoreText;
     [SerializeField] private TextMeshProUGUI rightScoreText;
-    [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private TextMeshProUGUI goalInfoText;
-    [SerializeField] private Button readyButton;
     [SerializeField] private Button restartButton;
 
     [Header("Goal Info Animation")]
@@ -28,16 +26,10 @@ public sealed class MatchUIView : MonoBehaviour
         matchManager = manager;
         ValidateReferences();
 
-        if (restartButton != null)
+        if (restartButton)
         {
             restartButton.onClick.RemoveListener(RestartMatch);
             restartButton.onClick.AddListener(RestartMatch);
-        }
-
-        if (readyButton != null)
-        {
-            readyButton.onClick.RemoveListener(BeginTurnCountdown);
-            readyButton.onClick.AddListener(BeginTurnCountdown);
         }
 
         HideGoalInfoImmediately();
@@ -45,22 +37,14 @@ public sealed class MatchUIView : MonoBehaviour
 
     public void SetScores(int leftScore, int rightScore)
     {
-        if (leftScoreText != null)
+        if (leftScoreText)
         {
             leftScoreText.text = leftScore.ToString();
         }
 
-        if (rightScoreText != null)
+        if (rightScoreText)
         {
             rightScoreText.text = rightScore.ToString();
-        }
-    }
-
-    public void SetCountdownText(string message)
-    {
-        if (countdownText != null)
-        {
-            countdownText.text = message;
         }
     }
 
@@ -68,21 +52,17 @@ public sealed class MatchUIView : MonoBehaviour
     {
         StopGoalInfoAnimation();
 
-        if (goalInfoText != null)
-        {
-            goalInfoText.text = message;
-            goalInfoText.gameObject.SetActive(!string.IsNullOrEmpty(message));
-            SetGoalInfoAlpha(1f);
-            goalInfoText.rectTransform.anchoredPosition = goalInfoStartAnchoredPosition;
-        }
+        if (!goalInfoText) return;
+        
+        goalInfoText.text = message;
+        goalInfoText.gameObject.SetActive(!string.IsNullOrEmpty(message));
+        SetGoalInfoAlpha(1f);
+        goalInfoText.rectTransform.anchoredPosition = goalInfoStartAnchoredPosition;
     }
 
     public void PlayGoalInfo(string message)
     {
-        if (goalInfoText == null)
-        {
-            return;
-        }
+        if (!goalInfoText) return;
 
         StopGoalInfoAnimation();
 
@@ -99,15 +79,6 @@ public sealed class MatchUIView : MonoBehaviour
         goalInfoSequence.Join(goalInfoRect.DOAnchorPos(endPosition, duration).SetEase(goalInfoMoveEase));
         goalInfoSequence.Join(goalInfoText.DOFade(0f, duration).SetEase(goalInfoFadeEase));
         goalInfoSequence.OnComplete(CompleteGoalInfoAnimation);
-    }
-
-    public void ShowReadyButton(bool show)
-    {
-        if (readyButton != null)
-        {
-            readyButton.gameObject.SetActive(show);
-            readyButton.interactable = show;
-        }
     }
 
     private void Awake()
@@ -130,11 +101,6 @@ public sealed class MatchUIView : MonoBehaviour
         matchManager?.RestartMatch();
     }
 
-    private void BeginTurnCountdown()
-    {
-        matchManager?.BeginTurnCountdown();
-    }
-
     private void HideGoalInfoImmediately()
     {
         StopGoalInfoAnimation();
@@ -149,10 +115,7 @@ public sealed class MatchUIView : MonoBehaviour
 
     private void HideGoalInfoElement()
     {
-        if (goalInfoText == null)
-        {
-            return;
-        }
+        if (!goalInfoText) return;
 
         goalInfoText.text = string.Empty;
         goalInfoText.rectTransform.anchoredPosition = goalInfoStartAnchoredPosition;
@@ -162,10 +125,7 @@ public sealed class MatchUIView : MonoBehaviour
 
     private void StopGoalInfoAnimation()
     {
-        if (goalInfoSequence == null)
-        {
-            return;
-        }
+        if (goalInfoSequence == null) return;
 
         goalInfoSequence.Kill();
         goalInfoSequence = null;
@@ -173,10 +133,7 @@ public sealed class MatchUIView : MonoBehaviour
 
     private void SetGoalInfoAlpha(float alpha)
     {
-        if (goalInfoText == null)
-        {
-            return;
-        }
+        if (!goalInfoText) return;
 
         var color = goalInfoText.color;
         color.a = alpha;
@@ -200,19 +157,9 @@ public sealed class MatchUIView : MonoBehaviour
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a RightScoreText reference.", this);
         }
 
-        if (countdownText == null)
-        {
-            Debug.LogError($"{nameof(MatchUIView)} on {name} requires a CountdownText reference.", this);
-        }
-
         if (goalInfoText == null)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a GoalInfoText reference.", this);
-        }
-
-        if (readyButton == null)
-        {
-            Debug.LogError($"{nameof(MatchUIView)} on {name} requires a ReadyButton reference.", this);
         }
 
         if (restartButton == null)

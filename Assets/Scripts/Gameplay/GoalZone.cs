@@ -6,8 +6,6 @@ public sealed class GoalZone : MonoBehaviour
     [SerializeField] private PlayerSide goalSide;
     [SerializeField] private MatchManager matchManager;
     
-    private Collider2D _collider;
-
     public PlayerSide GoalSide
     {
         get => goalSide;
@@ -16,15 +14,12 @@ public sealed class GoalZone : MonoBehaviour
 
     private void Reset()
     {
-        _collider ??= GetComponent<Collider2D>();
-        _collider.isTrigger = true;
+        GetComponent<Collider2D>().isTrigger = true;
     }
 
     private void Awake()
     {
-        _collider ??= GetComponent<Collider2D>();
-        _collider.isTrigger = true;
-        
+        GetComponent<Collider2D>().isTrigger = true;
         ValidateReferences();
     }
 

@@ -1,4 +1,3 @@
-using UI.Enums;
 using UnityEngine;
 
 public sealed class MatchModeController : MonoBehaviour
@@ -15,20 +14,9 @@ public sealed class MatchModeController : MonoBehaviour
         ValidateReferences();
     }
 
-    public void StartMatch(MainMenuSelection selection)
+    public void StartMatch(MatchConfiguration configuration)
     {
-        switch (selection)
-        {
-            case MainMenuSelection.AiOpponent:
-                roundResetter?.SpawnGameItemsForAiOpponent();
-                break;
-            case MainMenuSelection.SecondPlayer:
-                roundResetter?.SpawnGameItemsForSecondPlayer();
-                break;
-            default:
-                Debug.LogError($"Unhandled match mode selection: {selection}", this);
-                break;
-        }
+        roundResetter?.SpawnGameItems(configuration);
     }
 
     private void ValidateReferences()

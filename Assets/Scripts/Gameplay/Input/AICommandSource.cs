@@ -27,6 +27,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     [SerializeField] private float dashCooldown = 0.75f;
     [SerializeField, Range(-1f, 1f)] private float dashDirectionThreshold = 0.4f;
 
+    private PlayerSide side = PlayerSide.Left;
     private float remainingDashCooldown;
     private Rigidbody2D body;
     private Rigidbody2D puckBody;
@@ -85,6 +86,15 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         puckBody = puckRigidbody;
     }
 
+    public void SetSide(PlayerSide playerSide)
+    {
+        side = playerSide;
+
+        var defensiveX = Mathf.Abs(defensivePosition.x);
+        defensivePosition.x = side == PlayerSide.Left ? -defensiveX : defensiveX;
+        attackDirection = side == PlayerSide.Left ? Vector2.right : Vector2.left;
+    }
+
     private void TickCooldown()
     {
         if (remainingDashCooldown > 0f)
@@ -98,8 +108,14 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         var puckPosition = puckRb.position;
         var puckVelocity = puckRb.linearVelocity;
 
-        var puckIsOnAiSide = puckPosition.x < centerX;
-        var puckMovingTowardAi = puckVelocity.x < -0.05f;
+        var puckIsOnAiSide = side == PlayerSide.Left
+            ? puckPosition.x < centerX
+            : puckPosition.x > centerX;
+
+        var puckMovingTowardAi = side == PlayerSide.Left
+            ? puckVelocity.x < -0.05f
+            : puckVelocity.x > 0.05f;
+
         var puckIsCloseEnough = Mathf.Abs(puckPosition.x - body.position.x) <= interceptDistance;
 
         return puckIsOnAiSide || puckMovingTowardAi || puckIsCloseEnough;
@@ -108,7 +124,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     private Vector2 PredictPuckPosition(Vector2 puckPosition, Vector2 puckVelocity)
     {
         var predictedPosition = puckPosition + puckVelocity * predictionTime;
-        predictedPosition.x = Mathf.Min(predictedPosition.x, centerX - 0.25f);
+        predictedPosition.x = ClampToAiSide(predictedPosition.x);
 
         return predictedPosition;
     }
@@ -124,7 +140,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     private Vector2 GetSetupTarget(Vector2 puckPosition)
     {
         var setupTarget = puckPosition - attackDirection * setupDistance;
-        setupTarget.x = Mathf.Min(setupTarget.x, centerX - 0.25f);
+        setupTarget.x = ClampToAiSide(setupTarget.x);
 
         if (!IsPuckBetweenAiAndSetupTarget(puckPosition, setupTarget)) return setupTarget;
         
@@ -138,9 +154,16 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     {
         var approachOffset = Mathf.Min(behindPuckTolerance, setupDistance * 0.5f);
         var approachTarget = puckPosition - attackDirection * approachOffset;
-        approachTarget.x = Mathf.Min(approachTarget.x, centerX - 0.25f);
+        approachTarget.x = ClampToAiSide(approachTarget.x);
 
         return approachTarget;
+    }
+
+    private float ClampToAiSide(float x)
+    {
+        return side == PlayerSide.Left
+            ? Mathf.Min(x, centerX - 0.25f)
+            : Mathf.Max(x, centerX + 0.25f);
     }
 
     private bool IsPuckBetweenAiAndSetupTarget(Vector2 puckPosition, Vector2 setupTarget)

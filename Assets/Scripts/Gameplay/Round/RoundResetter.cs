@@ -24,37 +24,16 @@ public sealed class RoundResetter : MonoBehaviour
     private Rigidbody2D _leftStriker;
     private Rigidbody2D _rightStriker;
     
-    public void SpawnGameItemsForAiOpponent()
+    public void SpawnGameItems(MatchConfiguration configuration)
     {
         DespawnGameItems();
         ShowTable();
 
         _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
         puckRegistry?.RegisterPuck(_puck);
-        _leftStriker = SpawnRigidbody(leftAiStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
-        _rightStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(rightStrikerDefaultPoint));
 
-        if (_leftStriker)
-        {
-            var aiCommandSource = _leftStriker.GetComponent<AICommandSource>();
-            aiCommandSource?.SetPuck(_puck);
-        }
-
-        ResetRound();
-    }
-
-    public void SpawnGameItemsForSecondPlayer()
-    {
-        DespawnGameItems();
-        ShowTable();
-
-        _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
-        puckRegistry?.RegisterPuck(_puck);
-        _leftStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
-        _rightStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(rightStrikerDefaultPoint));
-
-        ConfigurePlayerStriker(_leftStriker, PlayerSide.Left, PlayerInputCommandSource.KeyboardLayout.Wasd);
-        ConfigurePlayerStriker(_rightStriker, PlayerSide.Right, PlayerInputCommandSource.KeyboardLayout.Arrows);
+        _leftStriker = SpawnStriker(configuration, PlayerSide.Left, GetPosition(leftStrikerDefaultPoint));
+        _rightStriker = SpawnStriker(configuration, PlayerSide.Right, GetPosition(rightStrikerDefaultPoint));
 
         ResetRound();
     }
@@ -105,6 +84,28 @@ public sealed class RoundResetter : MonoBehaviour
         return instance.GetComponent<Rigidbody2D>();
     }
 
+    private Rigidbody2D SpawnStriker(MatchConfiguration configuration, PlayerSide side, Vector2 position)
+    {
+        var player = configuration.GetPlayerForSide(side);
+        var isAi = player == MatchPlayer.PlayerTwo &&
+                   configuration.PlayerTwoControlType == PlayerTwoControlType.Ai;
+
+        var striker = SpawnRigidbody(isAi ? leftAiStrikerPrefab : rightPlayerStrikerPrefab, position);
+
+        if (isAi)
+        {
+            ConfigureAiStriker(striker, side);
+            return striker;
+        }
+
+        var layout = player == MatchPlayer.PlayerOne
+            ? PlayerInputCommandSource.KeyboardLayout.Arrows
+            : PlayerInputCommandSource.KeyboardLayout.Wasd;
+
+        ConfigurePlayerStriker(striker, side, layout);
+        return striker;
+    }
+
     private void ShowTable()
     {
         if (tableRoot)
@@ -125,14 +126,30 @@ public sealed class RoundResetter : MonoBehaviour
     {
         if (!striker) return;
 
+        ConfigureSideOwner(striker, side);
+
+        var inputSource = striker.GetComponent<PlayerInputCommandSource>();
+        inputSource?.SetKeyboardLayout(layout);
+    }
+
+    private void ConfigureAiStriker(Rigidbody2D striker, PlayerSide side)
+    {
+        if (!striker) return;
+
+        ConfigureSideOwner(striker, side);
+
+        var aiCommandSource = striker.GetComponent<AICommandSource>();
+        aiCommandSource?.SetSide(side);
+        aiCommandSource?.SetPuck(_puck);
+    }
+
+    private static void ConfigureSideOwner(Rigidbody2D striker, PlayerSide side)
+    {
         var sideOwner = striker.GetComponent<SideOwner>();
         if (sideOwner != null)
         {
             sideOwner.Side = side;
         }
-
-        var inputSource = striker.GetComponent<PlayerInputCommandSource>();
-        inputSource?.SetKeyboardLayout(layout);
     }
 
     private static Vector2 GetPosition(Transform point)

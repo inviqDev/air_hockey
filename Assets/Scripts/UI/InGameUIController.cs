@@ -2,10 +2,8 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 
-namespace UI
+public sealed class InGameUIController : MonoBehaviour
 {
-    public sealed class InGameUIController : MonoBehaviour
-    {
         [Header("References")]
         [SerializeField] private GameObject inGameUIRoot;
 
@@ -133,5 +131,4 @@ namespace UI
             if (inGameUIRoot) return;
             inGameUIRoot = gameObject;
         }
-    }
 }

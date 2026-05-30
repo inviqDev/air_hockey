@@ -1,30 +1,34 @@
 using System;
 using DG.Tweening;
-using UI.Enums;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UI
+public sealed class MainMenuController : MonoBehaviour
 {
-    public sealed class MainMenuController : MonoBehaviour
-    {
         [SerializeField] private GameObject mainMenuRoot;
+        [SerializeField] private GameObject opponentSelectionRoot;
+        [SerializeField] private GameObject sideSelectionRoot;
         [SerializeField] private Button aiOpponentButton;
         [SerializeField] private Button secondPlayerButton;
+        [SerializeField] private Button leftSideButton;
+        [SerializeField] private Button rightSideButton;
 
         [Header("Animation")]
         [SerializeField, Range(0.05f, 3f)] private float fadeInDuration = 1f;
         [SerializeField, Range(0.05f, 3f)] private float fadeOutDuration = 1f;
 
-        public event Action<MainMenuSelection> SelectionMade;
+        public event Action<MatchConfiguration> MatchConfigurationSelected;
 
         private CanvasGroup mainMenuCanvasGroup;
         private Tween mainMenuTween;
+        private PlayerTwoControlType selectedPlayerTwoControlType;
 
         private void Awake()
         {
             ValidateReferences();
             ResolveMainMenuRoot();
+            SetOpponentSelectionVisible(true);
+            SetSideSelectionVisible(false);
         }
 
         private void OnEnable()
@@ -57,6 +61,8 @@ namespace UI
             mainMenuCanvasGroup.alpha = 0f;
             mainMenuCanvasGroup.interactable = true;
             mainMenuCanvasGroup.blocksRaycasts = true;
+            SetOpponentSelectionVisible(true);
+            SetSideSelectionVisible(false);
 
             mainMenuTween = mainMenuCanvasGroup
                 .DOFade(1f, fadeInDuration)
@@ -89,18 +95,37 @@ namespace UI
 
         private void SelectAiOpponent()
         {
-            Select(MainMenuSelection.AiOpponent);
+            SelectMode(PlayerTwoControlType.Ai);
         }
 
         private void SelectSecondPlayer()
         {
-            Select(MainMenuSelection.SecondPlayer);
+            SelectMode(PlayerTwoControlType.Human);
         }
 
-        private void Select(MainMenuSelection selection)
+        private void SelectMode(PlayerTwoControlType playerTwoControlType)
         {
+            selectedPlayerTwoControlType = playerTwoControlType;
+            SetOpponentSelectionVisible(false);
+            SetSideSelectionVisible(true);
+        }
+
+        private void SelectLeftSide()
+        {
+            SelectSide(PlayerSide.Left);
+        }
+
+        private void SelectRightSide()
+        {
+            SelectSide(PlayerSide.Right);
+        }
+
+        private void SelectSide(PlayerSide playerOneSide)
+        {
+            SetSideSelectionVisible(false);
+            SetOpponentSelectionVisible(false);
             Hide();
-            SelectionMade?.Invoke(selection);
+            MatchConfigurationSelected?.Invoke(new MatchConfiguration(selectedPlayerTwoControlType, playerOneSide));
         }
 
         private void AddButtonListeners()
@@ -120,6 +145,18 @@ namespace UI
                 secondPlayerButton.onClick.RemoveListener(SelectSecondPlayer);
                 secondPlayerButton.onClick.AddListener(SelectSecondPlayer);
             }
+
+            if (leftSideButton)
+            {
+                leftSideButton.onClick.RemoveListener(SelectLeftSide);
+                leftSideButton.onClick.AddListener(SelectLeftSide);
+            }
+
+            if (rightSideButton)
+            {
+                rightSideButton.onClick.RemoveListener(SelectRightSide);
+                rightSideButton.onClick.AddListener(SelectRightSide);
+            }
         }
 
         private void RemoveButtonListeners()
@@ -134,6 +171,16 @@ namespace UI
             {
                 secondPlayerButton.interactable = false;
                 secondPlayerButton.onClick.RemoveListener(SelectSecondPlayer);
+            }
+
+            if (leftSideButton)
+            {
+                leftSideButton.onClick.RemoveListener(SelectLeftSide);
+            }
+
+            if (rightSideButton)
+            {
+                rightSideButton.onClick.RemoveListener(SelectRightSide);
             }
         }
 
@@ -157,6 +204,16 @@ namespace UI
 
         private void ValidateReferences()
         {
+            if (!opponentSelectionRoot)
+            {
+                Debug.LogError($"{nameof(MainMenuController)} requires an opponent selection root reference.", this);
+            }
+
+            if (!sideSelectionRoot)
+            {
+                Debug.LogError($"{nameof(MainMenuController)} requires a side selection root reference.", this);
+            }
+
             if (!aiOpponentButton)
             {
                 Debug.LogError($"{nameof(MainMenuController)} requires an AI opponent button reference.", this);
@@ -166,6 +223,50 @@ namespace UI
             {
                 Debug.LogError($"{nameof(MainMenuController)} requires a second player button reference.", this);
             }
+
+            if (!leftSideButton)
+            {
+                Debug.LogError($"{nameof(MainMenuController)} requires a left side button reference.", this);
+            }
+
+            if (!rightSideButton)
+            {
+                Debug.LogError($"{nameof(MainMenuController)} requires a right side button reference.", this);
+            }
         }
-    }
+
+        private void SetOpponentSelectionVisible(bool visible)
+        {
+            if (opponentSelectionRoot)
+            {
+                opponentSelectionRoot.SetActive(visible);
+            }
+
+            if (aiOpponentButton)
+            {
+                aiOpponentButton.interactable = visible;
+            }
+
+            if (secondPlayerButton)
+            {
+                secondPlayerButton.interactable = visible;
+            }
+        }
+
+        private void SetSideSelectionVisible(bool visible)
+        {
+            if (!sideSelectionRoot) return;
+
+            sideSelectionRoot.SetActive(visible);
+
+            if (leftSideButton)
+            {
+                leftSideButton.interactable = visible;
+            }
+
+            if (rightSideButton)
+            {
+                rightSideButton.interactable = visible;
+            }
+        }
 }

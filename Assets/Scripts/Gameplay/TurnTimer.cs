@@ -53,7 +53,7 @@ public sealed class TurnTimer : MonoBehaviour
     {
         if (timerText != null)
         {
-            timerText.text = elapsedSeconds.ToString("0.000");
+            timerText.text = elapsedSeconds.ToString("0.00");
         }
     }
 

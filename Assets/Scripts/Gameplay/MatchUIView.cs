@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,12 +19,12 @@ public sealed class MatchUIView : MonoBehaviour
     [SerializeField] private Ease goalInfoMoveEase = Ease.OutSine;
     [SerializeField] private Ease goalInfoFadeEase = Ease.InExpo;
 
-    private MatchManager matchManager;
     private Sequence goalInfoSequence;
 
-    public void Initialize(MatchManager manager)
+    public event Action RestartClicked;
+
+    public void Initialize()
     {
-        matchManager = manager;
         ValidateReferences();
 
         if (restartButton)
@@ -98,7 +99,7 @@ public sealed class MatchUIView : MonoBehaviour
 
     private void RestartMatch()
     {
-        matchManager?.RestartMatch();
+        RestartClicked?.Invoke();
     }
 
     private void HideGoalInfoImmediately()

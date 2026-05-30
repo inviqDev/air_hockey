@@ -180,4 +180,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goalSide: 0
-  matchManager: {fileID: 0}
+  goalController: {fileID: 0}

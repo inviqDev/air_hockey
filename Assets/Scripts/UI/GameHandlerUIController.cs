@@ -2,10 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UI
+public sealed class GameHandlerUIController : MonoBehaviour
 {
-    public sealed class GameHandlerUIController : MonoBehaviour
-    {
         [Header("Pause")]
         [SerializeField] private Button pausePlayButton;
         [SerializeField] private Image pausePlayIconImage;
@@ -241,5 +239,4 @@ namespace UI
                 Debug.LogError($"{nameof(GameHandlerUIController)} requires a quit button reference.", this);
             }
         }
-    }
 }

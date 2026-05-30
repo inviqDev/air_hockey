@@ -4,7 +4,6 @@ public sealed class RoundResetter : MonoBehaviour
 {
     [Header("Scene Objects")]
     [SerializeField] private GameObject tableRoot;
-    [SerializeField] private GameObject topUiRoot;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject puckPrefab;
@@ -19,22 +18,19 @@ public sealed class RoundResetter : MonoBehaviour
 
     [Header("Runtime Instances")]
     [SerializeField] private ServeManager serveManager;
+    [SerializeField] private PuckRegistry puckRegistry;
 
     private Rigidbody2D _puck;
     private Rigidbody2D _leftStriker;
     private Rigidbody2D _rightStriker;
     
-    public bool IsPuck(Rigidbody2D candidate)
-    {
-        return candidate && candidate == _puck;
-    }
-
     public void SpawnGameItemsForAiOpponent()
     {
         DespawnGameItems();
-        ShowMatchSceneObjects();
+        ShowTable();
 
         _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
+        puckRegistry?.RegisterPuck(_puck);
         _leftStriker = SpawnRigidbody(leftAiStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
         _rightStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(rightStrikerDefaultPoint));
 
@@ -50,9 +46,10 @@ public sealed class RoundResetter : MonoBehaviour
     public void SpawnGameItemsForSecondPlayer()
     {
         DespawnGameItems();
-        ShowMatchSceneObjects();
+        ShowTable();
 
         _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
+        puckRegistry?.RegisterPuck(_puck);
         _leftStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(leftStrikerDefaultPoint));
         _rightStriker = SpawnRigidbody(rightPlayerStrikerPrefab, GetPosition(rightStrikerDefaultPoint));
 
@@ -64,6 +61,8 @@ public sealed class RoundResetter : MonoBehaviour
 
     public void DespawnGameItems()
     {
+        Debug.Log("Add pool");
+
         DestroyBody(_leftStriker);
         DestroyBody(_rightStriker);
         DestroyBody(_puck);
@@ -71,8 +70,9 @@ public sealed class RoundResetter : MonoBehaviour
         _leftStriker = null;
         _rightStriker = null;
         _puck = null;
+        puckRegistry?.Clear();
 
-        HideMatchSceneObjects();
+        HideTable();
     }
 
     public void ResetRound()
@@ -105,29 +105,19 @@ public sealed class RoundResetter : MonoBehaviour
         return instance.GetComponent<Rigidbody2D>();
     }
 
-    private void ShowMatchSceneObjects()
+    private void ShowTable()
     {
-        if (tableRoot != null)
+        if (tableRoot)
         {
             tableRoot.SetActive(true);
         }
-
-        if (topUiRoot != null)
-        {
-            topUiRoot.SetActive(true);
-        }
     }
 
-    private void HideMatchSceneObjects()
+    private void HideTable()
     {
         if (tableRoot != null)
         {
             tableRoot.SetActive(false);
-        }
-
-        if (topUiRoot != null)
-        {
-            topUiRoot.SetActive(false);
         }
     }
 
@@ -179,11 +169,6 @@ public sealed class RoundResetter : MonoBehaviour
             Debug.LogError($"{nameof(RoundResetter)} requires a table root reference.", this);
         }
 
-        if (topUiRoot == null)
-        {
-            Debug.LogError($"{nameof(RoundResetter)} requires a top UI root reference.", this);
-        }
-
         if (puckPrefab == null)
         {
             Debug.LogError($"{nameof(RoundResetter)} requires a _puck prefab reference.", this);
@@ -222,6 +207,11 @@ public sealed class RoundResetter : MonoBehaviour
         if (serveManager == null)
         {
             Debug.LogError($"{nameof(RoundResetter)} requires a ServeManager reference.", this);
+        }
+
+        if (puckRegistry == null)
+        {
+            Debug.LogError($"{nameof(RoundResetter)} requires a PuckRegistry reference.", this);
         }
     }
 }

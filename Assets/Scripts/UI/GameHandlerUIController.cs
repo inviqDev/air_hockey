@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,15 +11,21 @@ namespace UI
         [SerializeField] private Image pausePlayIconImage;
         [SerializeField] private Sprite pauseIcon;
         [SerializeField] private Sprite playIcon;
-
-        [Header("Settings")]
+        
+        [Header("Top Menu Buttons")]
         [SerializeField] private Button settingsButton;
+        [SerializeField] private Button settingsBackButton;
+        [SerializeField] private Button mainMenuButton;
+        [SerializeField] private Button quitButton;
+        
+        [Header("Settings windows")]
         [SerializeField] private GameObject settingsMenu;
         [SerializeField] private GameObject centerPanel;
-        [SerializeField] private Button settingsBackButton;
+        
         [SerializeField] private bool pauseWhenSettingsOpen = true;
 
         public bool IsPaused { get; private set; }
+        public event Action MainMenuClicked;
 
         private void Awake()
         {
@@ -42,6 +49,16 @@ namespace UI
             {
                 settingsBackButton.onClick.AddListener(ResumeGame);
             }
+
+            if (mainMenuButton)
+            {
+                mainMenuButton.onClick.AddListener(GoToMainMenu);
+            }
+
+            if (quitButton)
+            {
+                quitButton.onClick.AddListener(QuitApplication);
+            }
         }
 
         private void OnDisable()
@@ -59,6 +76,16 @@ namespace UI
             if (settingsBackButton)
             {
                 settingsBackButton.onClick.RemoveListener(ResumeGame);
+            }
+
+            if (mainMenuButton)
+            {
+                mainMenuButton.onClick.RemoveListener(GoToMainMenu);
+            }
+
+            if (quitButton)
+            {
+                quitButton.onClick.RemoveListener(QuitApplication);
             }
 
             if (IsPaused)
@@ -143,6 +170,23 @@ namespace UI
             UpdatePauseIcon();
         }
 
+        private void GoToMainMenu()
+        {
+            ResetState();
+            MainMenuClicked?.Invoke();
+        }
+
+        private void QuitApplication()
+        {
+            Time.timeScale = 1f;
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
         private void UpdatePauseIcon()
         {
             if (!pausePlayIconImage) return;
@@ -185,6 +229,16 @@ namespace UI
             if (!centerPanel)
             {
                 Debug.LogError($"{nameof(GameHandlerUIController)} requires a center panel reference.", this);
+            }
+
+            if (!mainMenuButton)
+            {
+                Debug.LogError($"{nameof(GameHandlerUIController)} requires a main menu button reference.", this);
+            }
+
+            if (!quitButton)
+            {
+                Debug.LogError($"{nameof(GameHandlerUIController)} requires a quit button reference.", this);
             }
         }
     }

@@ -4567,6 +4567,8 @@ MonoBehaviour:
   settingsMenu: {fileID: 2102367015}
   centerPanel: {fileID: 1340184998}
   settingsBackButton: {fileID: 150704366}
+  mainMenuButton: {fileID: 1982403405}
+  quitButton: {fileID: 1751231889}
   pauseWhenSettingsOpen: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

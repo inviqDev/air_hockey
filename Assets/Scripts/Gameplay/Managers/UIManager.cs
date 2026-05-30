@@ -40,6 +40,11 @@ namespace Managers
             {
                 matchView.RestartClicked += HandleRestartClicked;
             }
+
+            if (gameHandlerUI)
+            {
+                gameHandlerUI.MainMenuClicked += HandleRestartClicked;
+            }
         }
 
         private void OnDisable()
@@ -52,6 +57,11 @@ namespace Managers
             if (matchView)
             {
                 matchView.RestartClicked -= HandleRestartClicked;
+            }
+
+            if (gameHandlerUI)
+            {
+                gameHandlerUI.MainMenuClicked -= HandleRestartClicked;
             }
         }
 

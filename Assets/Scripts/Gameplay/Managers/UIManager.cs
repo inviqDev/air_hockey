@@ -9,6 +9,7 @@ namespace Managers
     {
         [SerializeField] private MainMenuController mainMenu;
         [SerializeField] private InGameUIController inGameUI;
+        [SerializeField] private GameHandlerUIController gameHandlerUI;
         [SerializeField] private MatchUIView matchView;
         
         public static UIManager Instance { get; private set; }
@@ -66,6 +67,7 @@ namespace Managers
 
         public void ShowMainMenu()
         {
+            gameHandlerUI?.ResetState();
             inGameUI?.HideImmediately();
             mainMenu?.Show();
         }
@@ -93,6 +95,7 @@ namespace Managers
 
         private void HandleMainMenuSelectionMade(MainMenuSelection selection)
         {
+            gameHandlerUI?.ResetState();
             inGameUI?.Show();
             MainMenuSelectionMade?.Invoke(selection);
         }
@@ -119,6 +122,11 @@ namespace Managers
             if (!inGameUI)
             {
                 Debug.LogError($"{nameof(UIManager)} requires an InGameUIController reference.", this);
+            }
+
+            if (!gameHandlerUI)
+            {
+                Debug.LogError($"{nameof(UIManager)} requires a GameHandlerUIController reference.", this);
             }
 
             if (!matchView)

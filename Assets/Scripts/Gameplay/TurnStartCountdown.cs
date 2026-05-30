@@ -66,8 +66,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
             startTurnButton.gameObject.SetActive(false);
 
             startButtonDelayTween = DOVirtual
-                .DelayedCall(Mathf.Max(0f, startButtonAppearDelay), ShowDelayedStartButton)
-                .SetUpdate(true);
+                .DelayedCall(Mathf.Max(0f, startButtonAppearDelay), ShowDelayedStartButton);
         }
     }
 
@@ -118,8 +117,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
         startButtonPulseTween = startButtonImage
             .DOFade(fadeToValue, pulseDuration)
             .SetEase(Ease.InOutSine)
-            .SetLoops(-1, LoopType.Yoyo)
-            .SetUpdate(true);
+            .SetLoops(-1, LoopType.Yoyo);
     }
 
     private IEnumerator CountdownRoutine()

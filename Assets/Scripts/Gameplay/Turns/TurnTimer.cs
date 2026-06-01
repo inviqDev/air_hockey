@@ -51,7 +51,7 @@ public sealed class TurnTimer : MonoBehaviour
 
     private void UpdateText()
     {
-        if (timerText != null)
+        if (timerText)
         {
             timerText.text = elapsedSeconds.ToString("0.00");
         }
@@ -59,7 +59,7 @@ public sealed class TurnTimer : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (timerText == null)
+        if (!timerText)
         {
             Debug.LogError($"{nameof(TurnTimer)} on {name} requires a TimerText reference.", this);
         }

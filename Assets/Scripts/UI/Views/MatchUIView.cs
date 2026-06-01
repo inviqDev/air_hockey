@@ -120,22 +120,22 @@ public sealed class MatchUIView : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (canvas == null)
+        if (!canvas)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a Canvas reference.", this);
         }
 
-        if (leftScoreText == null)
+        if (!leftScoreText)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a LeftScoreText reference.", this);
         }
 
-        if (rightScoreText == null)
+        if (!rightScoreText)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a RightScoreText reference.", this);
         }
 
-        if (goalInfoText == null)
+        if (!goalInfoText)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a GoalInfoText reference.", this);
         }

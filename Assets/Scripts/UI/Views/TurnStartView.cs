@@ -5,15 +5,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class TurnStartCountdown : MonoBehaviour
+public sealed class TurnStartView : MonoBehaviour
 {
+    [Header("Start button settings")]
     [SerializeField] private Button startTurnButton;
-    [SerializeField] private TextMeshProUGUI countdownText;
+    [SerializeField, Range(0.1f, 2f)] private float pulseDuration = 0.75f;
+    [SerializeField, Range(0.1f, 2f)] private float fadeToValue = 0.4f;
     [SerializeField] private int countdownSeconds = 3;
     [SerializeField] private float startButtonAppearDelay = 2f;
     
-    [SerializeField, Range(0.1f, 2f)] private float pulseDuration = 0.75f;
-    [SerializeField, Range(0.1f, 2f)] private float fadeToValue = 0.4f;
+    [Header("Countdown text field")]
+    [SerializeField] private TextMeshProUGUI countdownText;
 
     private Coroutine countdownRoutine;
     private Image startButtonImage;
@@ -30,11 +32,10 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
     private void OnEnable()
     {
-        if (startTurnButton != null)
-        {
-            startTurnButton.onClick.RemoveListener(BeginCountdown);
-            startTurnButton.onClick.AddListener(BeginCountdown);
-        }
+        if (!startTurnButton) return;
+        
+        startTurnButton.onClick.RemoveListener(BeginCountdown);
+        startTurnButton.onClick.AddListener(BeginCountdown);
     }
 
     private void OnDisable()
@@ -42,7 +43,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
         StopCountdown();
         StopStartButtonAnimation();
 
-        if (startTurnButton != null)
+        if (startTurnButton)
         {
             startTurnButton.onClick.RemoveListener(BeginCountdown);
         }
@@ -59,26 +60,24 @@ public sealed class TurnStartCountdown : MonoBehaviour
         StopStartButtonAnimation();
         SetCountdownText(string.Empty);
 
-        if (startTurnButton != null)
-        {
-            ResolveStartButtonImage();
-            startTurnButton.interactable = false;
-            startTurnButton.gameObject.SetActive(false);
+        if (!startTurnButton) return;
+        
+        ResolveStartButtonImage();
+        startTurnButton.interactable = false;
+        startTurnButton.gameObject.SetActive(false);
 
-            startButtonDelayTween = DOVirtual
-                .DelayedCall(Mathf.Max(0f, startButtonAppearDelay), ShowDelayedStartButton);
-        }
+        startButtonDelayTween = DOVirtual
+            .DelayedCall(Mathf.Max(0f, startButtonAppearDelay), ShowDelayedStartButton);
     }
 
     public void HideStartButton()
     {
         StopStartButtonAnimation();
 
-        if (startTurnButton != null)
-        {
-            startTurnButton.gameObject.SetActive(false);
-            startTurnButton.interactable = false;
-        }
+        if (!startTurnButton) return;
+        
+        startTurnButton.gameObject.SetActive(false);
+        startTurnButton.interactable = false;
     }
 
     public void Cancel()
@@ -90,10 +89,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
     private void BeginCountdown()
     {
-        if (countdownRoutine != null)
-        {
-            return;
-        }
+        if (countdownRoutine != null) return;
 
         HideStartButton();
         countdownRoutine = StartCoroutine(CountdownRoutine());
@@ -137,10 +133,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
     private void StopCountdown()
     {
-        if (countdownRoutine == null)
-        {
-            return;
-        }
+        if (countdownRoutine == null) return;
 
         StopCoroutine(countdownRoutine);
         countdownRoutine = null;
@@ -154,7 +147,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
         startButtonPulseTween?.Kill();
         startButtonPulseTween = null;
 
-        if (startButtonImage != null)
+        if (startButtonImage)
         {
             SetStartButtonImageAlpha(1f);
         }
@@ -162,7 +155,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
     private void SetCountdownText(string message)
     {
-        if (countdownText != null)
+        if (countdownText)
         {
             countdownText.text = message;
         }
@@ -170,13 +163,13 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
     private void ResolveStartButtonImage()
     {
-        if (startTurnButton == null)
+        if (!startTurnButton)
         {
             startButtonImage = null;
             return;
         }
 
-        if (startButtonImage == null)
+        if (!startButtonImage)
         {
             startButtonImage = startTurnButton.GetComponent<Image>();
         }
@@ -184,10 +177,7 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
     private void SetStartButtonImageAlpha(float alpha)
     {
-        if (startButtonImage == null)
-        {
-            return;
-        }
+        if (!startButtonImage) return;
 
         var color = startButtonImage.color;
         color.a = alpha;
@@ -196,14 +186,14 @@ public sealed class TurnStartCountdown : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (startTurnButton == null)
+        if (!startTurnButton)
         {
-            Debug.LogError($"{nameof(TurnStartCountdown)} on {name} requires a StartTurnButton reference.", this);
+            Debug.LogError($"{nameof(TurnStartView)} on {name} requires a StartTurnButton reference.", this);
         }
 
-        if (countdownText == null)
+        if (!countdownText)
         {
-            Debug.LogError($"{nameof(TurnStartCountdown)} on {name} requires a CountdownText reference.", this);
+            Debug.LogError($"{nameof(TurnStartView)} on {name} requires a CountdownText reference.", this);
         }
     }
 }

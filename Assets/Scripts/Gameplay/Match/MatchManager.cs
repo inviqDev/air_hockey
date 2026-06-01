@@ -2,22 +2,32 @@ using UnityEngine;
 
 public sealed class MatchManager : MonoBehaviour
 {
-    [Header("Ref Managers")]
+    [Header("Ref Managers")] 
     [SerializeField] private UIManager uiManager;
 
-    [Header("References")]
+    [Header("References")] 
     [SerializeField] private GoalController goalController;
     [SerializeField] private MatchModeController matchModeController;
     [SerializeField] private RoundResetter roundResetter;
     [SerializeField] private TurnFlowController turnFlow;
 
+
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
     public bool IsTurnActive => turnFlow && turnFlow.IsTurnActive;
 
+    private InGameMenuController inGameMenu;
+    private MatchConfiguration currentConfiguration;
+    private bool hasCurrentConfiguration;
+
     private void Awake()
     {
         ValidateReferences();
+
+        if (uiManager && uiManager.InGameMenu)
+        {
+            inGameMenu = uiManager.InGameMenu;
+        }
     }
 
     private void OnEnable()
@@ -25,7 +35,12 @@ public sealed class MatchManager : MonoBehaviour
         if (uiManager)
         {
             uiManager.MatchConfigurationSelected += HandleMatchConfigurationSelected;
-            uiManager.RestartClicked += RestartMatch;
+        }
+
+        if (inGameMenu)
+        {
+            inGameMenu.RestartClicked += RestartMatch;
+            inGameMenu.MainMenuClicked += ReturnToMainMenu;
         }
 
         if (goalController)
@@ -39,7 +54,12 @@ public sealed class MatchManager : MonoBehaviour
         if (uiManager)
         {
             uiManager.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
-            uiManager.RestartClicked -= RestartMatch;
+        }
+
+        if (inGameMenu)
+        {
+            inGameMenu.RestartClicked -= RestartMatch;
+            inGameMenu.MainMenuClicked -= ReturnToMainMenu;
         }
 
         if (goalController)
@@ -62,12 +82,27 @@ public sealed class MatchManager : MonoBehaviour
 
     public void RestartMatch()
     {
+        if (!hasCurrentConfiguration)
+        {
+            return;
+        }
+
+        goalController?.ResetMatch();
+        turnFlow?.EndTurn();
+        roundResetter?.DespawnGameItems();
+        matchModeController?.StartMatch(currentConfiguration);
+        uiManager?.SetScores(LeftScore, RightScore);
+        uiManager?.ClearGoalInfo();
+        PrepareNextTurn();
+    }
+
+    private void ReturnToMainMenu()
+    {
         goalController?.ResetMatch();
         turnFlow?.EndTurn();
         roundResetter?.DespawnGameItems();
         uiManager?.SetScores(LeftScore, RightScore);
         uiManager?.ClearGoalInfo();
-
         ShowStartGameMenu();
     }
 
@@ -79,16 +114,18 @@ public sealed class MatchManager : MonoBehaviour
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
     {
+        currentConfiguration = configuration;
+        hasCurrentConfiguration = true;
         matchModeController?.StartMatch(configuration);
-        PrepareNextTurn(string.Empty);
+        PrepareNextTurn();
     }
 
-    private void PrepareNextTurn(string stateMessage)
+    private void PrepareNextTurn()
     {
-        turnFlow?.PrepareTurn(() => ResetRoundAndStatus(stateMessage));
+        turnFlow?.PrepareTurn(ResetRoundAndStatus);
     }
 
-    private void ResetRoundAndStatus(string stateMessage)
+    private void ResetRoundAndStatus()
     {
         roundResetter?.ResetRound();
         uiManager?.ClearGoalInfo();
@@ -101,7 +138,7 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!result.HasWinner)
         {
-            turnFlow?.PrepareTurnAfterGoalDelay(() => ResetRoundAndStatus(string.Empty));
+            turnFlow?.PrepareTurnAfterGoalDelay(ResetRoundAndStatus);
             return;
         }
 

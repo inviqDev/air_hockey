@@ -3,6 +3,8 @@ using UnityEngine;
 
 public sealed class MainMenuController : MenuViewBase
 {
+    [Header("References")]
+    [SerializeField] private StartGameMenuView startGameMenu;
     [SerializeField] private OpponentSelectionView opponentSelection;
     [SerializeField] private SideSelectionView sideSelection;
 
@@ -14,11 +16,17 @@ public sealed class MainMenuController : MenuViewBase
     {
         base.Awake();
         ValidateReferences();
-        ShowOpponentSelection();
+        ShowStartExitMenu();
     }
 
     private void OnEnable()
     {
+        if (startGameMenu)
+        {
+            startGameMenu.StartGameClicked += ShowOpponentSelection;
+            startGameMenu.ExitGameClicked += GameGame;
+        }
+
         if (opponentSelection)
         {
             opponentSelection.PlayerTwoControlTypeSelected += SelectMode;
@@ -33,6 +41,12 @@ public sealed class MainMenuController : MenuViewBase
 
     private void OnDisable()
     {
+        if (startGameMenu)
+        {
+            startGameMenu.StartGameClicked -= ShowOpponentSelection;
+            startGameMenu.ExitGameClicked -= GameGame;
+        }
+
         if (opponentSelection)
         {
             opponentSelection.PlayerTwoControlTypeSelected -= SelectMode;
@@ -52,18 +66,27 @@ public sealed class MainMenuController : MenuViewBase
 
     protected override void HandleBeforeShow()
     {
-        ShowOpponentSelection();
+        ShowStartExitMenu();
     }
 
     private void SelectMode(PlayerTwoControlType playerTwoControlType)
     {
         selectedPlayerTwoControlType = playerTwoControlType;
+        startGameMenu?.Hide();
         opponentSelection?.Hide();
         sideSelection?.Show();
     }
 
+    private void ShowStartExitMenu()
+    {
+        sideSelection?.Hide();
+        opponentSelection?.Hide();
+        startGameMenu?.Show();
+    }
+
     private void ShowOpponentSelection()
     {
+        startGameMenu?.Hide();
         sideSelection?.Hide();
         opponentSelection?.Show();
     }
@@ -75,8 +98,22 @@ public sealed class MainMenuController : MenuViewBase
         MatchConfigurationSelected?.Invoke(new MatchConfiguration(selectedPlayerTwoControlType, playerOneSide));
     }
 
+    private static void GameGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
     private void ValidateReferences()
     {
+        if (!startGameMenu)
+        {
+            Debug.LogError($"{nameof(MainMenuController)} requires a start/exit menu reference.", this);
+        }
+
         if (!opponentSelection)
         {
             Debug.LogError($"{nameof(MainMenuController)} requires an opponent selection reference.", this);

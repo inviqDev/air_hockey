@@ -2824,7 +2824,7 @@ GameObject:
   - component: {fileID: 1146422890}
   - component: {fileID: 1146422889}
   m_Layer: 5
-  m_Name: Start_countdown_text
+  m_Name: Countdown_text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5497,7 +5497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4a2f0d2838941f1a93a42c27a1aa42a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnStartCountdown: {fileID: 6500000000000000010}
+  turnStartView: {fileID: 6500000000000000010}
   turnTimer: {fileID: 6600000000000000005}
   goalDelayBeforeNextTurnSeconds: 3
 --- !u!1 &6500000000000000001
@@ -5633,11 +5633,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startTurnButton: {fileID: 6500000000000000005}
-  countdownText: {fileID: 1146422889}
-  countdownSeconds: 3
-  startButtonAppearDelay: 2
-  pulseDuration: 2
+  pulseDuration: 0.5
   fadeToValue: 0.35
+  countdownSeconds: 3
+  startButtonAppearDelay: 0.85
+  countdownText: {fileID: 1146422889}
 --- !u!1 &6600000000000000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -5956,7 +5956,7 @@ GameObject:
   - component: {fileID: 6500000000000000010}
   - component: {fileID: 6600000000000000005}
   m_Layer: 0
-  m_Name: Single_turn_controller
+  m_Name: Turn_flow_controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

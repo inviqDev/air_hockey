@@ -147,27 +147,27 @@ public sealed class MatchManager : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (goalController == null)
+        if (!goalController)
         {
             Debug.LogError($"{nameof(MatchManager)} requires a GoalController reference.", this);
         }
 
-        if (matchModeController == null)
+        if (!matchModeController)
         {
             Debug.LogError($"{nameof(MatchManager)} requires a MatchModeController reference.", this);
         }
 
-        if (roundResetter == null)
+        if (!roundResetter)
         {
             Debug.LogError($"{nameof(MatchManager)} requires a RoundResetter reference.", this);
         }
 
-        if (turnFlow == null)
+        if (!turnFlow)
         {
             Debug.LogError($"{nameof(MatchManager)} requires a TurnFlowController reference.", this);
         }
 
-        if (uiManager == null)
+        if (!uiManager)
         {
             Debug.LogError($"{nameof(MatchManager)} requires a UIManager reference.", this);
         }

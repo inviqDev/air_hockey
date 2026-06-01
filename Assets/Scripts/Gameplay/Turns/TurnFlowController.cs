@@ -4,10 +4,9 @@ using UnityEngine;
 
 public sealed class TurnFlowController : MonoBehaviour
 {
-    [SerializeField] private TurnStartCountdown turnStartCountdown;
+    [SerializeField] private TurnStartView turnStartView;
     [SerializeField] private TurnTimer turnTimer;
     [SerializeField] private float goalDelayBeforeNextTurnSeconds = 3f;
-
     private Coroutine goalDelayRoutine;
 
     public static TurnFlowController Instance { get; private set; }
@@ -21,17 +20,17 @@ public sealed class TurnFlowController : MonoBehaviour
 
     private void OnEnable()
     {
-        if (turnStartCountdown != null)
+        if (turnStartView)
         {
-            turnStartCountdown.CountdownCompleted += StartTurn;
+            turnStartView.CountdownCompleted += StartTurn;
         }
     }
 
     private void OnDisable()
     {
-        if (turnStartCountdown != null)
+        if (turnStartView)
         {
-            turnStartCountdown.CountdownCompleted -= StartTurn;
+            turnStartView.CountdownCompleted -= StartTurn;
         }
     }
 
@@ -45,7 +44,7 @@ public sealed class TurnFlowController : MonoBehaviour
         StopGoalDelayRoutine();
         EndTurn();
         beforeStartButton?.Invoke();
-        turnStartCountdown?.ShowStartButton();
+        turnStartView?.ShowStartButton();
     }
 
     public void PrepareTurnAfterGoalDelay(Action beforeStartButton)
@@ -58,7 +57,7 @@ public sealed class TurnFlowController : MonoBehaviour
     public void EndTurn()
     {
         IsTurnActive = false;
-        turnStartCountdown?.Cancel();
+        turnStartView?.Cancel();
         turnTimer?.StopAndReset();
     }
 
@@ -69,7 +68,7 @@ public sealed class TurnFlowController : MonoBehaviour
 
         goalDelayRoutine = null;
         beforeStartButton?.Invoke();
-        turnStartCountdown?.ShowStartButton();
+        turnStartView?.ShowStartButton();
     }
 
     private void StartTurn()
@@ -96,12 +95,12 @@ public sealed class TurnFlowController : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (turnStartCountdown == null)
+        if (!turnStartView)
         {
-            Debug.LogError($"{nameof(TurnFlowController)} requires a TurnStartCountdown reference.", this);
+            Debug.LogError($"{nameof(TurnFlowController)} requires a TurnStartView reference.", this);
         }
 
-        if (turnTimer == null)
+        if (!turnTimer)
         {
             Debug.LogError($"{nameof(TurnFlowController)} requires a TurnTimer reference.", this);
         }

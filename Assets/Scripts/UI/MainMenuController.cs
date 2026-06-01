@@ -1,27 +1,19 @@
 using System;
-using DG.Tweening;
 using UnityEngine;
 
-public sealed class MainMenuController : MonoBehaviour
+public sealed class MainMenuController : MenuViewBase
 {
-    [SerializeField] private GameObject mainMenuRoot;
     [SerializeField] private OpponentSelectionView opponentSelection;
     [SerializeField] private SideSelectionView sideSelection;
 
-    [Header("Animation")]
-    [SerializeField, Range(0.05f, 3f)] private float fadeInDuration = 1f;
-    [SerializeField, Range(0.05f, 3f)] private float fadeOutDuration = 1f;
-
     public event Action<MatchConfiguration> MatchConfigurationSelected;
 
-    private CanvasGroup mainMenuCanvasGroup;
-    private Tween mainMenuTween;
     private PlayerTwoControlType selectedPlayerTwoControlType;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         ValidateReferences();
-        ResolveMainMenuRoot();
         ShowOpponentSelection();
     }
 
@@ -41,9 +33,6 @@ public sealed class MainMenuController : MonoBehaviour
 
     private void OnDisable()
     {
-        mainMenuTween?.Kill();
-        mainMenuTween = null;
-
         if (opponentSelection)
         {
             opponentSelection.PlayerTwoControlTypeSelected -= SelectMode;
@@ -61,48 +50,9 @@ public sealed class MainMenuController : MonoBehaviour
         ValidateReferences();
     }
 
-    public void Show()
+    protected override void HandleBeforeShow()
     {
-        if (!mainMenuRoot) return;
-
-        ResolveMainMenuRoot();
-        mainMenuTween?.Kill();
-        mainMenuRoot.SetActive(true);
-
-        if (!mainMenuCanvasGroup) return;
-
-        mainMenuCanvasGroup.alpha = 0f;
-        mainMenuCanvasGroup.interactable = true;
-        mainMenuCanvasGroup.blocksRaycasts = true;
         ShowOpponentSelection();
-
-        mainMenuTween = mainMenuCanvasGroup
-            .DOFade(1f, fadeInDuration)
-            .SetEase(Ease.OutQuad)
-            .SetUpdate(true);
-    }
-
-    public void Hide()
-    {
-        if (!mainMenuRoot) return;
-
-        ResolveMainMenuRoot();
-        mainMenuTween?.Kill();
-
-        if (!mainMenuCanvasGroup)
-        {
-            mainMenuRoot.SetActive(false);
-            return;
-        }
-
-        mainMenuCanvasGroup.interactable = false;
-        mainMenuCanvasGroup.blocksRaycasts = false;
-
-        mainMenuTween = mainMenuCanvasGroup
-            .DOFade(0f, fadeOutDuration)
-            .SetEase(Ease.InQuad)
-            .SetUpdate(true)
-            .OnComplete(() => mainMenuRoot.SetActive(false));
     }
 
     private void SelectMode(PlayerTwoControlType playerTwoControlType)
@@ -120,29 +70,9 @@ public sealed class MainMenuController : MonoBehaviour
 
     private void SelectSide(PlayerSide playerOneSide)
     {
-        sideSelection?.Hide();
-        opponentSelection?.Hide();
         Hide();
 
         MatchConfigurationSelected?.Invoke(new MatchConfiguration(selectedPlayerTwoControlType, playerOneSide));
-    }
-
-    private void ResolveMainMenuRoot()
-    {
-        if (!mainMenuRoot)
-        {
-            mainMenuRoot = gameObject;
-        }
-
-        if (!mainMenuCanvasGroup)
-        {
-            mainMenuCanvasGroup = mainMenuRoot.GetComponent<CanvasGroup>();
-        }
-
-        if (!mainMenuCanvasGroup)
-        {
-            mainMenuCanvasGroup = mainMenuRoot.AddComponent<CanvasGroup>();
-        }
     }
 
     private void ValidateReferences()

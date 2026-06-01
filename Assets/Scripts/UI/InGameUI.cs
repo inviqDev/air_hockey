@@ -8,12 +8,12 @@ public sealed class InGameUI : MonoBehaviour
 
         [Header("Appear Animation")]
         [SerializeField, Min(0f)] private float appearDelaySeconds = 0.5f;
-        [SerializeField, Min(0.01f)] private float fadeInDuration = 0.35f;
-        [SerializeField] private Ease fadeEase = Ease.OutQuad;
+        [SerializeField, Min(0.01f)] private float fadeInDuration = 0.85f;
+        [SerializeField] private Ease fadeEase = Ease.InBack;
 
         [Header("Scale Animation")]
         [SerializeField] private bool animateScale = true;
-        [SerializeField] private Vector3 hiddenScale = new Vector3(0.96f, 0.96f, 1f);
+        [SerializeField] private Vector3 hiddenScale = new(0.65f, 0.65f, 1f);
         [SerializeField] private Vector3 visibleScale = Vector3.one;
         [SerializeField] private Ease scaleEase = Ease.OutBack;
 

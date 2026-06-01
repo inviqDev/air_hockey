@@ -2064,6 +2064,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 923193834}
+  - component: {fileID: 6900000000000000002}
   - component: {fileID: 6900000000000000001}
   m_Layer: 5
   m_Name: InGame_UI
@@ -4038,6 +4039,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1818409130}
+  - component: {fileID: 7900000000000000105}
   - component: {fileID: 7900000000000000102}
   m_Layer: 5
   m_Name: Side_selection
@@ -4334,6 +4336,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1930127147}
+  - component: {fileID: 6800000000000000003}
   - component: {fileID: 6800000000000000002}
   m_Layer: 5
   m_Name: Main_menu
@@ -4631,6 +4634,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2035618193}
+  - component: {fileID: 7900000000000000104}
   - component: {fileID: 7900000000000000101}
   m_Layer: 5
   m_Name: Opponent_selection
@@ -5472,11 +5476,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e1fe9217f64a4f9550c234dba70a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMenuRoot: {fileID: 1930127146}
+  menuRoot: {fileID: 1930127146}
+  animateVisibility: 1
+  showDuration: 0.85
+  hideDuration: 0.65
+  showEase: 6
+  hideEase: 5
   opponentSelection: {fileID: 7900000000000000101}
   sideSelection: {fileID: 7900000000000000102}
-  fadeInDuration: 2.5
-  fadeOutDuration: 1.25
+--- !u!225 &6800000000000000003
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1930127146}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &6900000000000000001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5490,13 +5509,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inGameUIRoot: {fileID: 923193833}
-  appearDelaySeconds: 0.85
+  appearDelaySeconds: 0.5
   fadeInDuration: 0.85
-  fadeEase: 34
+  fadeEase: 26
   animateScale: 1
-  hiddenScale: {x: 0.25, y: 0.25, z: 1}
+  hiddenScale: {x: 0.65, y: 0.65, z: 1}
   visibleScale: {x: 1, y: 1, z: 1}
-  scaleEase: 27
+  scaleEase: 21
+--- !u!225 &6900000000000000002
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 923193833}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &7000000000000000001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5638,6 +5669,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuRoot: {fileID: 2035618192}
+  animateVisibility: 1
+  showDuration: 1.85
+  hideDuration: 0.65
+  showEase: 6
+  hideEase: 5
   aiOpponentButton: {fileID: 753612194}
   secondPlayerButton: {fileID: 1390736642}
 --- !u!114 &7900000000000000102
@@ -5653,6 +5689,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuRoot: {fileID: 1818409129}
+  animateVisibility: 1
+  showDuration: 0.85
+  hideDuration: 0.65
+  showEase: 6
+  hideEase: 5
   leftSideButton: {fileID: 2084763932}
   rightSideButton: {fileID: 321251886}
   backButton: {fileID: 1441441155}
@@ -5675,6 +5716,30 @@ MonoBehaviour:
   settingsMenu: {fileID: 2102367015}
   topInfoPanel: {fileID: 1039242220}
   centerPanel: {fileID: 1340184998}
+--- !u!225 &7900000000000000104
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035618192}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!225 &7900000000000000105
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818409129}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

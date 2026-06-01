@@ -8,19 +8,12 @@ public sealed class UIManager : MonoBehaviour
     [SerializeField] private InGameMenuController inGameMenu;
     [SerializeField] private MatchUIView matchView;
         
-    public static UIManager Instance { get; private set; }
+    public InGameMenuController InGameMenu => inGameMenu;
+    
     public event Action<MatchConfiguration> MatchConfigurationSelected;
-    public event Action RestartClicked;
 
     private void Awake()
     {
-        if (Instance && Instance != this)
-        {
-            Debug.LogError($"Multiple {nameof(UIManager)} instances in scene.", this);
-            return;
-        }
-
-        Instance = this;
         ValidateReferences();
     }
 
@@ -31,11 +24,6 @@ public sealed class UIManager : MonoBehaviour
             mainMenu.MatchConfigurationSelected += HandleMatchConfigurationSelected;
         }
 
-        if (inGameMenu)
-        {
-            inGameMenu.RestartClicked += HandleRestartClicked;
-            inGameMenu.MainMenuClicked += HandleRestartClicked;
-        }
     }
 
     private void OnDisable()
@@ -45,11 +33,6 @@ public sealed class UIManager : MonoBehaviour
             mainMenu.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
         }
 
-        if (inGameMenu)
-        {
-            inGameMenu.RestartClicked -= HandleRestartClicked;
-            inGameMenu.MainMenuClicked -= HandleRestartClicked;
-        }
     }
 
     private void Start()
@@ -64,7 +47,6 @@ public sealed class UIManager : MonoBehaviour
 
     public void ShowMainMenu()
     {
-        inGameMenu?.ResetState();
         inGameUI?.HideImmediately();
         mainMenu?.Show();
     }
@@ -92,14 +74,8 @@ public sealed class UIManager : MonoBehaviour
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
     {
-        inGameMenu?.ResetState();
         inGameUI?.Show();
         MatchConfigurationSelected?.Invoke(configuration);
-    }
-
-    private void HandleRestartClicked()
-    {
-        RestartClicked?.Invoke();
     }
 
     private static string GetGoalInfoMessage(GoalResult result)
@@ -120,10 +96,10 @@ public sealed class UIManager : MonoBehaviour
         {
             Debug.LogError($"{nameof(UIManager)} requires an InGameUI reference.", this);
         }
-
+        
         if (!inGameMenu)
         {
-            Debug.LogError($"{nameof(UIManager)} requires a InGameMenuController reference.", this);
+            Debug.LogError($"{nameof(UIManager)} requires an InGameMenuController reference.", this);
         }
 
         if (!matchView)

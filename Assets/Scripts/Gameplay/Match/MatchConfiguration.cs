@@ -14,9 +14,4 @@ public readonly struct MatchConfiguration
     {
         return side == PlayerOneSide ? MatchPlayer.PlayerOne : MatchPlayer.PlayerTwo;
     }
-
-    public PlayerSide GetSideForPlayer(MatchPlayer player)
-    {
-        return player == MatchPlayer.PlayerOne ? PlayerOneSide : PlayerTwoSide;
-    }
 }

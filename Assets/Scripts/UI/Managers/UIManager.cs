@@ -4,8 +4,8 @@ using UnityEngine;
 public sealed class UIManager : MonoBehaviour
 {
     [SerializeField] private MainMenuController mainMenu;
-    [SerializeField] private InGameUIController inGameUI;
-    [SerializeField] private GameHandlerUIController gameHandlerUI;
+    [SerializeField] private InGameUI inGameUI;
+    [SerializeField] private InGameMenuController inGameMenu;
     [SerializeField] private MatchUIView matchView;
         
     public static UIManager Instance { get; private set; }
@@ -22,7 +22,6 @@ public sealed class UIManager : MonoBehaviour
 
         Instance = this;
         ValidateReferences();
-        matchView?.Initialize();
     }
 
     private void OnEnable()
@@ -32,14 +31,10 @@ public sealed class UIManager : MonoBehaviour
             mainMenu.MatchConfigurationSelected += HandleMatchConfigurationSelected;
         }
 
-        if (matchView)
+        if (inGameMenu)
         {
-            matchView.RestartClicked += HandleRestartClicked;
-        }
-
-        if (gameHandlerUI)
-        {
-            gameHandlerUI.MainMenuClicked += HandleRestartClicked;
+            inGameMenu.RestartClicked += HandleRestartClicked;
+            inGameMenu.MainMenuClicked += HandleRestartClicked;
         }
     }
 
@@ -50,14 +45,10 @@ public sealed class UIManager : MonoBehaviour
             mainMenu.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
         }
 
-        if (matchView)
+        if (inGameMenu)
         {
-            matchView.RestartClicked -= HandleRestartClicked;
-        }
-
-        if (gameHandlerUI)
-        {
-            gameHandlerUI.MainMenuClicked -= HandleRestartClicked;
+            inGameMenu.RestartClicked -= HandleRestartClicked;
+            inGameMenu.MainMenuClicked -= HandleRestartClicked;
         }
     }
 
@@ -73,7 +64,7 @@ public sealed class UIManager : MonoBehaviour
 
     public void ShowMainMenu()
     {
-        gameHandlerUI?.ResetState();
+        inGameMenu?.ResetState();
         inGameUI?.HideImmediately();
         mainMenu?.Show();
     }
@@ -101,7 +92,7 @@ public sealed class UIManager : MonoBehaviour
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
     {
-        gameHandlerUI?.ResetState();
+        inGameMenu?.ResetState();
         inGameUI?.Show();
         MatchConfigurationSelected?.Invoke(configuration);
     }
@@ -127,12 +118,12 @@ public sealed class UIManager : MonoBehaviour
 
         if (!inGameUI)
         {
-            Debug.LogError($"{nameof(UIManager)} requires an InGameUIController reference.", this);
+            Debug.LogError($"{nameof(UIManager)} requires an InGameUI reference.", this);
         }
 
-        if (!gameHandlerUI)
+        if (!inGameMenu)
         {
-            Debug.LogError($"{nameof(UIManager)} requires a GameHandlerUIController reference.", this);
+            Debug.LogError($"{nameof(UIManager)} requires a InGameMenuController reference.", this);
         }
 
         if (!matchView)

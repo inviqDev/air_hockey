@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public sealed class OpponentSelectionView : MenuViewBase
 {
+    [Header("Buttons")]
     [SerializeField] private Button aiOpponentButton;
     [SerializeField] private Button secondPlayerButton;
 
@@ -32,12 +33,12 @@ public sealed class OpponentSelectionView : MenuViewBase
         ValidateReferences();
     }
 
-    protected override void OnShown()
+    protected override void HandleBeforeShow()
     {
         SetInteractable(true);
     }
 
-    protected override void OnHidden()
+    protected override void HandleBeforeHide()
     {
         SetInteractable(false);
     }

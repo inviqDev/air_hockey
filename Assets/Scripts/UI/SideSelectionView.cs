@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public sealed class SideSelectionView : MenuViewBase
 {
+    [Header("Buttons")]
     [SerializeField] private Button leftSideButton;
     [SerializeField] private Button rightSideButton;
     [SerializeField] private Button backButton;
@@ -34,12 +35,12 @@ public sealed class SideSelectionView : MenuViewBase
         ValidateReferences();
     }
 
-    protected override void OnShown()
+    protected override void HandleBeforeShow()
     {
         SetInteractable(true);
     }
 
-    protected override void OnHidden()
+    protected override void HandleBeforeHide()
     {
         SetInteractable(false);
     }

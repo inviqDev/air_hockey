@@ -1,8 +1,7 @@
-using System;
 using DG.Tweening;
 using UnityEngine;
 
-public sealed class InGameUIController : MonoBehaviour
+public sealed class InGameUI : MonoBehaviour
 {
         [Header("References")]
         [SerializeField] private GameObject inGameUIRoot;

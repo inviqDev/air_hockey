@@ -3,22 +3,21 @@ using UnityEngine.InputSystem;
 
 public sealed class PlayerInputCommandSource : MonoBehaviour, IMovementCommandSource
 {
-    public enum KeyboardLayout
-    {
-        Wasd,
-        Arrows
-    }
-
-    [SerializeField] private KeyboardLayout keyboardLayout = KeyboardLayout.Wasd;
+    [SerializeField] private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
 
     private InputActions inputActions;
-    private InputAction moveAction;
-    private InputAction dashAction;
+    
+    private InputAction moveActionPlayerOne;
+    private InputAction dashActionPlayerOne;
+    
+    private InputAction moveActionPlayerTwo;
+    private InputAction dashActionPlayerTwo;
+    
     private bool dashPressed;
 
-    public void SetKeyboardLayout(KeyboardLayout layout)
+    public void SetControlScheme(PlayerControlScheme scheme)
     {
-        keyboardLayout = layout;
+        controlScheme = scheme;
 
         if (inputActions != null)
         {
@@ -28,9 +27,17 @@ public sealed class PlayerInputCommandSource : MonoBehaviour, IMovementCommandSo
 
     public MovementCommand ReadCommand()
     {
-        var move = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+        var move = moveActionPlayerOne?.ReadValue<Vector2>() ?? Vector2.zero;
+        if (moveActionPlayerTwo != null)
+        {
+            move += moveActionPlayerTwo.ReadValue<Vector2>();
+            move = Vector2.ClampMagnitude(move, 1f);
+        }
+
         var command = new MovementCommand(move, dashPressed);
         dashPressed = false;
+        
+        Debug.Log($"{gameObject.name} - ReadCommand()");
         return command;
     }
 
@@ -52,8 +59,10 @@ public sealed class PlayerInputCommandSource : MonoBehaviour, IMovementCommandSo
             inputActions = null;
         }
 
-        moveAction = null;
-        dashAction = null;
+        moveActionPlayerOne = null;
+        moveActionPlayerTwo = null;
+        dashActionPlayerOne = null;
+        dashActionPlayerTwo = null;
         dashPressed = false;
     }
 
@@ -63,23 +72,57 @@ public sealed class PlayerInputCommandSource : MonoBehaviour, IMovementCommandSo
 
         if (inputActions == null) return;
 
-        moveAction = keyboardLayout == KeyboardLayout.Wasd
-            ? inputActions.Gameplay.LeftPlayerMove
-            : inputActions.Gameplay.RightPlayerMove;
+        moveActionPlayerOne = GetMoveAction(controlScheme);
+        moveActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? inputActions.Gameplay.RightPlayerMove
+            : null;
 
-        dashAction = keyboardLayout == KeyboardLayout.Wasd
-            ? inputActions.Gameplay.LeftPlayerDash
-            : inputActions.Gameplay.RightPlayerDash;
+        dashActionPlayerOne = GetDashAction(controlScheme);
+        dashActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? inputActions.Gameplay.RightPlayerDash
+            : null;
 
-        dashAction.performed += OnDashPerformed;
+        SubscribeDash();
     }
 
     private void UnsubscribeDash()
     {
-        if (dashAction != null)
+        if (dashActionPlayerOne != null)
         {
-            dashAction.performed -= OnDashPerformed;
+            dashActionPlayerOne.performed -= OnDashPerformed;
         }
+
+        if (dashActionPlayerTwo != null)
+        {
+            dashActionPlayerTwo.performed -= OnDashPerformed;
+        }
+    }
+
+    private void SubscribeDash()
+    {
+        if (dashActionPlayerOne != null)
+        {
+            dashActionPlayerOne.performed += OnDashPerformed;
+        }
+
+        if (dashActionPlayerTwo != null)
+        {
+            dashActionPlayerTwo.performed += OnDashPerformed;
+        }
+    }
+
+    private InputAction GetMoveAction(PlayerControlScheme scheme)
+    {
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Gameplay.RightPlayerMove
+            : inputActions.Gameplay.LeftPlayerMove;
+    }
+
+    private InputAction GetDashAction(PlayerControlScheme scheme)
+    {
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Gameplay.RightPlayerDash
+            : inputActions.Gameplay.LeftPlayerDash;
     }
 
     private void OnDashPerformed(InputAction.CallbackContext context)

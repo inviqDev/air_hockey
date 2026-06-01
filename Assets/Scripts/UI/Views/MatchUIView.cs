@@ -1,8 +1,6 @@
 using DG.Tweening;
-using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public sealed class MatchUIView : MonoBehaviour
 {
@@ -10,7 +8,6 @@ public sealed class MatchUIView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI leftScoreText;
     [SerializeField] private TextMeshProUGUI rightScoreText;
     [SerializeField] private TextMeshProUGUI goalInfoText;
-    [SerializeField] private Button restartButton;
 
     [Header("Goal Info Animation")]
     [SerializeField] private Vector2 goalInfoStartAnchoredPosition = Vector2.zero;
@@ -20,21 +17,6 @@ public sealed class MatchUIView : MonoBehaviour
     [SerializeField] private Ease goalInfoFadeEase = Ease.InExpo;
 
     private Sequence goalInfoSequence;
-
-    public event Action RestartClicked;
-
-    public void Initialize()
-    {
-        ValidateReferences();
-
-        if (restartButton)
-        {
-            restartButton.onClick.RemoveListener(RestartMatch);
-            restartButton.onClick.AddListener(RestartMatch);
-        }
-
-        HideGoalInfoImmediately();
-    }
 
     public void SetScores(int leftScore, int rightScore)
     {
@@ -85,6 +67,7 @@ public sealed class MatchUIView : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
+        HideGoalInfoImmediately();
     }
 
     private void OnValidate()
@@ -96,12 +79,6 @@ public sealed class MatchUIView : MonoBehaviour
     {
         StopGoalInfoAnimation();
     }
-
-    private void RestartMatch()
-    {
-        RestartClicked?.Invoke();
-    }
-
     private void HideGoalInfoImmediately()
     {
         StopGoalInfoAnimation();
@@ -161,11 +138,6 @@ public sealed class MatchUIView : MonoBehaviour
         if (goalInfoText == null)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a GoalInfoText reference.", this);
-        }
-
-        if (restartButton == null)
-        {
-            Debug.LogError($"{nameof(MatchUIView)} on {name} requires a RestartButton reference.", this);
         }
     }
 }

@@ -98,12 +98,22 @@ public sealed class RoundResetter : MonoBehaviour
             return striker;
         }
 
-        var layout = player == MatchPlayer.PlayerOne
-            ? PlayerInputCommandSource.KeyboardLayout.Arrows
-            : PlayerInputCommandSource.KeyboardLayout.Wasd;
+        var controlScheme = GetControlScheme(configuration, player, side);
 
-        ConfigurePlayerStriker(striker, side, layout);
+        ConfigurePlayerStriker(striker, side, controlScheme);
         return striker;
+    }
+
+    private static PlayerControlScheme GetControlScheme(MatchConfiguration configuration, MatchPlayer player, PlayerSide side)
+    {
+        if (configuration.PlayerTwoControlType == PlayerTwoControlType.Ai && player == MatchPlayer.PlayerOne)
+        {
+            return PlayerControlScheme.WasdAndArrows;
+        }
+
+        return side == PlayerSide.Left
+            ? PlayerControlScheme.Wasd
+            : PlayerControlScheme.Arrows;
     }
 
     private void ShowTable()
@@ -122,14 +132,14 @@ public sealed class RoundResetter : MonoBehaviour
         }
     }
 
-    private static void ConfigurePlayerStriker(Rigidbody2D striker, PlayerSide side, PlayerInputCommandSource.KeyboardLayout layout)
+    private static void ConfigurePlayerStriker(Rigidbody2D striker, PlayerSide side, PlayerControlScheme controlScheme)
     {
         if (!striker) return;
 
         ConfigureSideOwner(striker, side);
 
         var inputSource = striker.GetComponent<PlayerInputCommandSource>();
-        inputSource?.SetKeyboardLayout(layout);
+        inputSource?.SetControlScheme(controlScheme);
     }
 
     private void ConfigureAiStriker(Rigidbody2D striker, PlayerSide side)

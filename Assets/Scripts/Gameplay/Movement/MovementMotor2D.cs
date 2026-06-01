@@ -10,12 +10,13 @@ public sealed class MovementMotor2D : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private MonoBehaviour commandSourceBehaviour;
 
-    private Rigidbody2D body;
     private SideOwner sideOwner;
     private DashAbility dashAbility;
     private HalfFieldAreaLimiter areaLimiter;
-    private CircleCollider2D circleCollider;
     private IMovementCommandSource commandSource;
+    
+    private Rigidbody2D rb;
+    private CircleCollider2D circleCollider;
 
     private void Reset()
     {
@@ -25,21 +26,21 @@ public sealed class MovementMotor2D : MonoBehaviour
 
     private void Awake()
     {
-        body = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         sideOwner = GetComponent<SideOwner>();
         dashAbility = GetComponent<DashAbility>();
         areaLimiter = GetComponent<HalfFieldAreaLimiter>();
         circleCollider = GetComponent<CircleCollider2D>();
         commandSource = GetCommandSource();
 
-        ConfigureBody(body);
+        ConfigureBody(rb);
     }
 
     private void FixedUpdate()
     {
         if (TurnFlowController.Instance != null && !TurnFlowController.Instance.IsTurnActive)
         {
-            body.linearVelocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             return;
         }
 
@@ -53,15 +54,15 @@ public sealed class MovementMotor2D : MonoBehaviour
         var dashVelocity = dashAbility.Step(command.DashPressed, sideOwner.Side, Time.fixedDeltaTime);
         var velocity = move * moveSpeed + dashVelocity;
         var worldRadius = GetWorldRadius();
-        var predictedPosition = body.position + velocity * Time.fixedDeltaTime;
+        var predictedPosition = rb.position + velocity * Time.fixedDeltaTime;
 
         if (areaLimiter.IsPastCenterLine(predictedPosition, sideOwner.Side, worldRadius))
         {
-            var clampedPosition = areaLimiter.ClampToCenterLine(body.position, sideOwner.Side, worldRadius);
+            var clampedPosition = areaLimiter.ClampToCenterLine(rb.position, sideOwner.Side, worldRadius);
 
-            if (clampedPosition != body.position)
+            if (clampedPosition != rb.position)
             {
-                body.MovePosition(clampedPosition);
+                rb.MovePosition(clampedPosition);
             }
 
             if (IsMovingAcrossCenterLine(velocity.x, sideOwner.Side))
@@ -70,21 +71,21 @@ public sealed class MovementMotor2D : MonoBehaviour
             }
         }
 
-        body.linearVelocity = velocity;
+        rb.linearVelocity = velocity;
     }
 
     private void OnDisable()
     {
-        if (body != null)
+        if (rb)
         {
-            body.linearVelocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
         }
     }
 
     private float GetWorldRadius()
     {
         var scale = transform.lossyScale;
-        var largestAxisScale = Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
+        var largestAxisScale = Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y)); 
         return circleCollider.radius * largestAxisScale;
     }
 
@@ -102,11 +103,9 @@ public sealed class MovementMotor2D : MonoBehaviour
 
         foreach (var behaviour in GetComponents<MonoBehaviour>())
         {
-            if (behaviour is IMovementCommandSource source)
-            {
-                commandSourceBehaviour = behaviour;
-                return source;
-            }
+            if (behaviour is not IMovementCommandSource source) continue;
+            commandSourceBehaviour = behaviour;
+            return source;
         }
 
         return null;

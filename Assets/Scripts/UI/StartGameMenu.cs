@@ -16,7 +16,7 @@ public sealed class StartGameMenu : MenuViewBase
     {
         base.Awake();
         ValidateReferences();
-        ShowStartExitMenu();
+        ShowStartGameMenu();
     }
 
     private void OnEnable()
@@ -62,7 +62,7 @@ public sealed class StartGameMenu : MenuViewBase
 
     protected override void HandleBeforeShow()
     {
-        ShowStartExitMenu();
+        ShowStartGameMenu();
     }
 
     private void SelectMode(PlayerTwoControlType playerTwoControlType)
@@ -73,10 +73,10 @@ public sealed class StartGameMenu : MenuViewBase
         sideSelection?.Show();
     }
 
-    private void ShowStartExitMenu()
+    private void ShowStartGameMenu()
     {
-        sideSelection?.Hide();
-        opponentSelection?.Hide();
+        sideSelection?.HideImmediately();
+        opponentSelection?.HideImmediately();
         startGameMenu?.Show();
     }
 

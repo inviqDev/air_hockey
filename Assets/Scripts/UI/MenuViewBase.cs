@@ -86,6 +86,18 @@ public abstract class MenuViewBase : MonoBehaviour
             });
     }
 
+    public void HideImmediately()
+    {
+        ResolveRoot();
+        ResolveCanvasGroup();
+        visibilityTween?.Kill();
+        visibilityTween = null;
+        HandleBeforeHide();
+        SetCanvasState(0f, false);
+        SetRootActive(false);
+        HandleAfterHide();
+    }
+
     protected virtual void HandleBeforeShow()
     {
     }
@@ -105,7 +117,7 @@ public abstract class MenuViewBase : MonoBehaviour
     private void ResolveRoot()
     {
         if (menuRoot) return;
-        
+
         Debug.LogError($"{gameObject.name} object root is  not set the inspector");
         menuRoot = gameObject;
     }

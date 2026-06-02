@@ -3437,11 +3437,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68baac1d314044e39af022a3fffc75d3, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   goalController: {fileID: 7000000000000000002}
   roundController: {fileID: 6400000000000000007}
-  turn: {fileID: 6400000000000000008}
+  turnController: {fileID: 6400000000000000008}
 --- !u!1 &1390736640
 GameObject:
   m_ObjectHideFlags: 0
@@ -5457,8 +5457,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6e1788143664e8f93cf743dd578f6ea, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   canvas: {fileID: 559178394}
   leftScoreText: {fileID: 180622732}
   rightScoreText: {fileID: 1728668364}
@@ -5478,8 +5478,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3ac253f05e34b3da0f1f97057397d90, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   winningScore: 3
 --- !u!114 &6400000000000000006
 MonoBehaviour:
@@ -5540,8 +5540,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32d76613d7384c8a9f5d2e2467cb245e, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   uiManager: {fileID: 6800000000000000001}
   matchManager: {fileID: 1387558709}
 --- !u!1 &6500000000000000001
@@ -5862,7 +5862,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuRoot: {fileID: 1930127146}
   animateVisibility: 1
-  showDuration: 0.85
+  showDuration: 0.15
   hideDuration: 0.65
   showEase: 6
   hideEase: 5
@@ -5895,7 +5895,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inGameUIRoot: {fileID: 923193833}
   appearDelaySeconds: 0.5
-  fadeInDuration: 0.15
+  fadeInDuration: 0.01
   fadeEase: 26
   animateScale: 1
   hiddenScale: {x: 0.65, y: 0.65, z: 1}
@@ -5953,7 +5953,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf6cbf8175c42cb996953a14a6f423c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roundController: {fileID: 6400000000000000007}
 --- !u!1 &7100000000000000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -6056,7 +6055,7 @@ MonoBehaviour:
   menuRoot: {fileID: 2035618192}
   animateVisibility: 1
   showDuration: 0.85
-  hideDuration: 0.15
+  hideDuration: 0.2
   showEase: 6
   hideEase: 5
   aiOpponentButton: {fileID: 753612194}
@@ -6076,7 +6075,7 @@ MonoBehaviour:
   menuRoot: {fileID: 1818409129}
   animateVisibility: 1
   showDuration: 0.85
-  hideDuration: 0.15
+  hideDuration: 0.2
   showEase: 6
   hideEase: 5
   leftSideButton: {fileID: 2084763932}
@@ -6139,8 +6138,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuRoot: {fileID: 2069067332}
   animateVisibility: 1
-  showDuration: 0.35
-  hideDuration: 0.15
+  showDuration: 0.85
+  hideDuration: 0.2
   showEase: 6
   hideEase: 5
   startGameButton: {fileID: 1038541376}

@@ -28,9 +28,7 @@ public sealed class ScoreKeeper : MonoBehaviour
         var scoringSide = goalSide == PlayerSide.Left ? PlayerSide.Right : PlayerSide.Left;
 
         if (scoringSide == PlayerSide.Left)
-        {
             LeftScore++;
-        }
         else
         {
             RightScore++;

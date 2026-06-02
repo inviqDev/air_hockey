@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public sealed class RoundResetter : MonoBehaviour
+public sealed class RoundController : MonoBehaviour
 {
     [Header("Scene Objects")]
     [SerializeField] private GameObject tableRoot;
@@ -119,17 +119,13 @@ public sealed class RoundResetter : MonoBehaviour
     private void ShowTable()
     {
         if (tableRoot)
-        {
             tableRoot.SetActive(true);
-        }
     }
 
     private void HideTable()
     {
-        if (tableRoot != null)
-        {
+        if (tableRoot)
             tableRoot.SetActive(false);
-        }
     }
 
     private static void ConfigurePlayerStriker(Rigidbody2D striker, PlayerSide side, PlayerControlScheme controlScheme)
@@ -193,52 +189,52 @@ public sealed class RoundResetter : MonoBehaviour
     {
         if (tableRoot == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a table root reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a table root reference.", this);
         }
 
         if (puckPrefab == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a _puck prefab reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a _puck prefab reference.", this);
         }
 
         if (leftAiStrikerPrefab == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a left AI striker prefab reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a left AI striker prefab reference.", this);
         }
 
         if (rightPlayerStrikerPrefab == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a right player striker prefab reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a right player striker prefab reference.", this);
         }
 
         if (leftPuckDefaultPoint == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a left _puck default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a left _puck default point reference.", this);
         }
 
         if (rightPuckDefaultPoint == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a right _puck default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a right _puck default point reference.", this);
         }
 
         if (leftStrikerDefaultPoint == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a left striker default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a left striker default point reference.", this);
         }
 
         if (rightStrikerDefaultPoint == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a right striker default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a right striker default point reference.", this);
         }
 
         if (serveManager == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a ServeManager reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a ServeManager reference.", this);
         }
 
         if (puckRegistry == null)
         {
-            Debug.LogError($"{nameof(RoundResetter)} requires a PuckRegistry reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a PuckRegistry reference.", this);
         }
     }
 }

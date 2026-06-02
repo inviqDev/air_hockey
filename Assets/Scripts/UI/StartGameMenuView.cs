@@ -62,27 +62,19 @@ public sealed class StartGameMenuView : MenuViewBase
     private void RemoveButtonListeners()
     {
         if (startGameButton)
-        {
             startGameButton.onClick.RemoveListener(HandleStartGameClicked);
-        }
 
         if (exitGameButton)
-        {
             exitGameButton.onClick.RemoveListener(HandleExitGameClicked);
-        }
     }
 
     private void SetInteractable(bool interactable)
     {
         if (startGameButton)
-        {
             startGameButton.interactable = interactable;
-        }
 
         if (exitGameButton)
-        {
             exitGameButton.interactable = interactable;
-        }
     }
 
     private void HandleStartGameClicked()
@@ -98,13 +90,9 @@ public sealed class StartGameMenuView : MenuViewBase
     private void ValidateReferences()
     {
         if (!startGameButton)
-        {
             Debug.LogError($"{nameof(StartGameMenuView)} requires a start game button reference.", this);
-        }
 
         if (!exitGameButton)
-        {
             Debug.LogError($"{nameof(StartGameMenuView)} requires an exit game button reference.", this);
-        }
     }
 }

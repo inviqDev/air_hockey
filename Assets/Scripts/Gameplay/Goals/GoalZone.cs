@@ -37,9 +37,7 @@ public sealed class GoalZone : MonoBehaviour
     private void ValidateReferences()
     {
         if (!goalController)
-        {
             Debug.LogError($"{nameof(GoalZone)} on {name} requires a GoalController reference.", this);
-        }
     }
 
     private void ResolveGoalController()

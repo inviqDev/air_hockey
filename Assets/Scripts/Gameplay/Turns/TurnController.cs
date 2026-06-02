@@ -2,14 +2,14 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public sealed class TurnFlowController : MonoBehaviour
+public sealed class TurnController : MonoBehaviour
 {
     [SerializeField] private TurnStartView turnStartView;
     [SerializeField] private TurnTimer turnTimer;
     [SerializeField] private float goalDelayBeforeNextTurnSeconds = 3f;
     private Coroutine goalDelayRoutine;
 
-    public static TurnFlowController Instance { get; private set; }
+    public static TurnController Instance { get; private set; }
     public bool IsTurnActive { get; private set; }
 
     private void Awake()
@@ -21,17 +21,13 @@ public sealed class TurnFlowController : MonoBehaviour
     private void OnEnable()
     {
         if (turnStartView)
-        {
             turnStartView.CountdownCompleted += StartTurn;
-        }
     }
 
     private void OnDisable()
     {
         if (turnStartView)
-        {
             turnStartView.CountdownCompleted -= StartTurn;
-        }
     }
 
     private void OnValidate()
@@ -73,10 +69,7 @@ public sealed class TurnFlowController : MonoBehaviour
 
     private void StartTurn()
     {
-        if (IsTurnActive)
-        {
-            return;
-        }
+        if (IsTurnActive) return;
 
         IsTurnActive = true;
         turnTimer?.StartTimer();
@@ -84,10 +77,7 @@ public sealed class TurnFlowController : MonoBehaviour
 
     private void StopGoalDelayRoutine()
     {
-        if (goalDelayRoutine == null)
-        {
-            return;
-        }
+        if (goalDelayRoutine == null) return;
 
         StopCoroutine(goalDelayRoutine);
         goalDelayRoutine = null;
@@ -96,13 +86,9 @@ public sealed class TurnFlowController : MonoBehaviour
     private void ValidateReferences()
     {
         if (!turnStartView)
-        {
-            Debug.LogError($"{nameof(TurnFlowController)} requires a TurnStartView reference.", this);
-        }
+            Debug.LogError($"{nameof(TurnController)} requires a TurnStartView reference.", this);
 
         if (!turnTimer)
-        {
-            Debug.LogError($"{nameof(TurnFlowController)} requires a TurnTimer reference.", this);
-        }
+            Debug.LogError($"{nameof(TurnController)} requires a TurnTimer reference.", this);
     }
 }

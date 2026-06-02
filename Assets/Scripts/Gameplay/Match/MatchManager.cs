@@ -2,77 +2,39 @@ using UnityEngine;
 
 public sealed class MatchManager : MonoBehaviour
 {
-    [Header("Ref Managers")] 
-    [SerializeField] private UIManager uiManager;
-
-    [Header("References")] 
+    [Header("References")]
     [SerializeField] private GoalController goalController;
-    [SerializeField] private MatchModeController matchModeController;
-    [SerializeField] private RoundResetter roundResetter;
-    [SerializeField] private TurnFlowController turnFlow;
-
+    [SerializeField] private RoundController roundController;
+    [SerializeField] private TurnController turnController;
 
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
-    public bool IsTurnActive => turnFlow && turnFlow.IsTurnActive;
+    public bool IsTurnActive => turnController && turnController.IsTurnActive;
+    public bool HasActiveMatch { get; private set; }
 
-    private InGameMenuController inGameMenu;
+    private UIManager uiManager;
+
     private MatchConfiguration currentConfiguration;
     private bool hasCurrentConfiguration;
+
+    private bool isInitialized;
 
     private void Awake()
     {
         ValidateReferences();
-
-        if (uiManager && uiManager.InGameMenu)
-        {
-            inGameMenu = uiManager.InGameMenu;
-        }
     }
 
     private void OnEnable()
     {
-        if (uiManager)
-        {
-            uiManager.MatchConfigurationSelected += HandleMatchConfigurationSelected;
-        }
-
-        if (inGameMenu)
-        {
-            inGameMenu.RestartClicked += RestartMatch;
-            inGameMenu.MainMenuClicked += ReturnToMainMenu;
-        }
-
-        if (goalController)
-        {
-            goalController.GoalResolved += HandleGoalResult;
-        }
+        if (!isInitialized) return;
+        SubscribeToGameFlow();
     }
 
     private void OnDisable()
     {
-        if (uiManager)
-        {
-            uiManager.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
-        }
+        if (!isInitialized) return;
 
-        if (inGameMenu)
-        {
-            inGameMenu.RestartClicked -= RestartMatch;
-            inGameMenu.MainMenuClicked -= ReturnToMainMenu;
-        }
-
-        if (goalController)
-        {
-            goalController.GoalResolved -= HandleGoalResult;
-        }
-    }
-
-    private void Start()
-    {
-        uiManager?.SetScores(LeftScore, RightScore);
-        roundResetter?.DespawnGameItems();
-        ShowStartGameMenu();
+        UnsubscribeFromGameFlow();
     }
 
     private void OnValidate()
@@ -80,96 +42,155 @@ public sealed class MatchManager : MonoBehaviour
         ValidateReferences();
     }
 
-    public void RestartMatch()
+    public void InitializeGameStart(UIManager rootUiManager)
     {
-        if (!hasCurrentConfiguration)
+        if (isInitialized) return;
+        ValidateReferences();
+        uiManager = rootUiManager;
+        if (!uiManager) return;
+
+        SubscribeToGameFlow();
+        isInitialized = true;
+    }
+
+    private void PrepareNextTurn()
+    {
+        if (!turnController) return;
+        turnController.PrepareTurn(ResetRoundAndStatus);
+    }
+
+    private void ResetRoundAndStatus()
+    {
+        if (roundController)
+            roundController.ResetRound();
+
+        if (uiManager)
+            uiManager.ClearGoalPopUpText();
+    }
+
+    private void HandleGoalResult(GoalResult result)
+    {
+        if (turnController)
+            turnController.EndTurn();
+
+        if (uiManager)
+            uiManager.PlayGoalInfo(result);
+
+        if (!result.HasWinner)
         {
+            turnController?.PrepareTurnAfterGoalDelay(ResetRoundAndStatus);
             return;
         }
 
-        goalController?.ResetMatch();
-        turnFlow?.EndTurn();
-        roundResetter?.DespawnGameItems();
-        matchModeController?.StartMatch(currentConfiguration);
-        uiManager?.SetScores(LeftScore, RightScore);
-        uiManager?.ClearGoalInfo();
-        PrepareNextTurn();
-    }
+        if (roundController)
+            roundController.DespawnGameItems();
 
-    private void ReturnToMainMenu()
-    {
-        goalController?.ResetMatch();
-        turnFlow?.EndTurn();
-        roundResetter?.DespawnGameItems();
-        uiManager?.SetScores(LeftScore, RightScore);
-        uiManager?.ClearGoalInfo();
-        ShowStartGameMenu();
-    }
-
-    private void ShowStartGameMenu()
-    {
-        turnFlow?.EndTurn();
-        uiManager?.ShowMainMenu();
+        HasActiveMatch = false;
     }
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
     {
         currentConfiguration = configuration;
         hasCurrentConfiguration = true;
-        matchModeController?.StartMatch(configuration);
+        StartConfiguredMatch(configuration);
+    }
+
+    private void HandleRestartClicked()
+    {
+        if (!hasCurrentConfiguration) return;
+        StartConfiguredMatch(currentConfiguration);
+    }
+
+    private void HandleMainMenuClicked()
+    {
+        StopCurrentMatch();
+
+        if (uiManager)
+            uiManager.ShowStartGameState(this);
+    }
+
+    private void StartConfiguredMatch(MatchConfiguration configuration)
+    {
+        ResetCurrentMatchProgress();
+        SpawnConfiguredMatch(configuration);
+
+        HasActiveMatch = true;
+
+        if (uiManager)
+            uiManager.ShowMatchState(this);
+
         PrepareNextTurn();
     }
 
-    private void PrepareNextTurn()
+    private void ResetCurrentMatchProgress()
     {
-        turnFlow?.PrepareTurn(ResetRoundAndStatus);
+        if (goalController)
+            goalController.ResetMatch();
+
+        if (turnController)
+            turnController.EndTurn();
     }
 
-    private void ResetRoundAndStatus()
+    private void SpawnConfiguredMatch(MatchConfiguration configuration)
     {
-        roundResetter?.ResetRound();
-        uiManager?.ClearGoalInfo();
+        if (!roundController) return;
+
+        roundController.DespawnGameItems();
+        roundController.SpawnGameItems(configuration);
     }
 
-    private void HandleGoalResult(GoalResult result)
+    private void StopCurrentMatch()
     {
-        turnFlow?.EndTurn();
-        uiManager?.PlayGoalInfo(result);
+        if (!HasActiveMatch) return;
+        ResetCurrentMatchProgress();
 
-        if (!result.HasWinner)
+        if (roundController)
+            roundController.DespawnGameItems();
+
+        HasActiveMatch = false;
+    }
+
+    private void SubscribeToGameFlow()
+    {
+        if (goalController)
+            goalController.GoalResolved += HandleGoalResult;
+
+        if (uiManager)
+            uiManager.MatchConfigurationSelected += HandleMatchConfigurationSelected;
+
+        var inGameMenu = uiManager ? uiManager.InGameMenu : null;
+        if (inGameMenu)
         {
-            turnFlow?.PrepareTurnAfterGoalDelay(ResetRoundAndStatus);
-            return;
+            inGameMenu.RestartClicked += HandleRestartClicked;
+            inGameMenu.MainMenuClicked += HandleMainMenuClicked;
         }
+    }
 
-        roundResetter?.DespawnGameItems();
+    private void UnsubscribeFromGameFlow()
+    {
+        if (goalController)
+            goalController.GoalResolved -= HandleGoalResult;
+
+        if (uiManager)
+            uiManager.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
+
+        var inGameMenu = uiManager ? uiManager.InGameMenu : null;
+        if (inGameMenu)
+        {
+            inGameMenu.RestartClicked -= HandleRestartClicked;
+            inGameMenu.MainMenuClicked -= HandleMainMenuClicked;
+        }
     }
 
     private void ValidateReferences()
     {
         if (!goalController)
-        {
             Debug.LogError($"{nameof(MatchManager)} requires a GoalController reference.", this);
-        }
 
-        if (!matchModeController)
-        {
-            Debug.LogError($"{nameof(MatchManager)} requires a MatchModeController reference.", this);
-        }
+        if (!roundController)
+            Debug.LogError($"{nameof(MatchManager)} requires a RoundController reference.", this);
 
-        if (!roundResetter)
-        {
-            Debug.LogError($"{nameof(MatchManager)} requires a RoundResetter reference.", this);
-        }
-
-        if (!turnFlow)
-        {
-            Debug.LogError($"{nameof(MatchManager)} requires a TurnFlowController reference.", this);
-        }
-
-        if (!uiManager)
-        {
-            Debug.LogError($"{nameof(MatchManager)} requires a UIManager reference.", this);
-        }
+        if (!turnController)
+            Debug.LogError($"{nameof(MatchManager)} requires a TurnController reference.", this);
     }
 }

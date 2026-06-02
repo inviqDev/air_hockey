@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public sealed class MainMenuController : MenuViewBase
+public sealed class StartGameMenu : MenuViewBase
 {
     [Header("References")]
     [SerializeField] private StartGameMenuView startGameMenu;
@@ -28,9 +28,7 @@ public sealed class MainMenuController : MenuViewBase
         }
 
         if (opponentSelection)
-        {
             opponentSelection.PlayerTwoControlTypeSelected += SelectMode;
-        }
 
         if (sideSelection)
         {
@@ -48,9 +46,7 @@ public sealed class MainMenuController : MenuViewBase
         }
 
         if (opponentSelection)
-        {
             opponentSelection.PlayerTwoControlTypeSelected -= SelectMode;
-        }
 
         if (sideSelection)
         {
@@ -110,18 +106,12 @@ public sealed class MainMenuController : MenuViewBase
     private void ValidateReferences()
     {
         if (!startGameMenu)
-        {
-            Debug.LogError($"{nameof(MainMenuController)} requires a start/exit menu reference.", this);
-        }
+            Debug.LogError($"{nameof(StartGameMenu)} requires a start/exit menu reference.", this);
 
         if (!opponentSelection)
-        {
-            Debug.LogError($"{nameof(MainMenuController)} requires an opponent selection reference.", this);
-        }
+            Debug.LogError($"{nameof(StartGameMenu)} requires an opponent selection reference.", this);
 
         if (!sideSelection)
-        {
-            Debug.LogError($"{nameof(MainMenuController)} requires a side selection reference.", this);
-        }
+            Debug.LogError($"{nameof(StartGameMenu)} requires a side selection reference.", this);
     }
 }

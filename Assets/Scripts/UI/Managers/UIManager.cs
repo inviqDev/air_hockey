@@ -3,14 +3,16 @@ using UnityEngine;
 
 public sealed class UIManager : MonoBehaviour
 {
-    [SerializeField] private MainMenuController mainMenu;
+    [SerializeField] private StartGameMenu startGameMenu;
     [SerializeField] private InGameUI inGameUI;
     [SerializeField] private InGameMenuController inGameMenu;
     [SerializeField] private MatchUIView matchView;
-        
+
     public InGameMenuController InGameMenu => inGameMenu;
-    
+
     public event Action<MatchConfiguration> MatchConfigurationSelected;
+
+    private bool isInitialized;
 
     private void Awake()
     {
@@ -19,25 +21,14 @@ public sealed class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if (mainMenu)
-        {
-            mainMenu.MatchConfigurationSelected += HandleMatchConfigurationSelected;
-        }
-
+        if (startGameMenu)
+            startGameMenu.MatchConfigurationSelected += HandleMatchConfigurationSelected;
     }
 
     private void OnDisable()
     {
-        if (mainMenu)
-        {
-            mainMenu.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
-        }
-
-    }
-
-    private void Start()
-    {
-        ShowMainMenu();
+        if (startGameMenu)
+            startGameMenu.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
     }
 
     private void OnValidate()
@@ -45,23 +36,49 @@ public sealed class UIManager : MonoBehaviour
         ValidateReferences();
     }
 
-    public void ShowMainMenu()
+    public void InitializeGameStart()
     {
-        inGameUI?.HideImmediately();
-        mainMenu?.Show();
+        if (isInitialized) return;
+
+        ValidateReferences();
+        ShowInitialGameStartState();
+        isInitialized = true;
     }
 
-    public void HideMainMenu()
+    public void ShowStartGameState(MatchManager matchManager)
     {
-        mainMenu?.Hide();
+        var leftPlayerScore = matchManager ? matchManager.LeftScore : 0;
+        var rightPlayerScore = matchManager ? matchManager.RightScore : 0;
+        ShowStartGameState(leftPlayerScore, rightPlayerScore);
     }
 
-    public void SetScores(int leftScore, int rightScore)
+    public void ShowMatchState(MatchManager matchManager)
+    {
+        if (matchManager)
+            ResetMatchUI(matchManager);
+
+        if (startGameMenu)
+            startGameMenu.Hide();
+
+        if (inGameUI)
+            inGameUI.Show();
+    }
+
+    private void SetScores(int leftScore, int rightScore)
     {
         matchView?.SetScores(leftScore, rightScore);
     }
 
-    public void ClearGoalInfo()
+    public void ResetMatchUI(MatchManager matchManager)
+    {
+        var leftPlayerScore = matchManager.LeftScore;
+        var rightPlayerScore = matchManager.RightScore;
+        SetScores(leftPlayerScore, rightPlayerScore);
+
+        ClearGoalPopUpText();
+    }
+
+    public void ClearGoalPopUpText()
     {
         matchView?.SetGoalInfoText(string.Empty);
     }
@@ -74,8 +91,24 @@ public sealed class UIManager : MonoBehaviour
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
     {
-        inGameUI?.Show();
         MatchConfigurationSelected?.Invoke(configuration);
+    }
+
+    private void ShowInitialGameStartState()
+    {
+        ShowStartGameState(0, 0);
+    }
+
+    private void ShowStartGameState(int leftScore, int rightScore)
+    {
+        SetScores(leftScore, rightScore);
+        ClearGoalPopUpText();
+
+        if (inGameUI)
+            inGameUI.HideImmediately();
+
+        if (startGameMenu)
+            startGameMenu.Show();
     }
 
     private static string GetGoalInfoMessage(GoalResult result)
@@ -87,24 +120,16 @@ public sealed class UIManager : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (!mainMenu)
-        {
-            Debug.LogError($"{nameof(UIManager)} requires a MainMenuController reference.", this);
-        }
+        if (!startGameMenu)
+            Debug.LogError($"{nameof(UIManager)} requires a StartGameMenu reference.", this);
 
         if (!inGameUI)
-        {
             Debug.LogError($"{nameof(UIManager)} requires an InGameUI reference.", this);
-        }
-        
+
         if (!inGameMenu)
-        {
             Debug.LogError($"{nameof(UIManager)} requires an InGameMenuController reference.", this);
-        }
 
         if (!matchView)
-        {
             Debug.LogError($"{nameof(UIManager)} requires a MatchUIView reference.", this);
-        }
     }
 }

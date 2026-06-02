@@ -21,10 +21,7 @@ public sealed class TurnTimer : MonoBehaviour
 
     private void Update()
     {
-        if (!isRunning)
-        {
-            return;
-        }
+        if (!isRunning) return;
 
         elapsedSeconds += Time.deltaTime;
         UpdateText();
@@ -52,16 +49,12 @@ public sealed class TurnTimer : MonoBehaviour
     private void UpdateText()
     {
         if (timerText)
-        {
             timerText.text = elapsedSeconds.ToString("0.00");
-        }
     }
 
     private void ValidateReferences()
     {
         if (!timerText)
-        {
             Debug.LogError($"{nameof(TurnTimer)} on {name} requires a TimerText reference.", this);
-        }
     }
 }

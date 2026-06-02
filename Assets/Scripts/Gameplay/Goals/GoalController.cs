@@ -50,18 +50,12 @@ public sealed class GoalController : MonoBehaviour
     private void ValidateReferences()
     {
         if (!scoreKeeper)
-        {
             Debug.LogError($"{nameof(GoalController)} requires a ScoreKeeper reference.", this);
-        }
 
         if (!serveManager)
-        {
             Debug.LogError($"{nameof(GoalController)} requires a ServeManager reference.", this);
-        }
 
         if (!puckRegistry)
-        {
             Debug.LogError($"{nameof(GoalController)} requires a PuckRegistry reference.", this);
-        }
     }
 }

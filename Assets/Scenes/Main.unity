@@ -1575,7 +1575,7 @@ GameObject:
   - component: {fileID: 6800000000000000001}
   - component: {fileID: 6400000000000000004}
   m_Layer: 5
-  m_Name: UI
+  m_Name: UIManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1682,7 +1682,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &724809467
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2731,7 +2731,7 @@ PrefabInstance:
     - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
       propertyPath: matchManager
       value: 
-      objectReference: {fileID: 6400000000000000003}
+      objectReference: {fileID: 1387558709}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2801,7 +2801,7 @@ PrefabInstance:
     - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
       propertyPath: matchManager
       value: 
-      objectReference: {fileID: 6400000000000000003}
+      objectReference: {fileID: 1387558709}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3395,6 +3395,53 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1387558707
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1387558708}
+  - component: {fileID: 1387558709}
+  m_Layer: 0
+  m_Name: MatchManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1387558708
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1387558707}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1387558709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1387558707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68baac1d314044e39af022a3fffc75d3, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  goalController: {fileID: 7000000000000000002}
+  roundController: {fileID: 6400000000000000007}
+  turn: {fileID: 6400000000000000008}
 --- !u!1 &1390736640
 GameObject:
   m_ObjectHideFlags: 0
@@ -4641,7 +4688,7 @@ GameObject:
   - component: {fileID: 6800000000000000003}
   - component: {fileID: 6800000000000000002}
   m_Layer: 5
-  m_Name: Main_menu
+  m_Name: Start_game_menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5373,13 +5420,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6400000000000000002}
-  - component: {fileID: 6400000000000000003}
+  - component: {fileID: 6400000000000000009}
   - component: {fileID: 6400000000000000005}
   - component: {fileID: 6400000000000000006}
   - component: {fileID: 7000000000000000002}
   - component: {fileID: 7000000000000000003}
   m_Layer: 0
-  m_Name: Match_manager
+  m_Name: GameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5400,23 +5447,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6400000000000000003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6400000000000000001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68baac1d314044e39af022a3fffc75d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uiManager: {fileID: 6800000000000000001}
-  goalController: {fileID: 7000000000000000002}
-  matchModeController: {fileID: 7000000000000000003}
-  roundResetter: {fileID: 6400000000000000007}
-  turnFlow: {fileID: 6400000000000000008}
 --- !u!114 &6400000000000000004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5427,8 +5457,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6e1788143664e8f93cf743dd578f6ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   canvas: {fileID: 559178394}
   leftScoreText: {fileID: 180622732}
   rightScoreText: {fileID: 1728668364}
@@ -5448,8 +5478,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3ac253f05e34b3da0f1f97057397d90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   winningScore: 3
 --- !u!114 &6400000000000000006
 MonoBehaviour:
@@ -5500,6 +5530,20 @@ MonoBehaviour:
   turnStartView: {fileID: 6500000000000000010}
   turnTimer: {fileID: 6600000000000000005}
   goalDelayBeforeNextTurnSeconds: 3
+--- !u!114 &6400000000000000009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6400000000000000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32d76613d7384c8a9f5d2e2467cb245e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  uiManager: {fileID: 6800000000000000001}
+  matchManager: {fileID: 1387558709}
 --- !u!1 &6500000000000000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -5800,7 +5844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e2c4f7881f443d8d622dd046e25d2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMenu: {fileID: 6800000000000000002}
+  startGameMenu: {fileID: 6800000000000000002}
   inGameUI: {fileID: 6900000000000000001}
   inGameMenu: {fileID: 7300000000000000001}
   matchView: {fileID: 6400000000000000004}
@@ -5909,7 +5953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf6cbf8175c42cb996953a14a6f423c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roundResetter: {fileID: 6400000000000000007}
+  roundController: {fileID: 6400000000000000007}
 --- !u!1 &7100000000000000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -5922,7 +5966,7 @@ GameObject:
   - component: {fileID: 6400000000000000007}
   - component: {fileID: 7000000000000000001}
   m_Layer: 0
-  m_Name: Round_controller
+  m_Name: RoundController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5956,7 +6000,7 @@ GameObject:
   - component: {fileID: 6500000000000000010}
   - component: {fileID: 6600000000000000005}
   m_Layer: 0
-  m_Name: Turn_flow_controller
+  m_Name: TurnController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6108,6 +6152,7 @@ SceneRoots:
   - {fileID: 458985311}
   - {fileID: 35699400}
   - {fileID: 6400000000000000002}
+  - {fileID: 1387558708}
   - {fileID: 7100000000000000002}
   - {fileID: 7200000000000000002}
   - {fileID: 559178395}

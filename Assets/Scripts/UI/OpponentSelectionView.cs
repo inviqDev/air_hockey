@@ -71,39 +71,27 @@ public sealed class OpponentSelectionView : MenuViewBase
     private void RemoveButtonListeners()
     {
         if (aiOpponentButton)
-        {
             aiOpponentButton.onClick.RemoveListener(SelectAiOpponent);
-        }
 
         if (secondPlayerButton)
-        {
             secondPlayerButton.onClick.RemoveListener(SelectSecondPlayer);
-        }
     }
 
     private void SetInteractable(bool interactable)
     {
         if (aiOpponentButton)
-        {
             aiOpponentButton.interactable = interactable;
-        }
 
         if (secondPlayerButton)
-        {
             secondPlayerButton.interactable = interactable;
-        }
     }
 
     private void ValidateReferences()
     {
         if (!aiOpponentButton)
-        {
             Debug.LogError($"{nameof(OpponentSelectionView)} requires an AI opponent button reference.", this);
-        }
 
         if (!secondPlayerButton)
-        {
             Debug.LogError($"{nameof(OpponentSelectionView)} requires a second player button reference.", this);
-        }
     }
 }

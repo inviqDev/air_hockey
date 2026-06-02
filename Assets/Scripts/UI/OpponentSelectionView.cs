@@ -7,8 +7,10 @@ public sealed class OpponentSelectionView : MenuViewBase
     [Header("Buttons")]
     [SerializeField] private Button aiOpponentButton;
     [SerializeField] private Button secondPlayerButton;
+    [SerializeField] private Button backButton;
 
     public event Action<PlayerTwoControlType> PlayerTwoControlTypeSelected;
+    public event Action BackButtonClicked;
 
     protected override void Awake()
     {
@@ -66,6 +68,12 @@ public sealed class OpponentSelectionView : MenuViewBase
             secondPlayerButton.onClick.RemoveListener(SelectSecondPlayer);
             secondPlayerButton.onClick.AddListener(SelectSecondPlayer);
         }
+
+        if (backButton)
+        {
+            backButton.onClick.RemoveListener(HandleBackClicked);
+            backButton.onClick.AddListener(HandleBackClicked);
+        }
     }
 
     private void RemoveButtonListeners()
@@ -75,6 +83,9 @@ public sealed class OpponentSelectionView : MenuViewBase
 
         if (secondPlayerButton)
             secondPlayerButton.onClick.RemoveListener(SelectSecondPlayer);
+
+        if (backButton)
+            backButton.onClick.RemoveListener(HandleBackClicked);
     }
 
     private void SetInteractable(bool interactable)
@@ -84,6 +95,14 @@ public sealed class OpponentSelectionView : MenuViewBase
 
         if (secondPlayerButton)
             secondPlayerButton.interactable = interactable;
+
+        if (backButton)
+            backButton.interactable = interactable;
+    }
+
+    private void HandleBackClicked()
+    {
+        BackButtonClicked?.Invoke();
     }
 
     private void ValidateReferences()
@@ -93,5 +112,8 @@ public sealed class OpponentSelectionView : MenuViewBase
 
         if (!secondPlayerButton)
             Debug.LogError($"{nameof(OpponentSelectionView)} requires a second player button reference.", this);
+
+        if (!backButton)
+            Debug.LogError($"{nameof(OpponentSelectionView)} requires a back button reference.", this);
     }
 }

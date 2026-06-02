@@ -10,11 +10,12 @@ public sealed class StartGameMenu : MenuViewBase
 
     public event Action<MatchConfiguration> MatchConfigurationSelected;
 
-    private PlayerTwoControlType selectedPlayerTwoControlType;
+    private PlayerTwoControlType playerTwoControlType;
 
     protected override void Awake()
     {
         base.Awake();
+        
         ValidateReferences();
         ShowStartGameMenu();
     }
@@ -24,11 +25,14 @@ public sealed class StartGameMenu : MenuViewBase
         if (startGameMenu)
         {
             startGameMenu.StartGameClicked += ShowOpponentSelection;
-            startGameMenu.ExitGameClicked += GameGame;
+            startGameMenu.ExitGameClicked += ExitGame;
         }
 
         if (opponentSelection)
-            opponentSelection.PlayerTwoControlTypeSelected += SelectMode;
+        {
+            opponentSelection.PlayerTwoControlTypeSelected += SelectOpponentMode;
+            opponentSelection.BackButtonClicked += ShowStartGameMenu;
+        }
 
         if (sideSelection)
         {
@@ -42,11 +46,14 @@ public sealed class StartGameMenu : MenuViewBase
         if (startGameMenu)
         {
             startGameMenu.StartGameClicked -= ShowOpponentSelection;
-            startGameMenu.ExitGameClicked -= GameGame;
+            startGameMenu.ExitGameClicked -= ExitGame;
         }
 
         if (opponentSelection)
-            opponentSelection.PlayerTwoControlTypeSelected -= SelectMode;
+        {
+            opponentSelection.PlayerTwoControlTypeSelected -= SelectOpponentMode;
+            opponentSelection.BackButtonClicked -= ShowStartGameMenu;
+        }
 
         if (sideSelection)
         {
@@ -65,9 +72,9 @@ public sealed class StartGameMenu : MenuViewBase
         ShowStartGameMenu();
     }
 
-    private void SelectMode(PlayerTwoControlType playerTwoControlType)
+    private void SelectOpponentMode(PlayerTwoControlType selectedPlayerTwoControlType)
     {
-        selectedPlayerTwoControlType = playerTwoControlType;
+        playerTwoControlType = selectedPlayerTwoControlType;
         startGameMenu?.Hide();
         opponentSelection?.Hide();
         sideSelection?.Show();
@@ -91,10 +98,11 @@ public sealed class StartGameMenu : MenuViewBase
     {
         Hide();
 
-        MatchConfigurationSelected?.Invoke(new MatchConfiguration(selectedPlayerTwoControlType, playerOneSide));
+        var configuration = new MatchConfiguration(playerTwoControlType, playerOneSide);
+        MatchConfigurationSelected?.Invoke(configuration);
     }
 
-    private static void GameGame()
+    private static void ExitGame()
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

@@ -189,17 +189,22 @@ MonoBehaviour:
   puck: {fileID: 1083338351928939836, guid: 8128990624cb6214c8c2a44501456305, type: 3}
   defensivePosition: {x: -7.5, y: 0}
   centerX: 0
-  aggression: 0.85
-  interceptDistance: 5
-  predictionTime: 0.35
+  aggression: 0.95
+  predictionTime: 0.28
+  threatTrackSpeedThreshold: 0.08
+  commitDistance: 3
+  guardForwardOffset: 0.85
+  guardYFollow: 0.45
+  guardYDeadZone: 0.9
   attackDirection: {x: 1, y: 0}
-  setupDistance: 0.55
-  behindPuckTolerance: 0.25
-  strikeDistance: 0.75
-  sideStepDistance: 0.8
-  dashDistance: 1.15
-  dashCooldown: 0.75
-  dashDirectionThreshold: 0.4
+  setupDistance: 0.7
+  behindPuckTolerance: 0.3
+  strikeDistance: 0.9
+  sideStepDistance: 0.95
+  goalCenteringWeight: 0.35
+  dashDistance: 1.35
+  dashCooldown: 0.55
+  dashDirectionThreshold: 0.25
 --- !u!114 &6200000000000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,5 +245,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e75963b72f994e5ca29227ab664f9951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 7
+  moveSpeed: 8
   commandSourceBehaviour: {fileID: 6200000000000000002}

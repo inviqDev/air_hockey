@@ -38,7 +38,7 @@ public sealed class MovementMotor2D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (TurnFlowController.Instance != null && !TurnFlowController.Instance.IsTurnActive)
+        if (TurnController.Instance != null && !TurnController.Instance.IsTurnActive)
         {
             rb.linearVelocity = Vector2.zero;
             return;

@@ -79,37 +79,25 @@ public sealed class SideSelectionView : MenuViewBase
     private void RemoveButtonListeners()
     {
         if (leftSideButton)
-        {
             leftSideButton.onClick.RemoveListener(SelectLeftSide);
-        }
 
         if (rightSideButton)
-        {
             rightSideButton.onClick.RemoveListener(SelectRightSide);
-        }
 
         if (backButton)
-        {
             backButton.onClick.RemoveListener(HandleBackClicked);
-        }
     }
 
     private void SetInteractable(bool interactable)
     {
         if (leftSideButton)
-        {
             leftSideButton.interactable = interactable;
-        }
 
         if (rightSideButton)
-        {
             rightSideButton.interactable = interactable;
-        }
 
         if (backButton)
-        {
             backButton.interactable = interactable;
-        }
     }
 
     private void HandleBackClicked()
@@ -120,18 +108,12 @@ public sealed class SideSelectionView : MenuViewBase
     private void ValidateReferences()
     {
         if (!leftSideButton)
-        {
             Debug.LogError($"{nameof(SideSelectionView)} requires a left side button reference.", this);
-        }
 
         if (!rightSideButton)
-        {
             Debug.LogError($"{nameof(SideSelectionView)} requires a right side button reference.", this);
-        }
 
         if (!backButton)
-        {
             Debug.LogError($"{nameof(SideSelectionView)} requires a back button reference.", this);
-        }
     }
 }

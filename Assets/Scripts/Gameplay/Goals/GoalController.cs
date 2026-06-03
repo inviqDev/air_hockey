@@ -29,7 +29,7 @@ public sealed class GoalController : MonoBehaviour
         if (!scoreKeeper || !serveManager) return false;
         if (Time.time < nextGoalAllowedTime) return false;
 
-        nextGoalAllowedTime = Time.time + goalLockoutSeconds;
+        StartGoalLockoutPeriod();
 
         var result = scoreKeeper.RegisterGoal(goalSide);
         serveManager?.SetNextAttacker(goalSide);
@@ -38,10 +38,8 @@ public sealed class GoalController : MonoBehaviour
         return true;
     }
 
-    public void ResetMatch()
+    public void StartGoalLockoutPeriod()
     {
-        scoreKeeper?.ResetScores();
-        serveManager?.ResetMatch();
         nextGoalAllowedTime = Time.time + goalLockoutSeconds;
     }
 

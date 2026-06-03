@@ -3,9 +3,11 @@ using UnityEngine;
 public sealed class MatchManager : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private GoalController goalController;
     [SerializeField] private RoundController roundController;
     [SerializeField] private TurnController turnController;
+    [SerializeField] private ServeManager serveManager;
+    [SerializeField] private GoalController goalController;
+    [SerializeField] private ScoreKeeper scoreKeeper;
 
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
@@ -125,7 +127,13 @@ public sealed class MatchManager : MonoBehaviour
     private void ResetCurrentMatchProgress()
     {
         if (goalController)
-            goalController.ResetMatch();
+            goalController.StartGoalLockoutPeriod();
+
+        if (scoreKeeper)
+            scoreKeeper.ResetScores();
+
+        if (serveManager)
+            serveManager.ResetMatch();
 
         if (turnController)
             turnController.EndTurn();
@@ -189,6 +197,12 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!roundController)
             Debug.LogError($"{nameof(MatchManager)} requires a RoundController reference.", this);
+
+        if (!scoreKeeper)
+            Debug.LogError($"{nameof(MatchManager)} requires a ScoreKeeper reference.", this);
+
+        if (!serveManager)
+            Debug.LogError($"{nameof(MatchManager)} requires a ServeManager reference.", this);
 
         if (!turnController)
             Debug.LogError($"{nameof(MatchManager)} requires a TurnController reference.", this);

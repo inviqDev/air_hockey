@@ -5,7 +5,6 @@ public sealed class GoalController : MonoBehaviour
 {
     [SerializeField] private ScoreKeeper scoreKeeper;
     [SerializeField] private ServeManager serveManager;
-    [SerializeField] private PuckRegistry puckRegistry;
     [SerializeField] private float goalLockoutSeconds = 0.25f;
 
     private float nextGoalAllowedTime;
@@ -25,10 +24,9 @@ public sealed class GoalController : MonoBehaviour
         ValidateReferences();
     }
 
-    public bool TryHandleGoal(PlayerSide goalSide, Puck candidate)
+    public bool TryHandleGoal(PlayerSide goalSide)
     {
         if (!scoreKeeper || !serveManager) return false;
-        if (!puckRegistry || !puckRegistry.IsPuck(candidate)) return false;
         if (Time.time < nextGoalAllowedTime) return false;
 
         nextGoalAllowedTime = Time.time + goalLockoutSeconds;
@@ -54,8 +52,5 @@ public sealed class GoalController : MonoBehaviour
 
         if (!serveManager)
             Debug.LogError($"{nameof(GoalController)} requires a ServeManager reference.", this);
-
-        if (!puckRegistry)
-            Debug.LogError($"{nameof(GoalController)} requires a PuckRegistry reference.", this);
     }
 }

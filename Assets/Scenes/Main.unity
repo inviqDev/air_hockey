@@ -2855,6 +2855,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1387558709}
     - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
+      propertyPath: puckRegistry
+      value: 
+      objectReference: {fileID: 7000000000000000001}
+    - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
       propertyPath: goalController
       value: 
       objectReference: {fileID: 7000000000000000002}
@@ -2928,6 +2932,10 @@ PrefabInstance:
       propertyPath: matchManager
       value: 
       objectReference: {fileID: 1387558709}
+    - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
+      propertyPath: puckRegistry
+      value: 
+      objectReference: {fileID: 7000000000000000001}
     - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
       propertyPath: goalController
       value: 
@@ -6189,7 +6197,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreKeeper: {fileID: 6400000000000000005}
   serveManager: {fileID: 6400000000000000006}
-  puckRegistry: {fileID: 7000000000000000001}
   goalLockoutSeconds: 0.25
 --- !u!114 &7000000000000000003
 MonoBehaviour:

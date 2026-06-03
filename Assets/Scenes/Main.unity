@@ -2854,6 +2854,10 @@ PrefabInstance:
       propertyPath: matchManager
       value: 
       objectReference: {fileID: 1387558709}
+    - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
+      propertyPath: goalController
+      value: 
+      objectReference: {fileID: 7000000000000000002}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2924,6 +2928,10 @@ PrefabInstance:
       propertyPath: matchManager
       value: 
       objectReference: {fileID: 1387558709}
+    - target: {fileID: 6300000000000000001, guid: 00d42898a9c798941b969e8507015719, type: 3}
+      propertyPath: goalController
+      value: 
+      objectReference: {fileID: 7000000000000000002}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

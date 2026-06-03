@@ -31,7 +31,9 @@ public sealed class GoalZone : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        goalController?.TryHandleGoal(goalSide, other.attachedRigidbody);
+        var attachedBody = other.attachedRigidbody;
+        var puck = attachedBody ? attachedBody.GetComponent<Puck>() : other.GetComponent<Puck>();
+        goalController?.TryHandleGoal(goalSide, puck);
     }
 
     private void ValidateReferences()

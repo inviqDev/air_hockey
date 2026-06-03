@@ -2,14 +2,16 @@ using UnityEngine;
 
 public sealed class PuckRegistry : MonoBehaviour
 {
-    private Rigidbody2D puck;
+    private Puck puck;
 
-    public bool IsPuck(Rigidbody2D candidate)
+    public Puck CurrentPuck => puck;
+
+    public bool IsPuck(Puck candidate)
     {
         return candidate && candidate == puck;
     }
 
-    public void RegisterPuck(Rigidbody2D newPuck)
+    public void RegisterPuck(Puck newPuck)
     {
         puck = newPuck;
     }

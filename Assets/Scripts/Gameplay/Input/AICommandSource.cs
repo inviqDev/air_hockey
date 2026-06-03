@@ -4,7 +4,7 @@ using UnityEngine;
 public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 {
     [Header("References")]
-    [SerializeField] private Rigidbody2D puck;
+    [SerializeField] private Puck puck;
 
     [Header("Positions")]
     [SerializeField] private Vector2 defensivePosition = new(-7.5f, 0f);
@@ -36,18 +36,16 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private PlayerSide side = PlayerSide.Left;
     private float remainingDashCooldown;
-    private Rigidbody2D body;
-    private Rigidbody2D puckBody;
-    private CircleCollider2D bodyCollider;
-    private CircleCollider2D puckCollider;
+    
+    private Rigidbody2D aiRigidbody;
+    private CircleCollider2D aiCircleCollider;
 
     private void Awake()
     {
-        body = GetComponent<Rigidbody2D>();
-        bodyCollider = GetComponent<CircleCollider2D>();
+        aiRigidbody = GetComponent<Rigidbody2D>();
+        aiCircleCollider = GetComponent<CircleCollider2D>();
+        
         attackDirection = attackDirection.sqrMagnitude > 0.001f ? attackDirection.normalized : Vector2.right;
-        puckBody = puck;
-        puckCollider = puckBody ? puckBody.GetComponent<CircleCollider2D>() : null;
     }
 
     private void OnValidate()
@@ -59,26 +57,20 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     {
         TickCooldown();
 
-        if (!puckBody)
-        {
+        if (!puck || !puck.PuckRigidbody)
             return MoveToward(defensivePosition, false);
-        }
 
-        var puckPosition = puckBody.position;
-        var puckVelocity = puckBody.linearVelocity;
+        var puckPosition = puck.Position;
+        var puckVelocity = puck.Velocity;
         var predictedPuckPosition = PredictPuckPosition(puckPosition, puckVelocity);
 
         if (!ShouldReactToPuck(puckPosition, puckVelocity))
-        {
             return MoveToward(GetGuardTarget(puckPosition), false);
-        }
 
         if (!ShouldCommitToPuck(puckPosition, puckVelocity))
-        {
             return MoveToward(GetGuardTarget(predictedPuckPosition), false);
-        }
 
-        var aiIsBehindPuck = IsBehindPuck(body.position, puckPosition);
+        var aiIsBehindPuck = IsBehindPuck(aiRigidbody.position, puckPosition);
 
         if (!aiIsBehindPuck)
         {
@@ -97,12 +89,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         return MoveToward(approachTarget, false);
     }
 
-    public void SetPuck(Rigidbody2D puckRigidbody)
-    {
-        puck = puckRigidbody;
-        puckBody = puckRigidbody;
-        puckCollider = puckRigidbody ? puckRigidbody.GetComponent<CircleCollider2D>() : null;
-    }
+    public void SetPuck(Puck puckComponent) => puck = puckComponent;
 
     public void SetSide(PlayerSide playerSide)
     {
@@ -116,9 +103,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
     private void TickCooldown()
     {
         if (remainingDashCooldown > 0f)
-        {
             remainingDashCooldown -= Time.fixedDeltaTime;
-        }
     }
 
     private bool ShouldReactToPuck(Vector2 puckPosition, Vector2 puckVelocity)
@@ -132,21 +117,15 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private bool ShouldCommitToPuck(Vector2 puckPosition, Vector2 puckVelocity)
     {
-        if (IsPuckOnAiSide(puckPosition))
-        {
-            return true;
-        }
+        if (IsPuckOnAiSide(puckPosition)) return true;
 
         var puckMovingTowardAi = side == PlayerSide.Left
             ? puckVelocity.x < -threatTrackSpeedThreshold
             : puckVelocity.x > threatTrackSpeedThreshold;
 
-        if (!puckMovingTowardAi)
-        {
-            return false;
-        }
+        if (!puckMovingTowardAi) return false;
 
-        return Mathf.Abs(puckPosition.x - body.position.x) <= GetCommitDistance();
+        return Mathf.Abs(puckPosition.x - aiRigidbody.position.x) <= GetCommitDistance();
     }
 
     private Vector2 PredictPuckPosition(Vector2 puckPosition, Vector2 puckVelocity)
@@ -175,7 +154,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
         if (!IsPuckBetweenAiAndSetupTarget(puckPosition, setupTarget)) return setupTarget;
         
-        var yDirection = body.position.y >= puckPosition.y ? 1f : -1f;
+        var yDirection = aiRigidbody.position.y >= puckPosition.y ? 1f : -1f;
         setupTarget.y += yDirection * GetSideStepDistance();
 
         return setupTarget;
@@ -209,7 +188,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private bool IsPuckBetweenAiAndSetupTarget(Vector2 puckPosition, Vector2 setupTarget)
     {
-        var aiPosition = body.position;
+        var aiPosition = aiRigidbody.position;
 
         var puckBetweenX =
             puckPosition.x > Mathf.Min(aiPosition.x, setupTarget.x) &&
@@ -227,7 +206,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
             return false;
         }
 
-        var toPuck = puckPosition - body.position;
+        var toPuck = puckPosition - aiRigidbody.position;
         var sqrDistanceToPuck = toPuck.sqrMagnitude;
 
         var resolvedDashDistance = GetDashDistance();
@@ -250,7 +229,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private bool IsCloseEnoughToStrike(Vector2 puckPosition)
     {
-        var toPuck = puckPosition - body.position;
+        var toPuck = puckPosition - aiRigidbody.position;
         var resolvedStrikeDistance = GetStrikeDistance();
         return toPuck.sqrMagnitude <= resolvedStrikeDistance * resolvedStrikeDistance;
     }
@@ -267,20 +246,20 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         var guardTarget = defensivePosition;
         guardTarget.x += attackDirection.x * guardForwardOffset;
 
-        var yDelta = puckPosition.y - body.position.y;
+        var yDelta = puckPosition.y - aiRigidbody.position.y;
         if (Mathf.Abs(yDelta) <= guardYDeadZone)
         {
-            guardTarget.y = body.position.y;
+            guardTarget.y = aiRigidbody.position.y;
             return guardTarget;
         }
 
-        guardTarget.y = body.position.y + (yDelta - Mathf.Sign(yDelta) * guardYDeadZone) * guardYFollow;
+        guardTarget.y = aiRigidbody.position.y + (yDelta - Mathf.Sign(yDelta) * guardYDeadZone) * guardYFollow;
         return guardTarget;
     }
 
     private MovementCommand MoveToward(Vector2 target, bool dashRequested)
     {
-        var toTarget = target - body.position;
+        var toTarget = target - aiRigidbody.position;
 
         if (toTarget.sqrMagnitude < 0.01f)
         {
@@ -291,7 +270,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         var desiredSpeedFactor = distanceToTarget >= 1.25f
             ? 1f
             : Mathf.Lerp(0.35f, 1f, distanceToTarget / 1.25f);
-        var move = Vector2.ClampMagnitude(toTarget, 1f) * aggression * desiredSpeedFactor;
+        var move = Vector2.ClampMagnitude(toTarget, 1f) * (aggression * desiredSpeedFactor);
         return new MovementCommand(move, dashRequested);
     }
 
@@ -327,43 +306,30 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private float GetBodyRadius()
     {
-        if (!bodyCollider)
-        {
-            return 0.35f;
-        }
+        if (!aiCircleCollider)
+            aiCircleCollider = GetComponent<CircleCollider2D>();
 
-        var scale = body.transform.lossyScale;
+        var scale = aiRigidbody.transform.lossyScale;
         var largestAxisScale = Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
-        return bodyCollider.radius * largestAxisScale;
+        
+        return aiCircleCollider.radius * largestAxisScale;
     }
 
     private float GetPuckRadius()
     {
-        if (!puckBody)
+        if (!puck)
         {
             return 0.175f;
         }
 
-        if (!puckCollider)
-        {
-            puckCollider = puckBody.GetComponent<CircleCollider2D>();
-        }
-
-        if (!puckCollider)
-        {
-            return 0.175f;
-        }
-
-        var scale = puckBody.transform.lossyScale;
-        var largestAxisScale = Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
-        return puckCollider.radius * largestAxisScale;
+        return puck.Radius;
     }
 
     private void ValidateReferences()
     {
         if (!puck)
         {
-            Debug.LogError($"{nameof(AICommandSource)} on {name} requires a puck Rigidbody2D reference.", this);
+            Debug.LogError($"{nameof(AICommandSource)} on {name} requires a Puck reference.", this);
         }
     }
 }

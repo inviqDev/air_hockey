@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public sealed class RoundController : MonoBehaviour
 {
@@ -6,34 +7,34 @@ public sealed class RoundController : MonoBehaviour
     [SerializeField] private GameObject tableRoot;
 
     [Header("Prefabs")]
-    [SerializeField] private GameObject puckPrefab;
-    [SerializeField] private GameObject leftAiStrikerPrefab;
-    [SerializeField] private GameObject rightPlayerStrikerPrefab;
+    [SerializeField] private Puck puckPrefab;
+    [SerializeField] private MovementMotor2D aiStrikerPrefab;
+    [SerializeField] private MovementMotor2D playerStrikerPrefab;
 
     [Header("Default Points")]
-    [SerializeField] private Transform leftPuckDefaultPoint;
-    [SerializeField] private Transform rightPuckDefaultPoint;
-    [SerializeField] private Transform leftStrikerDefaultPoint;
-    [SerializeField] private Transform rightStrikerDefaultPoint;
+    [SerializeField] private Transform leftPuckSpawnPoint;
+    [SerializeField] private Transform rightPuckSpawnPoint;
+    [SerializeField] private Transform leftStrikerSpawnPoint;
+    [SerializeField] private Transform rightStrikerSpawnPoint;
 
     [Header("Runtime Instances")]
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private PuckRegistry puckRegistry;
 
-    private Rigidbody2D _puck;
-    private Rigidbody2D _leftStriker;
-    private Rigidbody2D _rightStriker;
-    
+    private Puck puck;
+    private Rigidbody2D leftStrikerRb;
+    private Rigidbody2D rightStrikerRb;
+
     public void SpawnGameItems(MatchConfiguration configuration)
     {
         DespawnGameItems();
         ShowTable();
 
-        _puck = SpawnRigidbody(puckPrefab, GetPosition(leftPuckDefaultPoint));
-        puckRegistry?.RegisterPuck(_puck);
+        puck = SpawnPuck(puckPrefab, GetPosition(leftPuckSpawnPoint));
+        puckRegistry?.RegisterPuck(puck);
 
-        _leftStriker = SpawnStriker(configuration, PlayerSide.Left, GetPosition(leftStrikerDefaultPoint));
-        _rightStriker = SpawnStriker(configuration, PlayerSide.Right, GetPosition(rightStrikerDefaultPoint));
+        leftStrikerRb = SpawnStriker(configuration, PlayerSide.Left, GetPosition(leftStrikerSpawnPoint));
+        rightStrikerRb = SpawnStriker(configuration, PlayerSide.Right, GetPosition(rightStrikerSpawnPoint));
 
         ResetRound();
     }
@@ -42,13 +43,13 @@ public sealed class RoundController : MonoBehaviour
     {
         Debug.Log("Add pool");
 
-        DestroyBody(_leftStriker);
-        DestroyBody(_rightStriker);
-        DestroyBody(_puck);
+        DestroyBody(leftStrikerRb);
+        DestroyBody(rightStrikerRb);
+        DestroyPuck(puck);
 
-        _leftStriker = null;
-        _rightStriker = null;
-        _puck = null;
+        leftStrikerRb = null;
+        rightStrikerRb = null;
+        puck = null;
         puckRegistry?.Clear();
 
         HideTable();
@@ -56,13 +57,11 @@ public sealed class RoundController : MonoBehaviour
 
     public void ResetRound()
     {
-        ResetBody(_leftStriker, GetPosition(leftStrikerDefaultPoint));
-        ResetBody(_rightStriker, GetPosition(rightStrikerDefaultPoint));
+        ResetBody(leftStrikerRb, GetPosition(leftStrikerSpawnPoint));
+        ResetBody(rightStrikerRb, GetPosition(rightStrikerSpawnPoint));
 
         if (serveManager)
-        {
-            ResetBody(_puck, serveManager.GetPuckStartPosition(GetPosition(leftPuckDefaultPoint), GetPosition(rightPuckDefaultPoint)));
-        }
+            ResetPuck(puck, serveManager.GetPuckStartPosition(GetPosition(leftPuckSpawnPoint), GetPosition(rightPuckSpawnPoint)));
     }
 
     private void OnValidate()
@@ -76,12 +75,20 @@ public sealed class RoundController : MonoBehaviour
         DespawnGameItems();
     }
 
-    private static Rigidbody2D SpawnRigidbody(GameObject prefab, Vector2 position)
+    private static Rigidbody2D SpawnStrikerBody(MovementMotor2D prefab, Vector2 position)
     {
         if (!prefab) return null;
 
         var instance = Instantiate(prefab, position, Quaternion.identity);
         return instance.GetComponent<Rigidbody2D>();
+    }
+
+    private static Puck SpawnPuck(Puck prefab, Vector2 position)
+    {
+        if (!prefab) return null;
+
+        var instance = Instantiate(prefab, position, Quaternion.identity);
+        return instance;
     }
 
     private Rigidbody2D SpawnStriker(MatchConfiguration configuration, PlayerSide side, Vector2 position)
@@ -90,7 +97,8 @@ public sealed class RoundController : MonoBehaviour
         var isAi = player == MatchPlayer.PlayerTwo &&
                    configuration.PlayerTwoControlType == PlayerTwoControlType.Ai;
 
-        var striker = SpawnRigidbody(isAi ? leftAiStrikerPrefab : rightPlayerStrikerPrefab, position);
+        var strikerPrefab = isAi ? aiStrikerPrefab : playerStrikerPrefab;
+        var striker = SpawnStrikerBody(strikerPrefab, position);
 
         if (isAi)
         {
@@ -107,9 +115,7 @@ public sealed class RoundController : MonoBehaviour
     private static PlayerControlScheme GetControlScheme(MatchConfiguration configuration, MatchPlayer player, PlayerSide side)
     {
         if (configuration.PlayerTwoControlType == PlayerTwoControlType.Ai && player == MatchPlayer.PlayerOne)
-        {
             return PlayerControlScheme.WasdAndArrows;
-        }
 
         return side == PlayerSide.Left
             ? PlayerControlScheme.Wasd
@@ -146,16 +152,14 @@ public sealed class RoundController : MonoBehaviour
 
         var aiCommandSource = striker.GetComponent<AICommandSource>();
         aiCommandSource?.SetSide(side);
-        aiCommandSource?.SetPuck(_puck);
+        aiCommandSource?.SetPuck(puck);
     }
 
     private static void ConfigureSideOwner(Rigidbody2D striker, PlayerSide side)
     {
         var sideOwner = striker.GetComponent<SideOwner>();
-        if (sideOwner != null)
-        {
+        if (sideOwner)
             sideOwner.Side = side;
-        }
     }
 
     private static Vector2 GetPosition(Transform point)
@@ -170,6 +174,13 @@ public sealed class RoundController : MonoBehaviour
         Destroy(body.gameObject);
     }
 
+    private static void DestroyPuck(Puck puck)
+    {
+        if (!puck) return;
+
+        Destroy(puck.gameObject);
+    }
+
     private static void ResetBody(Rigidbody2D body, Vector2 position)
     {
         if (!body) return;
@@ -177,64 +188,51 @@ public sealed class RoundController : MonoBehaviour
 #if UNITY_6000_0_OR_NEWER
         body.linearVelocity = Vector2.zero;
 #else
-    body.velocity = Vector2.zero;
+        body.velocity = Vector2.zero;
 #endif
-        
+
         body.angularVelocity = 0f;
         body.position = position;
         body.rotation = 0f;
     }
 
+    private static void ResetPuck(Puck puck, Vector2 position)
+    {
+        if (!puck) return;
+
+        puck.ResetState(position);
+    }
+
     private void ValidateReferences()
     {
-        if (tableRoot == null)
-        {
+        if (!tableRoot)
             Debug.LogError($"{nameof(RoundController)} requires a table root reference.", this);
-        }
 
-        if (puckPrefab == null)
-        {
-            Debug.LogError($"{nameof(RoundController)} requires a _puck prefab reference.", this);
-        }
+        if (!puckPrefab)
+            Debug.LogError($"{nameof(RoundController)} requires a puck prefab reference.", this);
 
-        if (leftAiStrikerPrefab == null)
-        {
+        if (!aiStrikerPrefab)
             Debug.LogError($"{nameof(RoundController)} requires a left AI striker prefab reference.", this);
-        }
 
-        if (rightPlayerStrikerPrefab == null)
-        {
+        if (!playerStrikerPrefab)
             Debug.LogError($"{nameof(RoundController)} requires a right player striker prefab reference.", this);
-        }
 
-        if (leftPuckDefaultPoint == null)
-        {
-            Debug.LogError($"{nameof(RoundController)} requires a left _puck default point reference.", this);
-        }
+        if (!leftPuckSpawnPoint)
+            Debug.LogError($"{nameof(RoundController)} requires a left puck default point reference.", this);
 
-        if (rightPuckDefaultPoint == null)
-        {
-            Debug.LogError($"{nameof(RoundController)} requires a right _puck default point reference.", this);
-        }
+        if (!rightPuckSpawnPoint)
+            Debug.LogError($"{nameof(RoundController)} requires a right puck default point reference.", this);
 
-        if (leftStrikerDefaultPoint == null)
-        {
+        if (!leftStrikerSpawnPoint)
             Debug.LogError($"{nameof(RoundController)} requires a left striker default point reference.", this);
-        }
 
-        if (rightStrikerDefaultPoint == null)
-        {
+        if (!rightStrikerSpawnPoint)
             Debug.LogError($"{nameof(RoundController)} requires a right striker default point reference.", this);
-        }
 
-        if (serveManager == null)
-        {
+        if (!serveManager)
             Debug.LogError($"{nameof(RoundController)} requires a ServeManager reference.", this);
-        }
 
-        if (puckRegistry == null)
-        {
+        if (!puckRegistry)
             Debug.LogError($"{nameof(RoundController)} requires a PuckRegistry reference.", this);
-        }
     }
 }

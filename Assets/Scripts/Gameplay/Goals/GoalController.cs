@@ -25,7 +25,7 @@ public sealed class GoalController : MonoBehaviour
         ValidateReferences();
     }
 
-    public bool TryHandleGoal(PlayerSide goalSide, Rigidbody2D candidate)
+    public bool TryHandleGoal(PlayerSide goalSide, Puck candidate)
     {
         if (!scoreKeeper || !serveManager) return false;
         if (!puckRegistry || !puckRegistry.IsPuck(candidate)) return false;

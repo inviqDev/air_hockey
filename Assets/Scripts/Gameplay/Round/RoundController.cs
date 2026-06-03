@@ -212,22 +212,22 @@ public sealed class RoundController : MonoBehaviour
             Debug.LogError($"{nameof(RoundController)} requires a puck prefab reference.", this);
 
         if (!aiStrikerPrefab)
-            Debug.LogError($"{nameof(RoundController)} requires a left AI striker prefab reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a AI striker prefab reference.", this);
 
         if (!playerStrikerPrefab)
-            Debug.LogError($"{nameof(RoundController)} requires a right player striker prefab reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a player striker prefab reference.", this);
 
         if (!leftPuckSpawnPoint)
-            Debug.LogError($"{nameof(RoundController)} requires a left puck default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a left puck spawn point reference.", this);
 
         if (!rightPuckSpawnPoint)
-            Debug.LogError($"{nameof(RoundController)} requires a right puck default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a right puck spawn point reference.", this);
 
         if (!leftStrikerSpawnPoint)
-            Debug.LogError($"{nameof(RoundController)} requires a left striker default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a left striker spawn point reference.", this);
 
         if (!rightStrikerSpawnPoint)
-            Debug.LogError($"{nameof(RoundController)} requires a right striker default point reference.", this);
+            Debug.LogError($"{nameof(RoundController)} requires a right striker spawn point reference.", this);
 
         if (!serveManager)
             Debug.LogError($"{nameof(RoundController)} requires a ServeManager reference.", this);

@@ -16,3 +16,7 @@
 - If an `if` statement contains two or more lines inside its body, use braces.
 - Do not pass complex conditional or nested expressions directly into method calls.
   - Split that logic into local variables first, then pass the local variables into the method.
+- Do not use scene-wide or hierarchy-search lookup methods as routine dependency resolution.
+  - Avoid APIs that search the scene, object tree, tags, or global object collections at runtime.
+  - Prefer explicit serialized references, constructor-style setup, registration, or deliberate wiring from an owning composition/root object.
+  - If a lookup is truly unavoidable, treat it as an exceptional case and document why the dependency cannot be wired directly.

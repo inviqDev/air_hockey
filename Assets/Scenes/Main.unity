@@ -5756,13 +5756,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tableRoot: {fileID: 35699399}
-  puckPrefab: {fileID: 1257879466314776656, guid: 8128990624cb6214c8c2a44501456305, type: 3}
-  leftAiStrikerPrefab: {fileID: 2470998444364862894, guid: b99413a185c791f4b9dd58177564dc20, type: 3}
-  rightPlayerStrikerPrefab: {fileID: 1799019528874754244, guid: 350ae3115113dc24b855dd855754adbe, type: 3}
-  leftPuckDefaultPoint: {fileID: 1160358448}
-  rightPuckDefaultPoint: {fileID: 1783595228}
-  leftStrikerDefaultPoint: {fileID: 1818456561}
-  rightStrikerDefaultPoint: {fileID: 1889789905}
+  puckPrefab: {fileID: 6200000000000000007, guid: 8128990624cb6214c8c2a44501456305, type: 3}
+  aiStrikerPrefab: {fileID: 6200000000000000005, guid: b99413a185c791f4b9dd58177564dc20, type: 3}
+  playerStrikerPrefab: {fileID: 6100000000000000005, guid: 350ae3115113dc24b855dd855754adbe, type: 3}
+  leftPuckSpawnPoint: {fileID: 1160358448}
+  rightPuckSpawnPoint: {fileID: 1783595228}
+  leftStrikerSpawnPoint: {fileID: 1818456561}
+  rightStrikerSpawnPoint: {fileID: 1889789905}
   serveManager: {fileID: 6400000000000000006}
   puckRegistry: {fileID: 7000000000000000001}
 --- !u!114 &6400000000000000008

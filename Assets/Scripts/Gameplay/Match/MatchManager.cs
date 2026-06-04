@@ -61,13 +61,15 @@ public sealed class MatchManager : MonoBehaviour
         turnController.PrepareTurn(ResetRoundAndStatus);
     }
 
-    private void ResetRoundAndStatus()
+    private bool ResetRoundAndStatus()
     {
         if (roundController)
             roundController.ResetRound();
-
+        
         if (uiManager)
             uiManager.ClearGoalPopUpText();
+
+        return roundController && roundController.HasAllGameItemsSpawned;
     }
 
     private void HandleGoalResult(GoalResult result)
@@ -139,12 +141,12 @@ public sealed class MatchManager : MonoBehaviour
             turnController.EndTurn();
     }
 
-    private void SpawnConfiguredMatch(MatchConfiguration configuration)
+    private bool SpawnConfiguredMatch(MatchConfiguration configuration)
     {
-        if (!roundController) return;
+        if (!roundController) return false;
 
         roundController.DespawnGameItems();
-        roundController.SpawnGameItems(configuration);
+        return roundController.SpawnGameItems(configuration);
     }
 
     private void StopCurrentMatch()
@@ -166,6 +168,9 @@ public sealed class MatchManager : MonoBehaviour
         if (uiManager)
             uiManager.MatchConfigurationSelected += HandleMatchConfigurationSelected;
 
+        if (turnController)
+            turnController.RespawnItemsRequested += HandleRespawnItemsRequested;
+
         var inGameMenu = uiManager ? uiManager.InGameMenu : null;
         if (inGameMenu)
         {
@@ -182,12 +187,25 @@ public sealed class MatchManager : MonoBehaviour
         if (uiManager)
             uiManager.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
 
+        if (turnController)
+            turnController.RespawnItemsRequested -= HandleRespawnItemsRequested;
+
         var inGameMenu = uiManager ? uiManager.InGameMenu : null;
         if (inGameMenu)
         {
             inGameMenu.RestartClicked -= HandleRestartClicked;
             inGameMenu.MainMenuClicked -= HandleMainMenuClicked;
         }
+    }
+
+    private void HandleRespawnItemsRequested()
+    {
+        if (!HasActiveMatch) return;
+        if (!hasCurrentConfiguration) return;
+
+        var canStartTurn = SpawnConfiguredMatch(currentConfiguration);
+        uiManager?.ClearGoalPopUpText();
+        turnController?.ShowTurnPreparation(canStartTurn);
     }
 
     private void ValidateReferences()

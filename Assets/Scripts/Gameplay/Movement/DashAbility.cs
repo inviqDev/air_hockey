@@ -9,6 +9,12 @@ public sealed class DashAbility : MonoBehaviour
     private float remainingDashTime;
     private float remainingCooldownTime;
 
+    public void ResetState()
+    {
+        remainingDashTime = 0f;
+        remainingCooldownTime = 0f;
+    }
+
     public Vector2 Step(bool requested, PlayerSide side, float deltaTime)
     {
         if (remainingCooldownTime > 0f)

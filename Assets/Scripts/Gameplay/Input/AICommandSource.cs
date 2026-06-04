@@ -3,49 +3,55 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 {
-    [Header("References")]
-    [SerializeField] private Puck puck;
+    [Header("References")] [SerializeField]
+    private Puck puck;
 
-    [Header("Positions")]
-    [SerializeField] private Vector2 defensivePosition = new(-7.5f, 0f);
+    [Header("Positions")] [SerializeField] private Vector2 defensivePosition = new(-7.5f, 0f);
     [SerializeField] private float centerX = 0f;
 
-    [Header("AI Tuning")]
-    [SerializeField, Range(0f, 1f)] private float aggression = 0.95f;
+    [Header("AI Tuning")] [SerializeField, Range(0f, 1f)]
+    private float aggression = 0.95f;
+
     [SerializeField] private float predictionTime = 0.28f;
     [SerializeField] private float threatTrackSpeedThreshold = 0.08f;
     [SerializeField] private float commitDistance = 3f;
 
-    [Header("Guard Position")]
-    [SerializeField] private float guardForwardOffset = 0.85f;
+    [Header("Guard Position")] [SerializeField]
+    private float guardForwardOffset = 0.85f;
+
     [SerializeField] private float guardYFollow = 0.45f;
     [SerializeField] private float guardYDeadZone = 0.9f;
 
-    [Header("Strike Logic")]
-    [SerializeField] private Vector2 attackDirection = Vector2.right;
+    [Header("Strike Logic")] [SerializeField]
+    private Vector2 attackDirection = Vector2.right;
+
     [SerializeField] private float setupDistance = 0.7f;
     [SerializeField] private float behindPuckTolerance = 0.3f;
     [SerializeField] private float strikeDistance = 0.9f;
     [SerializeField] private float sideStepDistance = 0.95f;
     [SerializeField] private float goalCenteringWeight = 0.35f;
 
-    [Header("Dash")]
-    [SerializeField] private float dashDistance = 1.35f;
+    [Header("Dash")] [SerializeField] private float dashDistance = 1.35f;
     [SerializeField] private float dashCooldown = 0.55f;
     [SerializeField, Range(-1f, 1f)] private float dashDirectionThreshold = 0.25f;
 
     private PlayerSide side = PlayerSide.Left;
     private float remainingDashCooldown;
-    
+
     private Rigidbody2D aiRigidbody;
     private CircleCollider2D aiCircleCollider;
 
     private void Awake()
     {
-        aiRigidbody = GetComponent<Rigidbody2D>();
-        aiCircleCollider = GetComponent<CircleCollider2D>();
-        
-        attackDirection = attackDirection.sqrMagnitude > 0.001f ? attackDirection.normalized : Vector2.right;
+        if (!aiRigidbody)
+            aiRigidbody = GetComponent<Rigidbody2D>();
+
+        if (!aiCircleCollider)
+            aiCircleCollider = GetComponent<CircleCollider2D>();
+
+        attackDirection = attackDirection.sqrMagnitude > 0.001f 
+            ? attackDirection.normalized 
+            : Vector2.right;
     }
 
     private void OnValidate()
@@ -89,9 +95,14 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         return MoveToward(approachTarget, false);
     }
 
-    public void SetPuck(Puck puckComponent) => puck = puckComponent;
+    public void SetCurrentPuck(Puck puckComponent) => puck = puckComponent;
 
-    public void SetSide(PlayerSide playerSide)
+    public void ResetState()
+    {
+        remainingDashCooldown = 0f;
+    }
+
+    public void SetStrikerSide(PlayerSide playerSide)
     {
         side = playerSide;
 
@@ -153,7 +164,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         setupTarget.x = ClampToAiSide(setupTarget.x);
 
         if (!IsPuckBetweenAiAndSetupTarget(puckPosition, setupTarget)) return setupTarget;
-        
+
         var yDirection = aiRigidbody.position.y >= puckPosition.y ? 1f : -1f;
         setupTarget.y += yDirection * GetSideStepDistance();
 
@@ -172,7 +183,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private Vector2 GetAttackContactTarget(Vector2 puckPosition)
     {
-        var contactOffset = GetPuckRadius() + GetBodyRadius() * 0.35f;
+        var contactOffset = GetPuckRadius() + GetStrikerRadius() * 0.35f;
         var contactTarget = puckPosition - attackDirection * contactOffset;
         contactTarget.y = Mathf.Lerp(contactTarget.y, 0f, goalCenteringWeight);
         contactTarget.x = ClampToAiSide(contactTarget.x);
@@ -276,7 +287,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private float GetCommitDistance()
     {
-        return commitDistance + GetPuckRadius() * 2f + GetBodyRadius() * 0.6f;
+        return commitDistance + GetPuckRadius() * 2f + GetStrikerRadius() * 0.6f;
     }
 
     private float GetSetupDistance()
@@ -291,7 +302,7 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
 
     private float GetStrikeDistance()
     {
-        return strikeDistance + GetPuckRadius() * 0.9f + GetBodyRadius() * 0.2f;
+        return strikeDistance + GetPuckRadius() * 0.9f + GetStrikerRadius() * 0.2f;
     }
 
     private float GetSideStepDistance()
@@ -304,14 +315,14 @@ public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
         return dashDistance + GetPuckRadius() * 1.1f;
     }
 
-    private float GetBodyRadius()
+    private float GetStrikerRadius()
     {
         if (!aiCircleCollider)
             aiCircleCollider = GetComponent<CircleCollider2D>();
 
         var scale = aiRigidbody.transform.lossyScale;
         var largestAxisScale = Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
-        
+
         return aiCircleCollider.radius * largestAxisScale;
     }
 

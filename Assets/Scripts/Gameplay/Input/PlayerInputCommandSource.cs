@@ -15,6 +15,11 @@ public sealed class PlayerInputCommandSource : MonoBehaviour, IMovementCommandSo
     
     private bool dashPressed;
 
+    public void ResetState()
+    {
+        dashPressed = false;
+    }
+
     public void SetControlScheme(PlayerControlScheme scheme)
     {
         controlScheme = scheme;

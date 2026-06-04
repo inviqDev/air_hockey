@@ -5769,8 +5769,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tableRoot: {fileID: 35699399}
   puckPrefab: {fileID: 6200000000000000007, guid: 8128990624cb6214c8c2a44501456305, type: 3}
-  aiStrikerPrefab: {fileID: 6200000000000000005, guid: b99413a185c791f4b9dd58177564dc20, type: 3}
-  playerStrikerPrefab: {fileID: 6100000000000000005, guid: 350ae3115113dc24b855dd855754adbe, type: 3}
+  aiStrikerPrefab: {fileID: 6200000000000000006, guid: b99413a185c791f4b9dd58177564dc20, type: 3}
+  playerStrikerPrefab: {fileID: 6100000000000000006, guid: 350ae3115113dc24b855dd855754adbe, type: 3}
   leftPuckSpawnPoint: {fileID: 1160358448}
   rightPuckSpawnPoint: {fileID: 1783595228}
   leftStrikerSpawnPoint: {fileID: 1818456561}

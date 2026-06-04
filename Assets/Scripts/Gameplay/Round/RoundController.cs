@@ -24,7 +24,9 @@ public sealed class RoundController : MonoBehaviour
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
 
-    public void SpawnGameItems(MatchConfiguration configuration)
+    public bool HasAllGameItemsSpawned => puck && leftStriker && rightStriker;
+
+    public bool SpawnGameItems(MatchConfiguration configuration)
     {
         DespawnGameItems();
         ShowTable();
@@ -36,6 +38,7 @@ public sealed class RoundController : MonoBehaviour
         rightStriker = SpawnStriker(configuration, PlayerSide.Right, GetPosition(rightStrikerSpawnPoint));
 
         ResetRound();
+        return HasAllGameItemsSpawned;
     }
     
     public void DespawnGameItems()

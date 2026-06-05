@@ -1,4 +1,4 @@
-# CodexWorkflow.md
+# AgentWorkflow.md
 
 Workflow rules for AI coding agents working on this Unity project.
 
@@ -46,13 +46,13 @@ Always read root `AGENTS.md` first.
 Then read additional files only when relevant:
 
 - Unity gameplay / scene / prefab / input / UI / physics / pooling / performance work:
-  - `Docs/AI/UnityRules.md`
+  - `Docs/AI/UnityCodingRules.md`
 
 - architecture / class design / patterns / dependencies / managers / services:
   - `Docs/AI/ArchitectureRules.md`
 
 - code editing / reporting / validation workflow:
-  - `Docs/AI/CodexWorkflow.md`
+  - `Docs/AI/AgentWorkflow.md`
 
 If unsure, read the relevant file before making changes.
 

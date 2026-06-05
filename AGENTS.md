@@ -14,7 +14,7 @@ This file contains mandatory instructions for AI coding agents working on this U
 
 Before starting work, read the relevant instruction files:
 
-If the task touches Unity scene logic, MonoBehaviours, prefabs, spawning, input, UI, physics, pooling, or performance - read `Docs/AI/UnityRules.md`.
+If the task touches Unity scene logic, MonoBehaviours, prefabs, spawning, input, UI, physics, pooling, or performance - read `Docs/AI/UnityCodingRules.md`.
 
 If the task touches class design, managers, services, factories, state machines, events, ScriptableObjects, or system boundaries - read `Docs/AI/ArchitectureRules.md`.
 

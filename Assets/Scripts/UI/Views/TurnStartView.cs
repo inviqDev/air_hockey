@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class TurnStartView : MonoBehaviour
+public sealed class TurnStartView : MenuViewBase
 {
     [Header("Start button settings")] 
     [SerializeField] private GameObject startRoundButtonsRoot;
@@ -31,17 +31,12 @@ public sealed class TurnStartView : MonoBehaviour
 
     private Coroutine countdownRoutine;
     private bool canStartTurn;
+    private int currentCountdownValue;
+    private bool shouldResumeCountdownAfterEnable;
     private const string SpawnErrorMessage = "Round setup failed.\nPress Respawn Items to rebuild it.";
 
     public event Action CountdownCompleted;
     public event Action RespawnItemsRequested;
-
-    private void Awake()
-    {
-        ValidateReferences();
-        CacheReferences();
-        ResolveStartButtonImage();
-    }
 
     private void OnEnable()
     {
@@ -56,11 +51,13 @@ public sealed class TurnStartView : MonoBehaviour
             respawnItemsButton.onClick.RemoveListener(RequestRespawnItems);
             respawnItemsButton.onClick.AddListener(RequestRespawnItems);
         }
+
+        ResumeCountdownIfNeeded();
     }
 
     private void OnDisable()
     {
-        StopCountdown();
+        PauseCountdownForViewDisable();
         StopStartButtonAnimation();
 
         if (startTurnButton)
@@ -75,10 +72,26 @@ public sealed class TurnStartView : MonoBehaviour
         ValidateReferences();
     }
 
+    protected override void HandleAfterInitialize()
+    {
+        ValidateReferences();
+        CacheReferences();
+        ResolveStartButtonImage();
+        SetCountdownText(string.Empty);
+        SetStartRoundButtonsVisible(false);
+        SetSpawnErrorMessageVisible(false);
+
+        if (startTurnButton)
+            startTurnButton.interactable = false;
+
+        if (respawnItemsButton)
+            respawnItemsButton.interactable = false;
+    }
+
     public void ShowTurnPreparation(bool isTurnReadyToStart)
     {
-        EnsureTurnPreparationViewIsActive();
-        StopCountdown();
+        ResetCountdownState();
+        ShowImmediately();
         StopStartButtonAnimation();
         SetCountdownText(string.Empty);
         SetSpawnErrorMessageVisible(false);
@@ -111,7 +124,7 @@ public sealed class TurnStartView : MonoBehaviour
 
     public void Cancel()
     {
-        StopCountdown();
+        ResetCountdownState();
         SetCountdownText(string.Empty);
         HideTurnPreparation();
     }
@@ -121,7 +134,9 @@ public sealed class TurnStartView : MonoBehaviour
         if (countdownRoutine != null) return;
 
         HideTurnPreparation();
-        countdownRoutine = StartCoroutine(CountdownRoutine());
+        currentCountdownValue = Mathf.Max(1, countdownSeconds);
+        shouldResumeCountdownAfterEnable = false;
+        countdownRoutine = StartCoroutine(CountdownRoutine(currentCountdownValue));
     }
 
     private void RequestRespawnItems()
@@ -137,7 +152,6 @@ public sealed class TurnStartView : MonoBehaviour
 
         if (!startTurnButton) return;
 
-        EnsureTurnPreparationViewIsActive();
         CacheReferences();
         ResolveStartButtonImage();
         SetStartRoundButtonsVisible(true);
@@ -164,17 +178,18 @@ public sealed class TurnStartView : MonoBehaviour
             .SetLoops(-1, LoopType.Yoyo);
     }
 
-    private IEnumerator CountdownRoutine()
+    private IEnumerator CountdownRoutine(int startingValue)
     {
-        var seconds = Mathf.Max(1, countdownSeconds);
-
-        for (var secondsRemaining = seconds; secondsRemaining > 0; secondsRemaining--)
+        for (var secondsRemaining = startingValue; secondsRemaining > 0; secondsRemaining--)
         {
+            currentCountdownValue = secondsRemaining;
             SetCountdownText(secondsRemaining.ToString());
             yield return new WaitForSeconds(1f);
         }
 
         countdownRoutine = null;
+        currentCountdownValue = 0;
+        shouldResumeCountdownAfterEnable = false;
         SetCountdownText(string.Empty);
         CountdownCompleted?.Invoke();
     }
@@ -185,6 +200,33 @@ public sealed class TurnStartView : MonoBehaviour
 
         StopCoroutine(countdownRoutine);
         countdownRoutine = null;
+    }
+
+    private void PauseCountdownForViewDisable()
+    {
+        if (countdownRoutine == null) return;
+
+        StopCoroutine(countdownRoutine);
+        countdownRoutine = null;
+        shouldResumeCountdownAfterEnable = currentCountdownValue > 0;
+    }
+
+    private void ResumeCountdownIfNeeded()
+    {
+        if (!shouldResumeCountdownAfterEnable) return;
+        if (currentCountdownValue <= 0) return;
+        if (countdownRoutine != null) return;
+
+        shouldResumeCountdownAfterEnable = false;
+        SetCountdownText(currentCountdownValue.ToString());
+        countdownRoutine = StartCoroutine(CountdownRoutine(currentCountdownValue));
+    }
+
+    private void ResetCountdownState()
+    {
+        StopCountdown();
+        currentCountdownValue = 0;
+        shouldResumeCountdownAfterEnable = false;
     }
 
     private void StopStartButtonAnimation()
@@ -201,8 +243,11 @@ public sealed class TurnStartView : MonoBehaviour
 
     private void SetCountdownText(string message)
     {
-        if (countdownText)
-            countdownText.text = message;
+        if (!countdownText) return;
+
+        var shouldShowCountdown = !string.IsNullOrEmpty(message);
+        countdownText.gameObject.SetActive(shouldShowCountdown);
+        countdownText.text = message;
     }
 
     private void SetSpawnErrorMessageVisible(bool isVisible)
@@ -231,52 +276,6 @@ public sealed class TurnStartView : MonoBehaviour
     {
         if (!startRoundButtonsRoot && startTurnButton)
             startRoundButtonsRoot = startTurnButton.transform.parent.gameObject;
-    }
-
-    private void EnsureTurnPreparationViewIsActive()
-    {
-        EnsureGameObjectIsActive(gameObject);
-        EnsureAncestorsAreActive(transform, null);
-
-        if (startRoundButtonsRoot)
-            EnsureGameObjectIsActive(startRoundButtonsRoot);
-
-        if (startTurnButton)
-        {
-            EnsureGameObjectIsActive(startTurnButton.gameObject);
-            EnsureAncestorsAreActive(startTurnButton.transform, transform);
-        }
-
-        if (respawnItemsButton)
-        {
-            EnsureGameObjectIsActive(respawnItemsButton.gameObject);
-            EnsureAncestorsAreActive(respawnItemsButton.transform, transform);
-        }
-
-        if (spawnErrorMessageText)
-        {
-            EnsureGameObjectIsActive(spawnErrorMessageText.gameObject);
-            EnsureAncestorsAreActive(spawnErrorMessageText.transform, transform);
-        }
-    }
-
-    private static void EnsureAncestorsAreActive(Transform leaf, Transform exclusiveStopParent)
-    {
-        var current = leaf;
-
-        while (current && current != exclusiveStopParent)
-        {
-            EnsureGameObjectIsActive(current.gameObject);
-            current = current.parent;
-        }
-    }
-
-    private static void EnsureGameObjectIsActive(GameObject target)
-    {
-        if (!target) return;
-        if (target.activeSelf) return;
-
-        target.SetActive(true);
     }
 
     private void SetStartRoundButtonsVisible(bool isVisible)

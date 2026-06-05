@@ -72,6 +72,14 @@ public sealed class TurnController : MonoBehaviour
         turnStartView?.ShowTurnPreparation(canStartTurn);
     }
 
+    public void RefreshTurnPreparation(Func<bool> beforeShowTurnPreparation)
+    {
+        if (IsTurnActive) return;
+
+        var canStartTurn = beforeShowTurnPreparation == null || beforeShowTurnPreparation();
+        turnStartView?.ShowTurnPreparation(canStartTurn);
+    }
+
     private IEnumerator PrepareTurnAfterGoalDelayRoutine(Func<bool> beforeShowTurnPreparation)
     {
         var delaySeconds = Mathf.Max(0f, goalDelayBeforeNextTurnSeconds);

@@ -1,8 +1,15 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 
 public sealed class StartGameMenu : MenuViewBase
 {
+    [Header("Animation")]
+    [SerializeField, Min(0.01f)] private float fadeInDuration = 0.25f;
+    [SerializeField, Min(0.01f)] private float fadeOutDuration = 0.2f;
+    [SerializeField] private Ease fadeInEase = Ease.OutSine;
+    [SerializeField] private Ease fadeOutEase = Ease.InSine;
+
     [Header("References")]
     [SerializeField] private StartGameMenuView startGameMenu;
     [SerializeField] private OpponentSelectionView opponentSelection;
@@ -11,14 +18,7 @@ public sealed class StartGameMenu : MenuViewBase
     public event Action<MatchConfiguration> MatchConfigurationSelected;
 
     private PlayerTwoControlType playerTwoControlType;
-
-    protected override void Awake()
-    {
-        base.Awake();
-        
-        ValidateReferences();
-        ShowStartGameMenu();
-    }
+    private Tween fadeTween;
 
     private void OnEnable()
     {
@@ -60,6 +60,8 @@ public sealed class StartGameMenu : MenuViewBase
             sideSelection.SideSelected -= SelectSide;
             sideSelection.BackButtonClicked -= ShowOpponentSelection;
         }
+
+        StopFadeTween();
     }
 
     private void OnValidate()
@@ -72,26 +74,52 @@ public sealed class StartGameMenu : MenuViewBase
         ShowStartGameMenu();
     }
 
+    protected override void HandleAfterInitialize()
+    {
+        ValidateReferences();
+        ShowStartGameMenu();
+    }
+
+    protected override void PlayShowAnimation(Action onComplete)
+    {
+        StopFadeTween();
+        fadeTween = MenuAnimationsHelper.PlayCanvasGroupFade(
+            ResolvedCanvasGroup,
+            0f,
+            1f,
+            fadeInDuration,
+            fadeInEase,
+            HandleFadeCompleted(onComplete),
+            true);
+    }
+
+    protected override void PlayHideAnimation(Action onComplete)
+    {
+        StopFadeTween();
+        fadeTween = MenuAnimationsHelper.PlayCanvasGroupFade(
+            ResolvedCanvasGroup,
+            1f,
+            0f,
+            fadeOutDuration,
+            fadeOutEase,
+            HandleFadeCompleted(onComplete),
+            true);
+    }
+
     private void SelectOpponentMode(PlayerTwoControlType selectedPlayerTwoControlType)
     {
         playerTwoControlType = selectedPlayerTwoControlType;
-        startGameMenu?.Hide();
-        opponentSelection?.Hide();
-        sideSelection?.Show();
+        ShowOnly(sideSelection);
     }
 
     private void ShowStartGameMenu()
     {
-        sideSelection?.HideImmediately();
-        opponentSelection?.HideImmediately();
-        startGameMenu?.Show();
+        ShowOnly(startGameMenu);
     }
 
     private void ShowOpponentSelection()
     {
-        startGameMenu?.Hide();
-        sideSelection?.Hide();
-        opponentSelection?.Show();
+        ShowOnly(opponentSelection);
     }
 
     private void SelectSide(PlayerSide playerOneSide)
@@ -109,6 +137,38 @@ public sealed class StartGameMenu : MenuViewBase
 #else
         Application.Quit();
 #endif
+    }
+
+    private void ShowOnly(MenuViewBase target)
+    {
+        SetSubmenuVisibility(startGameMenu, target == startGameMenu);
+        SetSubmenuVisibility(opponentSelection, target == opponentSelection);
+        SetSubmenuVisibility(sideSelection, target == sideSelection);
+    }
+
+    private static void SetSubmenuVisibility(MenuViewBase view, bool shouldShow)
+    {
+        if (!view) return;
+
+        if (shouldShow)
+            view.Show();
+        else
+            view.HideImmediately();
+    }
+
+    private void StopFadeTween()
+    {
+        fadeTween?.Kill();
+        fadeTween = null;
+    }
+
+    private Action HandleFadeCompleted(Action onComplete)
+    {
+        return () =>
+        {
+            fadeTween = null;
+            onComplete?.Invoke();
+        };
     }
 
     private void ValidateReferences()

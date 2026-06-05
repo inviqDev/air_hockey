@@ -3,8 +3,9 @@ using UnityEngine;
 
 public sealed class UIManager : MonoBehaviour
 {
+    [SerializeField] private MenuViewsContainer menuViewsContainer;
     [SerializeField] private StartGameMenu startGameMenu;
-    [SerializeField] private InGameUI inGameUI;
+    [SerializeField] private InGameMenuView inGameMenuView;
     [SerializeField] private InGameMenuController inGameMenu;
     [SerializeField] private MatchUIView matchView;
 
@@ -41,6 +42,7 @@ public sealed class UIManager : MonoBehaviour
         if (isInitialized) return;
 
         ValidateReferences();
+        menuViewsContainer?.Initialize();
         ShowInitialGameStartState();
         isInitialized = true;
     }
@@ -49,7 +51,14 @@ public sealed class UIManager : MonoBehaviour
     {
         var leftPlayerScore = matchManager ? matchManager.LeftScore : 0;
         var rightPlayerScore = matchManager ? matchManager.RightScore : 0;
-        ShowStartGameState(leftPlayerScore, rightPlayerScore);
+        ShowStartGameState(leftPlayerScore, rightPlayerScore, false);
+    }
+
+    public void ShowStartGameStateImmediately(MatchManager matchManager)
+    {
+        var leftPlayerScore = matchManager ? matchManager.LeftScore : 0;
+        var rightPlayerScore = matchManager ? matchManager.RightScore : 0;
+        ShowStartGameState(leftPlayerScore, rightPlayerScore, true);
     }
 
     public void ShowMatchState(MatchManager matchManager)
@@ -60,8 +69,8 @@ public sealed class UIManager : MonoBehaviour
         if (startGameMenu)
             startGameMenu.Hide();
 
-        if (inGameUI)
-            inGameUI.Show();
+        if (inGameMenuView)
+            inGameMenuView.Show();
     }
 
     private void SetScores(int leftScore, int rightScore)
@@ -96,16 +105,21 @@ public sealed class UIManager : MonoBehaviour
 
     private void ShowInitialGameStartState()
     {
-        ShowStartGameState(0, 0);
+        ShowStartGameState(0, 0, true);
     }
 
-    private void ShowStartGameState(int leftScore, int rightScore)
+    private void ShowStartGameState(int leftScore, int rightScore, bool hideInGameImmediately)
     {
         SetScores(leftScore, rightScore);
         ClearGoalPopUpText();
 
-        if (inGameUI)
-            inGameUI.HideImmediately();
+        if (inGameMenuView)
+        {
+            if (hideInGameImmediately || !isInitialized)
+                inGameMenuView.HideImmediately();
+            else
+                inGameMenuView.Hide();
+        }
 
         if (startGameMenu)
             startGameMenu.Show();
@@ -123,8 +137,11 @@ public sealed class UIManager : MonoBehaviour
         if (!startGameMenu)
             Debug.LogError($"{nameof(UIManager)} requires a StartGameMenu reference.", this);
 
-        if (!inGameUI)
-            Debug.LogError($"{nameof(UIManager)} requires an InGameUI reference.", this);
+        if (!menuViewsContainer)
+            Debug.LogError($"{nameof(UIManager)} requires a {nameof(MenuViewsContainer)} reference.", this);
+
+        if (!inGameMenuView)
+            Debug.LogError($"{nameof(UIManager)} requires an InGameMenuView reference.", this);
 
         if (!inGameMenu)
             Debug.LogError($"{nameof(UIManager)} requires an InGameMenuController reference.", this);

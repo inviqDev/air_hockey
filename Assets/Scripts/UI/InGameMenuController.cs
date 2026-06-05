@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class InGameMenuController : MonoBehaviour
+public sealed class InGameMenuController : MenuViewBase
 {
     [Header("Top Menu Buttons")]
     [SerializeField] private Button settingsButton;
@@ -15,18 +15,12 @@ public sealed class InGameMenuController : MonoBehaviour
     [SerializeField] private Sprite playIcon;
 
     [Header("Settings Flow")]
-    [SerializeField] private InGameSettingsMenuController settingsMenuController;
+    [SerializeField] private InGameSettingsView settingsView;
     [SerializeField] private bool pauseWhenSettingsOpen = true;
 
     public bool IsPaused { get; private set; }
     public event Action RestartClicked;
     public event Action MainMenuClicked;
-
-    private void Awake()
-    {
-        ValidateReferences();
-        ResetState();
-    }
 
     private void OnEnable()
     {
@@ -45,10 +39,10 @@ public sealed class InGameMenuController : MonoBehaviour
             settingsButton.onClick.AddListener(OpenSettings);
         }
 
-        if (settingsMenuController)
+        if (settingsView)
         {
-            settingsMenuController.BackClicked += HandleSettingsBackClicked;
-            settingsMenuController.MainMenuClicked += HandleMainMenuClicked;
+            settingsView.BackClicked += HandleSettingsBackClicked;
+            settingsView.MainMenuClicked += HandleMainMenuClicked;
         }
     }
 
@@ -69,10 +63,10 @@ public sealed class InGameMenuController : MonoBehaviour
             settingsButton.onClick.RemoveListener(OpenSettings);
         }
 
-        if (settingsMenuController)
+        if (settingsView)
         {
-            settingsMenuController.BackClicked -= HandleSettingsBackClicked;
-            settingsMenuController.MainMenuClicked -= HandleMainMenuClicked;
+            settingsView.BackClicked -= HandleSettingsBackClicked;
+            settingsView.MainMenuClicked -= HandleMainMenuClicked;
         }
 
         if (IsPaused)
@@ -85,6 +79,12 @@ public sealed class InGameMenuController : MonoBehaviour
     {
         ValidateReferences();
         UpdatePauseIcon();
+    }
+
+    protected override void HandleAfterInitialize()
+    {
+        ValidateReferences();
+        ResetState();
     }
 
     [ContextMenu("Toggle Pause")]
@@ -118,7 +118,7 @@ public sealed class InGameMenuController : MonoBehaviour
     [ContextMenu("Open Settings")]
     public void OpenSettings()
     {
-        settingsMenuController?.Open();
+        settingsView?.Open();
 
         if (pauseWhenSettingsOpen)
         {
@@ -130,7 +130,7 @@ public sealed class InGameMenuController : MonoBehaviour
     {
         IsPaused = false;
         Time.timeScale = 1f;
-        settingsMenuController?.ResetState();
+        settingsView?.ResetState();
         UpdatePauseIcon();
     }
 
@@ -193,7 +193,7 @@ public sealed class InGameMenuController : MonoBehaviour
             Debug.LogError($"{nameof(InGameMenuController)} requires a settings button reference.", this);
         }
 
-        if (!settingsMenuController)
+        if (!settingsView)
         {
             Debug.LogError($"{nameof(InGameMenuController)} requires a settings menu controller reference.", this);
         }

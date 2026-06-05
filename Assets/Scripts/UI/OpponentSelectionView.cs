@@ -1,9 +1,16 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
 public sealed class OpponentSelectionView : MenuViewBase
 {
+    [Header("Animation")]
+    [SerializeField, Min(0.01f)] private float fadeInDuration = 0.25f;
+    [SerializeField, Min(0.01f)] private float fadeOutDuration = 0.2f;
+    [SerializeField] private Ease fadeInEase = Ease.OutSine;
+    [SerializeField] private Ease fadeOutEase = Ease.InSine;
+
     [Header("Buttons")]
     [SerializeField] private Button aiOpponentButton;
     [SerializeField] private Button secondPlayerButton;
@@ -12,11 +19,7 @@ public sealed class OpponentSelectionView : MenuViewBase
     public event Action<PlayerTwoControlType> PlayerTwoControlTypeSelected;
     public event Action BackButtonClicked;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        ValidateReferences();
-    }
+    private Tween fadeTween;
 
     private void OnEnable()
     {
@@ -26,6 +29,7 @@ public sealed class OpponentSelectionView : MenuViewBase
 
     private void OnDisable()
     {
+        StopFadeTween();
         RemoveButtonListeners();
         SetInteractable(false);
     }
@@ -43,6 +47,35 @@ public sealed class OpponentSelectionView : MenuViewBase
     protected override void HandleBeforeHide()
     {
         SetInteractable(false);
+    }
+
+    protected override void HandleAfterInitialize()
+    {
+        ValidateReferences();
+    }
+
+    protected override void PlayShowAnimation(Action onComplete)
+    {
+        StopFadeTween();
+        fadeTween = MenuAnimationsHelper.PlayCanvasGroupFade(
+            ResolvedCanvasGroup,
+            0f,
+            1f,
+            fadeInDuration,
+            fadeInEase,
+            HandleFadeCompleted(onComplete));
+    }
+
+    protected override void PlayHideAnimation(Action onComplete)
+    {
+        StopFadeTween();
+        fadeTween = MenuAnimationsHelper.PlayCanvasGroupFade(
+            ResolvedCanvasGroup,
+            1f,
+            0f,
+            fadeOutDuration,
+            fadeOutEase,
+            HandleFadeCompleted(onComplete));
     }
 
     private void SelectAiOpponent()
@@ -103,6 +136,21 @@ public sealed class OpponentSelectionView : MenuViewBase
     private void HandleBackClicked()
     {
         BackButtonClicked?.Invoke();
+    }
+
+    private void StopFadeTween()
+    {
+        fadeTween?.Kill();
+        fadeTween = null;
+    }
+
+    private Action HandleFadeCompleted(Action onComplete)
+    {
+        return () =>
+        {
+            fadeTween = null;
+            onComplete?.Invoke();
+        };
     }
 
     private void ValidateReferences()

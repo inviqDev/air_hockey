@@ -11,12 +11,6 @@ public sealed class StartGameMenuView : MenuViewBase
     public event Action StartGameClicked;
     public event Action ExitGameClicked;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        ValidateReferences();
-    }
-
     private void OnEnable()
     {
         AddButtonListeners();
@@ -42,6 +36,11 @@ public sealed class StartGameMenuView : MenuViewBase
     protected override void HandleBeforeHide()
     {
         SetInteractable(false);
+    }
+
+    protected override void HandleAfterInitialize()
+    {
+        ValidateReferences();
     }
 
     private void AddButtonListeners()

@@ -1,4 +1,4 @@
-# UnityRules.md
+# UnityCodingRules.md
 
 Unity-specific rules for AI coding agents working on this Unity 3D project.
 

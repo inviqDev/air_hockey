@@ -2,9 +2,8 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
-public sealed class MatchUIView : MonoBehaviour
+public sealed class MatchUIView : MenuViewBase
 {
-    [SerializeField] private Canvas canvas;
     [SerializeField] private TextMeshProUGUI leftScoreText;
     [SerializeField] private TextMeshProUGUI rightScoreText;
     [SerializeField] private TextMeshProUGUI goalInfoText;
@@ -64,12 +63,6 @@ public sealed class MatchUIView : MonoBehaviour
         goalInfoSequence.OnComplete(CompleteGoalInfoAnimation);
     }
 
-    private void Awake()
-    {
-        ValidateReferences();
-        HideGoalInfoImmediately();
-    }
-
     private void OnValidate()
     {
         ValidateReferences();
@@ -79,6 +72,13 @@ public sealed class MatchUIView : MonoBehaviour
     {
         StopGoalInfoAnimation();
     }
+
+    protected override void HandleAfterInitialize()
+    {
+        ValidateReferences();
+        HideGoalInfoImmediately();
+    }
+
     private void HideGoalInfoImmediately()
     {
         StopGoalInfoAnimation();
@@ -120,11 +120,6 @@ public sealed class MatchUIView : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (!canvas)
-        {
-            Debug.LogError($"{nameof(MatchUIView)} on {name} requires a Canvas reference.", this);
-        }
-
         if (!leftScoreText)
         {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a LeftScoreText reference.", this);

@@ -24,7 +24,10 @@ public sealed class RoundController : MonoBehaviour
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
 
-    public bool HasAllGameItemsSpawned => puck && leftStriker && rightStriker;
+    public bool HasAllGameItemsSpawned =>
+        IsGameplayItemReady(puck) &&
+        IsGameplayItemReady(leftStriker) &&
+        IsGameplayItemReady(rightStriker);
 
     public bool SpawnGameItems(MatchConfiguration configuration)
     {
@@ -39,6 +42,19 @@ public sealed class RoundController : MonoBehaviour
 
         ResetRound();
         return HasAllGameItemsSpawned;
+    }
+
+    public bool PrepareTurn()
+    {
+        if (!HasAllGameItemsSpawned) return false;
+
+        ResetRound();
+        return HasAllGameItemsSpawned;
+    }
+
+    public bool RespawnTurnItems(MatchConfiguration configuration)
+    {
+        return SpawnGameItems(configuration);
     }
     
     public void DespawnGameItems()
@@ -158,6 +174,11 @@ public sealed class RoundController : MonoBehaviour
         if (!puck) return;
 
         puck.ResetState(position);
+    }
+
+    private static bool IsGameplayItemReady(Component gameplayItem)
+    {
+        return gameplayItem && gameplayItem.gameObject.activeInHierarchy;
     }
 
     private void ValidateReferences()

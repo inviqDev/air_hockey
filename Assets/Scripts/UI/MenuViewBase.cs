@@ -1,101 +1,88 @@
-using DG.Tweening;
 using UnityEngine;
 
+[RequireComponent(typeof(CanvasGroup))]
 public abstract class MenuViewBase : MonoBehaviour
 {
-    [SerializeField] private GameObject menuRoot;
-    
-    [Header("Visibility Animation")]
-    [SerializeField] private bool animateVisibility = true;
-    [SerializeField, Min(0.01f)] private float showDuration = 0.35f;
-    [SerializeField, Min(0.01f)] private float hideDuration = 0.25f;
-    [SerializeField] private Ease showEase = Ease.OutQuad;
-    [SerializeField] private Ease hideEase = Ease.InQuad;
+    [SerializeField] private bool visibleByDefault;
 
-    public bool IsVisible => menuRoot && menuRoot.activeSelf;
+    public bool IsVisible => gameObject.activeSelf;
+    public bool IsTransitioning { get; private set; }
 
     private CanvasGroup canvasGroup;
-    private Tween visibilityTween;
+    private bool isInitialized;
 
-    protected virtual void Awake()
+    protected CanvasGroup ResolvedCanvasGroup => canvasGroup;
+
+    public void Initialize()
     {
-        ResolveRoot();
+        if (isInitialized) return;
+
         ResolveCanvasGroup();
+        IsTransitioning = false;
+        
+        gameObject.SetActive(false);
+        
+        ResetToDefault();
+        HandleAfterInitialize();
+
+        isInitialized = true;
     }
 
     public void Show()
     {
-        ResolveRoot();
-        ResolveCanvasGroup();
-        visibilityTween?.Kill();
-
+        PrepareViewForAppearance();
         HandleBeforeShow();
 
-        if (menuRoot)
-        {
-            menuRoot.SetActive(true);
-        }
+        SetCanvasVisibleState(1f, true);
+        IsTransitioning = true;
 
-        if (!animateVisibility || !canvasGroup)
-        {
-            SetCanvasState(1f, true);
-            SetRootActive(true);
-            HandleAfterShow();
-            return;
-        }
+        PlayShowAnimation(CompleteShowTransition);
+    }
 
-        SetRootActive(true);
-        SetCanvasState(0f, true);
-        visibilityTween = canvasGroup
-            .DOFade(1f, showDuration)
-            .SetEase(showEase)
-            .SetUpdate(true)
-            .OnComplete(() =>
-            {
-                visibilityTween = null;
-                HandleAfterShow();
-            });
+    public void ShowImmediately()
+    {
+        PrepareViewForAppearance();
+        HandleBeforeShow();
+
+        IsTransitioning = false;
+
+        ApplyVisibleState();
+        HandleAfterShow();
     }
 
     public void Hide()
     {
-        ResolveRoot();
         ResolveCanvasGroup();
-        visibilityTween?.Kill();
         HandleBeforeHide();
 
-        if (!animateVisibility || !canvasGroup)
-        {
-            SetCanvasState(0f, false);
-            SetRootActive(false);
-            HandleAfterHide();
-            return;
-        }
+        SetCanvasVisibleState(1f, false);
+        IsTransitioning = true;
 
-        SetCanvasState(1f, false);
-        visibilityTween = canvasGroup
-            .DOFade(0f, hideDuration)
-            .SetEase(hideEase)
-            .SetUpdate(true)
-            .OnComplete(() =>
-            {
-                visibilityTween = null;
-                SetCanvasState(0f, false);
-                SetRootActive(false);
-                HandleAfterHide();
-            });
+        PlayHideAnimation(CompleteHideTransition);
     }
 
     public void HideImmediately()
     {
-        ResolveRoot();
         ResolveCanvasGroup();
-        visibilityTween?.Kill();
-        visibilityTween = null;
         HandleBeforeHide();
-        SetCanvasState(0f, false);
-        SetRootActive(false);
+
+        IsTransitioning = false;
+
+        ApplyHiddenState();
         HandleAfterHide();
+    }
+
+    public void ResetToDefault()
+    {
+        ResolveCanvasGroup();
+        HandleBeforeResetToDefault();
+
+        if (visibleByDefault)
+            ShowImmediately();
+        else
+            HideImmediately();
+
+        HandleAfterResetToDefault();
     }
 
     protected virtual void HandleBeforeShow()
@@ -114,41 +101,83 @@ public abstract class MenuViewBase : MonoBehaviour
     {
     }
 
-    private void ResolveRoot()
+    protected virtual void HandleBeforeResetToDefault()
     {
-        if (menuRoot) return;
+    }
 
-        Debug.LogError($"{gameObject.name} object root is  not set the inspector");
-        menuRoot = gameObject;
+    protected virtual void HandleAfterResetToDefault()
+    {
+    }
+
+    protected virtual void HandleAfterInitialize()
+    {
+    }
+
+    protected virtual void PlayShowAnimation(System.Action onComplete)
+    {
+        onComplete?.Invoke();
+    }
+
+    protected virtual void PlayHideAnimation(System.Action onComplete)
+    {
+        onComplete?.Invoke();
+    }
+
+    protected void SetCanvasVisibleState(float alpha, bool isInteractive)
+    {
+        if (!canvasGroup) return;
+
+        canvasGroup.alpha = alpha;
+        canvasGroup.interactable = isInteractive;
+        canvasGroup.blocksRaycasts = isInteractive;
+    }
+
+    private void PrepareViewForAppearance()
+    {
+        ResolveCanvasGroup();
+
+        if (!gameObject.activeSelf)
+            gameObject.SetActive(true);
     }
 
     private void ResolveCanvasGroup()
     {
-        if (!menuRoot || canvasGroup) return;
+        if (canvasGroup) return;
 
-        if (menuRoot.TryGetComponent<CanvasGroup>(out var resolvedCanvasGroup))
-        {
-            canvasGroup = resolvedCanvasGroup;
-            return;
-        }
+        canvasGroup = GetComponent<CanvasGroup>();
 
-        canvasGroup = menuRoot.AddComponent<CanvasGroup>();
+        if (!canvasGroup)
+            Debug.LogError($"{nameof(MenuViewBase)} on {name} requires a " +
+                           $"{nameof(CanvasGroup)} on the same GameObject.", this);
     }
 
-    private void SetCanvasState(float alpha, bool active)
+    private void ApplyVisibleState()
     {
-        if (canvasGroup)
-        {
-            canvasGroup.alpha = alpha;
-            canvasGroup.interactable = active;
-            canvasGroup.blocksRaycasts = active;
-        }
+        SetCanvasVisibleState(1f, true);
     }
 
-    private void SetRootActive(bool active)
+    private void ApplyHiddenState()
     {
-        if (!menuRoot) return;
+        SetCanvasVisibleState(0f, false);
+        SetViewRootActive(false);
+    }
 
-        menuRoot.SetActive(active);
+    private void CompleteShowTransition()
+    {
+        IsTransitioning = false;
+        ApplyVisibleState();
+        HandleAfterShow();
+    }
+
+    private void CompleteHideTransition()
+    {
+        IsTransitioning = false;
+        ApplyHiddenState();
+        HandleAfterHide();
+    }
+
+    private void SetViewRootActive(bool isActive)
+    {
+        gameObject.SetActive(isActive);
     }
 }

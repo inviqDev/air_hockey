@@ -18,6 +18,8 @@ public sealed class MatchManager : MonoBehaviour
 
     private MatchConfiguration currentConfiguration;
     private bool hasCurrentConfiguration;
+    private bool hasPreparedTurnState;
+    private bool lastPreparedTurnCanStart;
 
     private bool isInitialized;
 
@@ -39,6 +41,20 @@ public sealed class MatchManager : MonoBehaviour
         UnsubscribeFromGameFlow();
     }
 
+    private void Update()
+    {
+        if (!HasActiveMatch) return;
+        if (!turnController) return;
+        if (turnController.IsTurnActive) return;
+
+        var canStartTurn = roundController && roundController.HasAllGameItemsSpawned;
+        if (hasPreparedTurnState && lastPreparedTurnCanStart == canStartTurn) return;
+
+        lastPreparedTurnCanStart = canStartTurn;
+        hasPreparedTurnState = true;
+        turnController.RefreshTurnPreparation(PrepareCurrentTurn);
+    }
+
     private void OnValidate()
     {
         ValidateReferences();
@@ -58,18 +74,20 @@ public sealed class MatchManager : MonoBehaviour
     private void PrepareNextTurn()
     {
         if (!turnController) return;
-        turnController.PrepareTurn(ResetRoundAndStatus);
+        hasPreparedTurnState = false;
+        turnController.PrepareTurn(PrepareCurrentTurn);
     }
 
-    private bool ResetRoundAndStatus()
+    private bool PrepareCurrentTurn()
     {
-        if (roundController)
-            roundController.ResetRound();
+        var canStartTurn = roundController && roundController.PrepareTurn();
+        lastPreparedTurnCanStart = canStartTurn;
+        hasPreparedTurnState = true;
         
         if (uiManager)
             uiManager.ClearGoalPopUpText();
 
-        return roundController && roundController.HasAllGameItemsSpawned;
+        return canStartTurn;
     }
 
     private void HandleGoalResult(GoalResult result)
@@ -82,7 +100,7 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!result.HasWinner)
         {
-            turnController?.PrepareTurnAfterGoalDelay(ResetRoundAndStatus);
+            turnController?.PrepareTurnAfterGoalDelay(PrepareCurrentTurn);
             return;
         }
 
@@ -110,7 +128,7 @@ public sealed class MatchManager : MonoBehaviour
         StopCurrentMatch();
 
         if (uiManager)
-            uiManager.ShowStartGameState(this);
+            uiManager.ShowStartGameStateImmediately(this);
     }
 
     private void StartConfiguredMatch(MatchConfiguration configuration)
@@ -139,6 +157,8 @@ public sealed class MatchManager : MonoBehaviour
 
         if (turnController)
             turnController.EndTurn();
+
+        hasPreparedTurnState = false;
     }
 
     private bool SpawnConfiguredMatch(MatchConfiguration configuration)
@@ -158,6 +178,7 @@ public sealed class MatchManager : MonoBehaviour
             roundController.DespawnGameItems();
 
         HasActiveMatch = false;
+        hasPreparedTurnState = false;
     }
 
     private void SubscribeToGameFlow()
@@ -203,7 +224,9 @@ public sealed class MatchManager : MonoBehaviour
         if (!HasActiveMatch) return;
         if (!hasCurrentConfiguration) return;
 
-        var canStartTurn = SpawnConfiguredMatch(currentConfiguration);
+        var canStartTurn = roundController && roundController.RespawnTurnItems(currentConfiguration);
+        lastPreparedTurnCanStart = canStartTurn;
+        hasPreparedTurnState = true;
         uiManager?.ClearGoalPopUpText();
         turnController?.ShowTurnPreparation(canStartTurn);
     }

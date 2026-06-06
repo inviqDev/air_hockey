@@ -100,7 +100,9 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!result.HasWinner)
         {
-            turnController?.PrepareTurnAfterGoalDelay(PrepareCurrentTurn);
+            if (turnController)
+                turnController.PrepareTurnAfterGoalDelay(PrepareCurrentTurn);
+
             return;
         }
 
@@ -227,8 +229,12 @@ public sealed class MatchManager : MonoBehaviour
         var canStartTurn = roundController && roundController.RespawnTurnItems(currentConfiguration);
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
-        uiManager?.ClearGoalPopUpText();
-        turnController?.ShowTurnPreparation(canStartTurn);
+
+        if (uiManager)
+            uiManager.ClearGoalPopUpText();
+
+        if (turnController)
+            turnController.ShowTurnPreparation(canStartTurn);
     }
 
     private void ValidateReferences()

@@ -41,8 +41,7 @@ public sealed class PlayerInputCommandSource : MonoBehaviour, IMovementCommandSo
 
         var command = new MovementCommand(move, dashPressed);
         dashPressed = false;
-        
-        Debug.Log($"{gameObject.name} - ReadCommand()");
+
         return command;
     }
 

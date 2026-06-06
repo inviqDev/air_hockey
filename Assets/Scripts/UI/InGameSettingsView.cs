@@ -44,6 +44,9 @@ public sealed class InGameSettingsView : MenuViewBase
 
         if (quitButton)
             quitButton.onClick.AddListener(HandleQuitClicked);
+
+        if (sureExitView)
+            sureExitView.ExitCancelled += HandleSureExitCancelled;
     }
 
     private void OnDisable()
@@ -56,6 +59,10 @@ public sealed class InGameSettingsView : MenuViewBase
 
         if (quitButton)
             quitButton.onClick.RemoveListener(HandleQuitClicked);
+
+        if (sureExitView)
+            sureExitView.ExitCancelled -= HandleSureExitCancelled;
+
         StopFadeTween();
     }
 
@@ -73,14 +80,18 @@ public sealed class InGameSettingsView : MenuViewBase
     [ContextMenu("Close Settings")]
     public void Close()
     {
-        sureExitView?.CancelExit();
+        if (sureExitView)
+            sureExitView.CancelExit();
+
         SetSettingsContentActive(true);
         Hide();
     }
 
     public void ResetState()
     {
-        sureExitView?.CancelExit();
+        if (sureExitView)
+            sureExitView.CancelExit();
+
         SetSettingsContentActive(true);
         HideImmediately();
     }
@@ -90,7 +101,9 @@ public sealed class InGameSettingsView : MenuViewBase
         CacheManagedViewState();
         SetManagedViewUIActive(false);
         SetSettingsContentActive(true);
-        sureExitView?.CancelExit();
+
+        if (sureExitView)
+            sureExitView.CancelExit();
     }
 
     protected override void HandleAfterHide()
@@ -126,9 +139,6 @@ public sealed class InGameSettingsView : MenuViewBase
 
     protected override void HandleAfterInitialize()
     {
-        if (sureExitView)
-            sureExitView.ExitCancelled += HandleSureExitCancelled;
-
         ValidateReferences();
         ResetState();
     }
@@ -186,7 +196,9 @@ public sealed class InGameSettingsView : MenuViewBase
     private void HandleQuitClicked()
     {
         SetSettingsContentActive(false);
-        sureExitView?.ShowConfirmation();
+
+        if (sureExitView)
+            sureExitView.ShowConfirmation();
     }
 
     private void HandleSureExitCancelled()

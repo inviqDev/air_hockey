@@ -48,7 +48,9 @@ public sealed class TurnController : MonoBehaviour
         StopGoalDelayRoutine();
         EndTurn();
         var canStartTurn = beforeShowTurnPreparation == null || beforeShowTurnPreparation();
-        turnStartView?.ShowTurnPreparation(canStartTurn);
+
+        if (turnStartView)
+            turnStartView.ShowTurnPreparation(canStartTurn);
     }
 
     public void PrepareTurnAfterGoalDelay(Func<bool> beforeShowTurnPreparation)
@@ -61,15 +63,21 @@ public sealed class TurnController : MonoBehaviour
     public void EndTurn()
     {
         IsTurnActive = false;
-        turnStartView?.Cancel();
-        turnTimer?.StopAndReset();
+
+        if (turnStartView)
+            turnStartView.Cancel();
+
+        if (turnTimer)
+            turnTimer.StopAndReset();
     }
 
     public void ShowTurnPreparation(bool canStartTurn)
     {
         StopGoalDelayRoutine();
         EndTurn();
-        turnStartView?.ShowTurnPreparation(canStartTurn);
+
+        if (turnStartView)
+            turnStartView.ShowTurnPreparation(canStartTurn);
     }
 
     public void RefreshTurnPreparation(Func<bool> beforeShowTurnPreparation)
@@ -77,7 +85,9 @@ public sealed class TurnController : MonoBehaviour
         if (IsTurnActive) return;
 
         var canStartTurn = beforeShowTurnPreparation == null || beforeShowTurnPreparation();
-        turnStartView?.ShowTurnPreparation(canStartTurn);
+
+        if (turnStartView)
+            turnStartView.ShowTurnPreparation(canStartTurn);
     }
 
     private IEnumerator PrepareTurnAfterGoalDelayRoutine(Func<bool> beforeShowTurnPreparation)
@@ -87,7 +97,9 @@ public sealed class TurnController : MonoBehaviour
 
         goalDelayRoutine = null;
         var canStartTurn = beforeShowTurnPreparation == null || beforeShowTurnPreparation();
-        turnStartView?.ShowTurnPreparation(canStartTurn);
+
+        if (turnStartView)
+            turnStartView.ShowTurnPreparation(canStartTurn);
     }
 
     private void StartTurn()
@@ -95,7 +107,9 @@ public sealed class TurnController : MonoBehaviour
         if (IsTurnActive) return;
 
         IsTurnActive = true;
-        turnTimer?.StartTimer();
+
+        if (turnTimer)
+            turnTimer.StartTimer();
     }
 
     private void StopGoalDelayRoutine()

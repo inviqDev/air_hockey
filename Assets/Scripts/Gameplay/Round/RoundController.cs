@@ -35,7 +35,8 @@ public sealed class RoundController : MonoBehaviour
         ShowTable();
 
         puck = SpawnPuck(puckPrefab, GetPosition(leftPuckSpawnPoint));
-        puckRegistry?.RegisterPuck(puck);
+        if (puckRegistry)
+            puckRegistry.RegisterPuck(puck);
 
         leftStriker = SpawnStriker(configuration, PlayerSide.Left, GetPosition(leftStrikerSpawnPoint));
         rightStriker = SpawnStriker(configuration, PlayerSide.Right, GetPosition(rightStrikerSpawnPoint));
@@ -59,8 +60,6 @@ public sealed class RoundController : MonoBehaviour
     
     public void DespawnGameItems()
     {
-        Debug.Log("Add pool");
-
         DestroyStriker(leftStriker);
         DestroyStriker(rightStriker);
         DestroyPuck(puck);
@@ -68,7 +67,9 @@ public sealed class RoundController : MonoBehaviour
         leftStriker = null;
         rightStriker = null;
         puck = null;
-        puckRegistry?.Clear();
+
+        if (puckRegistry)
+            puckRegistry.Clear();
 
         HideTable();
     }
@@ -117,7 +118,9 @@ public sealed class RoundController : MonoBehaviour
             ? SpawnGameplayItem<StrikerBase>(aiStrikerPrefab, position)
             : SpawnGameplayItem<StrikerBase>(playerStrikerPrefab, position);
 
-        striker?.Initialize(setupContext);
+        if (striker)
+            striker.Initialize(setupContext);
+
         return striker;
     }
 

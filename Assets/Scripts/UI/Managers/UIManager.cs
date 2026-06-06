@@ -42,7 +42,9 @@ public sealed class UIManager : MonoBehaviour
         if (isInitialized) return;
 
         ValidateReferences();
-        menuViewsContainer?.Initialize();
+        if (menuViewsContainer)
+            menuViewsContainer.Initialize();
+
         ShowInitialGameStartState();
         isInitialized = true;
     }
@@ -75,7 +77,8 @@ public sealed class UIManager : MonoBehaviour
 
     private void SetScores(int leftScore, int rightScore)
     {
-        matchView?.SetScores(leftScore, rightScore);
+        if (matchView)
+            matchView.SetScores(leftScore, rightScore);
     }
 
     public void ResetMatchUI(MatchManager matchManager)
@@ -89,13 +92,17 @@ public sealed class UIManager : MonoBehaviour
 
     public void ClearGoalPopUpText()
     {
-        matchView?.SetGoalInfoText(string.Empty);
+        if (matchView)
+            matchView.SetGoalInfoText(string.Empty);
     }
 
     public void PlayGoalInfo(GoalResult result)
     {
-        matchView?.SetScores(result.LeftScore, result.RightScore);
-        matchView?.PlayGoalInfo(GetGoalInfoMessage(result));
+        if (matchView)
+        {
+            matchView.SetScores(result.LeftScore, result.RightScore);
+            matchView.PlayGoalInfo(GetGoalInfoMessage(result));
+        }
     }
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)

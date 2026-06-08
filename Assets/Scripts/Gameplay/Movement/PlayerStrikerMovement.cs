@@ -32,7 +32,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
         inputReader.Initialize(controlScheme);
         inputReader.MoveInputChanged += HandleMoveInputChanged;
-        inputReader.DashInputChanged += HandleDashInputChanged;
+        inputReader.DashPressed += HandleDashPressed;
 
         currentMoveDirection = inputReader.CurrentMoveInput;
 
@@ -104,9 +104,8 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         UpdateMovementLoopState();
     }
 
-    private void HandleDashInputChanged(bool isDashPressed)
+    private void HandleDashPressed()
     {
-        if (!isDashPressed) return;
         if (!IsMovementAllowed) return;
 
         dashRequested = true;
@@ -118,7 +117,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         if (!inputReader) return;
 
         inputReader.MoveInputChanged -= HandleMoveInputChanged;
-        inputReader.DashInputChanged -= HandleDashInputChanged;
+        inputReader.DashPressed -= HandleDashPressed;
         inputReader.Shutdown();
     }
 

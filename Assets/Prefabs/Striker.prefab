@@ -174,9 +174,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ee3483641d44073b1cc671ea1ab480f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 2124718481866502570}
   sideOwner: {fileID: 6100000000000000001}
-  dashAbility: {fileID: 6100000000000000003}
+  movementMotor: {fileID: 6100000000000000005}
   inputCommandSource: {fileID: 6100000000000000002}
 --- !u!114 &6100000000000000005
 MonoBehaviour:

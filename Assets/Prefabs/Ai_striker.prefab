@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sideOwner: {fileID: 6200000000000000001}
-  dashAbility: {fileID: 6200000000000000003}
+  movementMotor: {fileID: 6200000000000000005}
   aiCommandSource: {fileID: 6200000000000000002}
 --- !u!114 &6200000000000000005
 MonoBehaviour:

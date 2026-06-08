@@ -1,13 +1,20 @@
 using UnityEngine;
 
-public sealed class DashAbility : MonoBehaviour
+public sealed class DashAbility
 {
-    [SerializeField] private float dashSpeed = 16f;
-    [SerializeField] private float dashDuration = 0.12f;
-    [SerializeField] private float cooldown = 0.35f;
+    private readonly float dashSpeed;
+    private readonly float dashDuration;
+    private readonly float cooldown;
 
     private float remainingDashTime;
     private float remainingCooldownTime;
+
+    public DashAbility(float dashSpeed, float dashDuration, float cooldown)
+    {
+        this.dashSpeed = dashSpeed;
+        this.dashDuration = dashDuration;
+        this.cooldown = cooldown;
+    }
 
     public void ResetState()
     {

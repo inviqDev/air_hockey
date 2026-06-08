@@ -2,22 +2,27 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
-[RequireComponent(typeof(DashAbility))]
 [RequireComponent(typeof(HalfFieldAreaLimiter))]
 [RequireComponent(typeof(CircleCollider2D))]
 public sealed class MovementMotor2D : MonoBehaviour
 {
+    [Header("Movement")]
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private MonoBehaviour commandSourceBehaviour;
 
+    [Header("Dash")]
+    [SerializeField, Min(0f)] private float dashSpeed = 16f;
+    [SerializeField, Min(0f)] private float dashDuration = 0.12f;
+    [SerializeField, Min(0f)] private float dashCooldown = 0.35f;
+
     private SideOwner sideOwner;
-    private DashAbility dashAbility;
     private HalfFieldAreaLimiter areaLimiter;
     private IMovementCommandSource commandSource;
     private bool isMovementAllowed;
     
     private Rigidbody2D strikerRb;
     private CircleCollider2D circleCollider;
+    private DashAbility dashAbility;
 
     private void Reset()
     {
@@ -30,6 +35,7 @@ public sealed class MovementMotor2D : MonoBehaviour
         if (!CacheReferences()) return;
 
         ConfigureBody(strikerRb);
+        dashAbility = CreateDashAbility();
         commandSource = GetCommandSource();
     }
 
@@ -45,6 +51,7 @@ public sealed class MovementMotor2D : MonoBehaviour
 
         if (commandSource == null)
         {
+            strikerRb.linearVelocity = Vector2.zero;
             return;
         }
 
@@ -95,7 +102,7 @@ public sealed class MovementMotor2D : MonoBehaviour
         strikerRb.position = position;
         strikerRb.rotation = 0f;
 
-        if (dashAbility)
+        if (dashAbility != null)
             dashAbility.ResetState();
     }
 
@@ -135,6 +142,11 @@ public sealed class MovementMotor2D : MonoBehaviour
         return null;
     }
 
+    private DashAbility CreateDashAbility()
+    {
+        return new DashAbility(dashSpeed, dashDuration, dashCooldown);
+    }
+
     private bool CacheReferences()
     {
         var hasAllReferences = true;
@@ -148,12 +160,6 @@ public sealed class MovementMotor2D : MonoBehaviour
         if (!sideOwner && !TryGetComponent(out sideOwner))
         {
             Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(SideOwner)} component.", this);
-            hasAllReferences = false;
-        }
-
-        if (!dashAbility && !TryGetComponent(out dashAbility))
-        {
-            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(DashAbility)} component.", this);
             hasAllReferences = false;
         }
 

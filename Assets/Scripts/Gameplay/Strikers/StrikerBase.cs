@@ -1,11 +1,11 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SideOwner))]
-[RequireComponent(typeof(MovementMotor2D))]
+[RequireComponent(typeof(StrikerMovement))]
 public abstract class StrikerBase : MonoBehaviour
 {
     [SerializeField] private SideOwner sideOwner;
-    [SerializeField] private MovementMotor2D movementMotor;
+    [SerializeField] private StrikerMovement strikerMovement;
 
     private TurnController turnController;
 
@@ -14,8 +14,8 @@ public abstract class StrikerBase : MonoBehaviour
         if (!sideOwner)
             sideOwner = GetComponent<SideOwner>();
 
-        if (!movementMotor)
-            movementMotor = GetComponent<MovementMotor2D>();
+        if (!strikerMovement)
+            strikerMovement = GetComponent<StrikerMovement>();
     }
 
     private void Awake()
@@ -30,16 +30,26 @@ public abstract class StrikerBase : MonoBehaviour
         if (sideOwner)
             sideOwner.Side = setupContext.Side;
 
-        ConfigureTurnController(controller);
-
         ApplyStrikerSetup(setupContext);
+
+        var movementCommandSource = GetMovementCommandSource();
+        if (movementCommandSource == null)
+        {
+            Debug.LogError($"{nameof(StrikerBase)} on {name} could not resolve a movement command source.", this);
+            return;
+        }
+
+        if (!strikerMovement.Initialize(movementCommandSource))
+            return;
+
+        ConfigureTurnController(controller);
     }
 
     public void ResetState(Vector2 position)
     {
         if (!CacheReferences()) return;
 
-        movementMotor.ResetMovementState(position);
+        strikerMovement.ResetMovementState(position);
 
         ResetCustomStrikerState();
     }
@@ -49,6 +59,7 @@ public abstract class StrikerBase : MonoBehaviour
     }
 
     protected abstract void ApplyStrikerSetup(StrikerSetupContext setupContext);
+    protected abstract IMovementCommandSource GetMovementCommandSource();
 
     private void OnDestroy()
     {
@@ -65,9 +76,9 @@ public abstract class StrikerBase : MonoBehaviour
             hasAllReferences = false;
         }
 
-        if (!movementMotor && !TryGetComponent(out movementMotor))
+        if (!strikerMovement && !TryGetComponent(out strikerMovement))
         {
-            Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(MovementMotor2D)} component.", this);
+            Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(StrikerMovement)} component.", this);
             hasAllReferences = false;
         }
 
@@ -108,21 +119,21 @@ public abstract class StrikerBase : MonoBehaviour
 
     private void ApplyCurrentTurnState()
     {
-        if (!movementMotor) return;
+        if (!strikerMovement) return;
 
         var isMovementAllowed = turnController && turnController.IsTurnActive;
-        movementMotor.SetMovementAllowed(isMovementAllowed);
+        strikerMovement.SetMovementAllowed(isMovementAllowed);
     }
 
     private void HandleTurnStarted()
     {
-        if (movementMotor)
-            movementMotor.SetMovementAllowed(true);
+        if (strikerMovement)
+            strikerMovement.SetMovementAllowed(true);
     }
 
     private void HandleTurnEnded()
     {
-        if (movementMotor)
-            movementMotor.SetMovementAllowed(false);
+        if (strikerMovement)
+            strikerMovement.SetMovementAllowed(false);
     }
 }

@@ -25,4 +25,12 @@ public sealed class PlayerStriker : StrikerBase
         if (inputCommandSource)
             inputCommandSource.ResetState();
     }
+
+    protected override IMovementCommandSource GetMovementCommandSource()
+    {
+        if (!inputCommandSource)
+            inputCommandSource = GetComponent<PlayerInputCommandSource>();
+
+        return inputCommandSource;
+    }
 }

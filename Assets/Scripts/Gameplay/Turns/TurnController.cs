@@ -10,13 +10,13 @@ public sealed class TurnController : MonoBehaviour
     
     private Coroutine goalDelayRoutine;
 
-    public static TurnController Instance { get; private set; }
     public bool IsTurnActive { get; private set; }
+    public event Action TurnStarted;
+    public event Action TurnEnded;
     public event Action RespawnItemsRequested;
 
     private void Awake()
     {
-        Instance = this;
         ValidateReferences();
     }
 
@@ -62,7 +62,11 @@ public sealed class TurnController : MonoBehaviour
 
     public void EndTurn()
     {
+        var wasTurnActive = IsTurnActive;
         IsTurnActive = false;
+
+        if (wasTurnActive)
+            TurnEnded?.Invoke();
 
         if (turnStartView)
             turnStartView.Cancel();
@@ -107,6 +111,7 @@ public sealed class TurnController : MonoBehaviour
         if (IsTurnActive) return;
 
         IsTurnActive = true;
+        TurnStarted?.Invoke();
 
         if (turnTimer)
             turnTimer.StartTimer();

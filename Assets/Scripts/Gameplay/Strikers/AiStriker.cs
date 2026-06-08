@@ -16,12 +16,16 @@ public sealed class AiStriker : StrikerBase
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
 
-        aiCommandSource?.SetStrikerSide(setupContext.Side);
-        aiCommandSource?.SetCurrentPuck(setupContext.Puck);
+        if (aiCommandSource)
+        {
+            aiCommandSource.SetStrikerSide(setupContext.Side);
+            aiCommandSource.SetCurrentPuck(setupContext.Puck);
+        }
     }
 
     protected override void ResetCustomStrikerState()
     {
-        aiCommandSource?.ResetState();
+        if (aiCommandSource)
+            aiCommandSource.ResetState();
     }
 }

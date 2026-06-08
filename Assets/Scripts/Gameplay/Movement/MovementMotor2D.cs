@@ -14,6 +14,7 @@ public sealed class MovementMotor2D : MonoBehaviour
     private DashAbility dashAbility;
     private HalfFieldAreaLimiter areaLimiter;
     private IMovementCommandSource commandSource;
+    private bool isMovementAllowed;
     
     private Rigidbody2D rb;
     private CircleCollider2D circleCollider;
@@ -38,7 +39,7 @@ public sealed class MovementMotor2D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (TurnController.Instance != null && !TurnController.Instance.IsTurnActive)
+        if (!isMovementAllowed)
         {
             rb.linearVelocity = Vector2.zero;
             return;
@@ -72,6 +73,14 @@ public sealed class MovementMotor2D : MonoBehaviour
         }
 
         rb.linearVelocity = velocity;
+    }
+
+    public void SetMovementAllowed(bool isAllowed)
+    {
+        isMovementAllowed = isAllowed;
+
+        if (!isMovementAllowed && rb)
+            rb.linearVelocity = Vector2.zero;
     }
 
     private void OnDisable()

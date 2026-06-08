@@ -3,12 +3,15 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
 [RequireComponent(typeof(DashAbility))]
+[RequireComponent(typeof(MovementMotor2D))]
 public abstract class StrikerBase : MonoBehaviour
 {
     [SerializeField] private SideOwner sideOwner;
     [SerializeField] private DashAbility dashAbility;
+    [SerializeField] private MovementMotor2D movementMotor;
 
     private Rigidbody2D strikerRigidbody;
+    private TurnController turnController;
 
     private void Reset()
     {
@@ -20,6 +23,9 @@ public abstract class StrikerBase : MonoBehaviour
 
         if (!dashAbility)
             dashAbility = GetComponent<DashAbility>();
+
+        if (!movementMotor)
+            movementMotor = GetComponent<MovementMotor2D>();
     }
 
     private void Awake()
@@ -27,12 +33,14 @@ public abstract class StrikerBase : MonoBehaviour
         CacheReferences();
     }
 
-    public void Initialize(StrikerSetupContext setupContext)
+    public void Initialize(StrikerSetupContext setupContext, TurnController controller)
     {
         CacheReferences();
 
         if (sideOwner)
             sideOwner.Side = setupContext.Side;
+
+        ConfigureTurnController(controller);
 
         ApplyStrikerSetup(setupContext);
     }
@@ -65,6 +73,11 @@ public abstract class StrikerBase : MonoBehaviour
 
     protected abstract void ApplyStrikerSetup(StrikerSetupContext setupContext);
 
+    private void OnDestroy()
+    {
+        UnsubscribeFromTurnController();
+    }
+
     private void CacheReferences()
     {
         if (!sideOwner)
@@ -72,5 +85,60 @@ public abstract class StrikerBase : MonoBehaviour
 
         if (!dashAbility)
             dashAbility = GetComponent<DashAbility>();
+
+        if (!movementMotor)
+            movementMotor = GetComponent<MovementMotor2D>();
+    }
+
+    private void ConfigureTurnController(TurnController newTurnController)
+    {
+        if (turnController == newTurnController)
+        {
+            ApplyCurrentTurnState();
+            return;
+        }
+
+        UnsubscribeFromTurnController();
+        
+        turnController = newTurnController;
+        SubscribeToTurnController();
+        
+        ApplyCurrentTurnState();
+    }
+
+    private void SubscribeToTurnController()
+    {
+        if (!turnController) return;
+
+        turnController.TurnStarted += HandleTurnStarted;
+        turnController.TurnEnded += HandleTurnEnded;
+    }
+
+    private void UnsubscribeFromTurnController()
+    {
+        if (!turnController) return;
+
+        turnController.TurnStarted -= HandleTurnStarted;
+        turnController.TurnEnded -= HandleTurnEnded;
+    }
+
+    private void ApplyCurrentTurnState()
+    {
+        if (!movementMotor) return;
+
+        var isMovementAllowed = turnController && turnController.IsTurnActive;
+        movementMotor.SetMovementAllowed(isMovementAllowed);
+    }
+
+    private void HandleTurnStarted()
+    {
+        if (movementMotor)
+            movementMotor.SetMovementAllowed(true);
+    }
+
+    private void HandleTurnEnded()
+    {
+        if (movementMotor)
+            movementMotor.SetMovementAllowed(false);
     }
 }

@@ -17,6 +17,7 @@ public sealed class RoundController : MonoBehaviour
     [SerializeField] private Transform rightStrikerSpawnPoint;
 
     [Header("Runtime Instances")]
+    [SerializeField] private TurnController turnController;
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private PuckRegistry puckRegistry;
 
@@ -119,7 +120,7 @@ public sealed class RoundController : MonoBehaviour
             : SpawnGameplayItem<StrikerBase>(playerStrikerPrefab, position);
 
         if (striker)
-            striker.Initialize(setupContext);
+            striker.Initialize(setupContext, turnController);
 
         return striker;
     }
@@ -209,6 +210,9 @@ public sealed class RoundController : MonoBehaviour
 
         if (!rightStrikerSpawnPoint)
             Debug.LogError($"{nameof(RoundController)} requires a right striker spawn point reference.", this);
+
+        if (!turnController)
+            Debug.LogError($"{nameof(RoundController)} requires a TurnController reference.", this);
 
         if (!serveManager)
             Debug.LogError($"{nameof(RoundController)} requires a ServeManager reference.", this);

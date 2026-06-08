@@ -2,11 +2,18 @@ using UnityEngine;
 
 [RequireComponent(typeof(SideOwner))]
 [RequireComponent(typeof(StrikerMovement))]
+[RequireComponent(typeof(BoxCollider2D))]
+[RequireComponent(typeof(Collider2D))]
 public abstract class StrikerBase : MonoBehaviour
 {
+    [Header("Striker colliders")]
+    [SerializeField] private BoxCollider2D strikerBoundsCollider;
+    [SerializeField] private Collider2D strikerCollisionCollider;
+
+    [Header("References")]
     [SerializeField] private SideOwner sideOwner;
     [SerializeField] private StrikerMovement strikerMovement;
-
+    
     private TurnController turnController;
 
     private void Reset()
@@ -16,6 +23,12 @@ public abstract class StrikerBase : MonoBehaviour
 
         if (!strikerMovement)
             strikerMovement = GetComponent<StrikerMovement>();
+
+        if (!strikerBoundsCollider)
+            strikerBoundsCollider = GetComponent<BoxCollider2D>();
+
+        if (!strikerCollisionCollider)
+            strikerCollisionCollider = GetCollisionCollider();
     }
 
     private void Awake()
@@ -39,8 +52,7 @@ public abstract class StrikerBase : MonoBehaviour
             return;
         }
 
-        if (!strikerMovement.Initialize(movementCommandSource))
-            return;
+        if (!strikerMovement.Initialize(movementCommandSource, strikerBoundsCollider)) return;
 
         ConfigureTurnController(controller);
     }
@@ -82,7 +94,35 @@ public abstract class StrikerBase : MonoBehaviour
             hasAllReferences = false;
         }
 
+        if (!strikerBoundsCollider && !TryGetComponent(out strikerBoundsCollider))
+        {
+            Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(BoxCollider2D)} component.", this);
+            hasAllReferences = false;
+        }
+
+        if (!strikerCollisionCollider)
+        {
+            strikerCollisionCollider = GetCollisionCollider();
+
+            if (!strikerCollisionCollider)
+            {
+                Debug.LogError($"{nameof(StrikerBase)} on {name} requires a collision {nameof(Collider2D)} component.", this);
+                hasAllReferences = false;
+            }
+        }
+
         return hasAllReferences;
+    }
+
+    private Collider2D GetCollisionCollider()
+    {
+        foreach (var collider in GetComponents<Collider2D>())
+        {
+            if (collider == strikerBoundsCollider) continue;
+            return collider;
+        }
+
+        return null;
     }
 
     private void ConfigureTurnController(TurnController newTurnController)

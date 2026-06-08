@@ -1,28 +1,18 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
-[RequireComponent(typeof(DashAbility))]
 [RequireComponent(typeof(MovementMotor2D))]
 public abstract class StrikerBase : MonoBehaviour
 {
     [SerializeField] private SideOwner sideOwner;
-    [SerializeField] private DashAbility dashAbility;
     [SerializeField] private MovementMotor2D movementMotor;
 
-    private Rigidbody2D strikerRigidbody;
     private TurnController turnController;
 
     private void Reset()
     {
-        if (!strikerRigidbody)
-            strikerRigidbody = GetComponent<Rigidbody2D>();
-        
         if (!sideOwner)
             sideOwner = GetComponent<SideOwner>();
-
-        if (!dashAbility)
-            dashAbility = GetComponent<DashAbility>();
 
         if (!movementMotor)
             movementMotor = GetComponent<MovementMotor2D>();
@@ -35,7 +25,7 @@ public abstract class StrikerBase : MonoBehaviour
 
     public void Initialize(StrikerSetupContext setupContext, TurnController controller)
     {
-        CacheReferences();
+        if (!CacheReferences()) return;
 
         if (sideOwner)
             sideOwner.Side = setupContext.Side;
@@ -47,22 +37,9 @@ public abstract class StrikerBase : MonoBehaviour
 
     public void ResetState(Vector2 position)
     {
-        CacheReferences();
+        if (!CacheReferences()) return;
 
-        if (!strikerRigidbody) return;
-
-#if UNITY_6000_0_OR_NEWER
-        strikerRigidbody.linearVelocity = Vector2.zero;
-#else
-        strikerRigidbody.velocity = Vector2.zero;
-#endif
-
-        strikerRigidbody.angularVelocity = 0f;
-        strikerRigidbody.position = position;
-        strikerRigidbody.rotation = 0f;
-
-        if (dashAbility)
-            dashAbility.ResetState();
+        movementMotor.ResetMovementState(position);
 
         ResetCustomStrikerState();
     }
@@ -78,16 +55,23 @@ public abstract class StrikerBase : MonoBehaviour
         UnsubscribeFromTurnController();
     }
 
-    private void CacheReferences()
+    private bool CacheReferences()
     {
-        if (!sideOwner)
-            sideOwner = GetComponent<SideOwner>();
+        var hasAllReferences = true;
 
-        if (!dashAbility)
-            dashAbility = GetComponent<DashAbility>();
+        if (!sideOwner && !TryGetComponent(out sideOwner))
+        {
+            Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(SideOwner)} component.", this);
+            hasAllReferences = false;
+        }
 
-        if (!movementMotor)
-            movementMotor = GetComponent<MovementMotor2D>();
+        if (!movementMotor && !TryGetComponent(out movementMotor))
+        {
+            Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(MovementMotor2D)} component.", this);
+            hasAllReferences = false;
+        }
+
+        return hasAllReferences;
     }
 
     private void ConfigureTurnController(TurnController newTurnController)
@@ -99,10 +83,10 @@ public abstract class StrikerBase : MonoBehaviour
         }
 
         UnsubscribeFromTurnController();
-        
+
         turnController = newTurnController;
         SubscribeToTurnController();
-        
+
         ApplyCurrentTurnState();
     }
 

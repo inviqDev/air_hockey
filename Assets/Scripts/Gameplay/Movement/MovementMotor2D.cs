@@ -16,7 +16,7 @@ public sealed class MovementMotor2D : MonoBehaviour
     private IMovementCommandSource commandSource;
     private bool isMovementAllowed;
     
-    private Rigidbody2D rb;
+    private Rigidbody2D strikerRb;
     private CircleCollider2D circleCollider;
 
     private void Reset()
@@ -27,21 +27,19 @@ public sealed class MovementMotor2D : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        sideOwner = GetComponent<SideOwner>();
-        dashAbility = GetComponent<DashAbility>();
-        areaLimiter = GetComponent<HalfFieldAreaLimiter>();
-        circleCollider = GetComponent<CircleCollider2D>();
-        commandSource = GetCommandSource();
+        if (!CacheReferences()) return;
 
-        ConfigureBody(rb);
+        ConfigureBody(strikerRb);
+        commandSource = GetCommandSource();
     }
 
     private void FixedUpdate()
     {
+        if (!strikerRb) return;
+
         if (!isMovementAllowed)
         {
-            rb.linearVelocity = Vector2.zero;
+            strikerRb.linearVelocity = Vector2.zero;
             return;
         }
 
@@ -55,15 +53,15 @@ public sealed class MovementMotor2D : MonoBehaviour
         var dashVelocity = dashAbility.Step(command.DashPressed, sideOwner.Side, Time.fixedDeltaTime);
         var velocity = move * moveSpeed + dashVelocity;
         var worldRadius = GetWorldRadius();
-        var predictedPosition = rb.position + velocity * Time.fixedDeltaTime;
+        var predictedPosition = strikerRb.position + velocity * Time.fixedDeltaTime;
 
         if (areaLimiter.IsPastCenterLine(predictedPosition, sideOwner.Side, worldRadius))
         {
-            var clampedPosition = areaLimiter.ClampToCenterLine(rb.position, sideOwner.Side, worldRadius);
+            var clampedPosition = areaLimiter.ClampToCenterLine(strikerRb.position, sideOwner.Side, worldRadius);
 
-            if (clampedPosition != rb.position)
+            if (clampedPosition != strikerRb.position)
             {
-                rb.MovePosition(clampedPosition);
+                strikerRb.MovePosition(clampedPosition);
             }
 
             if (IsMovingAcrossCenterLine(velocity.x, sideOwner.Side))
@@ -72,22 +70,40 @@ public sealed class MovementMotor2D : MonoBehaviour
             }
         }
 
-        rb.linearVelocity = velocity;
+        strikerRb.linearVelocity = velocity;
     }
 
     public void SetMovementAllowed(bool isAllowed)
     {
         isMovementAllowed = isAllowed;
 
-        if (!isMovementAllowed && rb)
-            rb.linearVelocity = Vector2.zero;
+        if (!isMovementAllowed && strikerRb)
+            strikerRb.linearVelocity = Vector2.zero;
+    }
+
+    public void ResetMovementState(Vector2 position)
+    {
+        if (!strikerRb) return;
+
+#if UNITY_6000_0_OR_NEWER
+        strikerRb.linearVelocity = Vector2.zero;
+#else
+        strikerRb.velocity = Vector2.zero;
+#endif
+
+        strikerRb.angularVelocity = 0f;
+        strikerRb.position = position;
+        strikerRb.rotation = 0f;
+
+        if (dashAbility)
+            dashAbility.ResetState();
     }
 
     private void OnDisable()
     {
-        if (rb)
+        if (strikerRb)
         {
-            rb.linearVelocity = Vector2.zero;
+            strikerRb.linearVelocity = Vector2.zero;
         }
     }
 
@@ -106,9 +122,7 @@ public sealed class MovementMotor2D : MonoBehaviour
     private IMovementCommandSource GetCommandSource()
     {
         if (commandSourceBehaviour is IMovementCommandSource serializedSource)
-        {
             return serializedSource;
-        }
 
         foreach (var behaviour in GetComponents<MonoBehaviour>())
         {
@@ -117,7 +131,45 @@ public sealed class MovementMotor2D : MonoBehaviour
             return source;
         }
 
+        Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a command source that implements {nameof(IMovementCommandSource)}.", this);
         return null;
+    }
+
+    private bool CacheReferences()
+    {
+        var hasAllReferences = true;
+
+        if (!strikerRb && !TryGetComponent(out strikerRb))
+        {
+            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(Rigidbody2D)} component.", this);
+            hasAllReferences = false;
+        }
+
+        if (!sideOwner && !TryGetComponent(out sideOwner))
+        {
+            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(SideOwner)} component.", this);
+            hasAllReferences = false;
+        }
+
+        if (!dashAbility && !TryGetComponent(out dashAbility))
+        {
+            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(DashAbility)} component.", this);
+            hasAllReferences = false;
+        }
+
+        if (!areaLimiter && !TryGetComponent(out areaLimiter))
+        {
+            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(HalfFieldAreaLimiter)} component.", this);
+            hasAllReferences = false;
+        }
+
+        if (!circleCollider && !TryGetComponent(out circleCollider))
+        {
+            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(CircleCollider2D)} component.", this);
+            hasAllReferences = false;
+        }
+
+        return hasAllReferences;
     }
 
     private static void ConfigureBody(Rigidbody2D targetBody)

@@ -28,4 +28,12 @@ public sealed class AiStriker : StrikerBase
         if (aiCommandSource)
             aiCommandSource.ResetState();
     }
+
+    protected override IMovementCommandSource GetMovementCommandSource()
+    {
+        if (!aiCommandSource)
+            aiCommandSource = GetComponent<AICommandSource>();
+
+        return aiCommandSource;
+    }
 }

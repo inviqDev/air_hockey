@@ -4,11 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(SideOwner))]
 [RequireComponent(typeof(HalfFieldAreaLimiter))]
 [RequireComponent(typeof(CircleCollider2D))]
-public sealed class MovementMotor2D : MonoBehaviour
+public sealed class StrikerMovement : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 7f;
-    [SerializeField] private MonoBehaviour commandSourceBehaviour;
 
     [Header("Dash")]
     [SerializeField, Min(0f)] private float dashSpeed = 16f;
@@ -19,6 +18,7 @@ public sealed class MovementMotor2D : MonoBehaviour
     private HalfFieldAreaLimiter areaLimiter;
     private IMovementCommandSource commandSource;
     private bool isMovementAllowed;
+    private bool isInitialized;
     
     private Rigidbody2D strikerRb;
     private CircleCollider2D circleCollider;
@@ -26,22 +26,34 @@ public sealed class MovementMotor2D : MonoBehaviour
 
     private void Reset()
     {
-        commandSourceBehaviour = GetComponent<PlayerInputCommandSource>();
-        ConfigureBody(GetComponent<Rigidbody2D>());
+        if (!strikerRb)
+            strikerRb = GetComponent<Rigidbody2D>();
+
+        if (strikerRb)
+            ConfigureBody(strikerRb);
     }
 
-    private void Awake()
+    public bool Initialize(IMovementCommandSource movementCommandSource)
     {
-        if (!CacheReferences()) return;
+        if (movementCommandSource == null)
+        {
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a movement command source during initialization.", this);
+            return false;
+        }
+
+        commandSource = movementCommandSource;
+        if (isInitialized) return true;
+        if (!CacheReferences()) return false;
 
         ConfigureBody(strikerRb);
         dashAbility = CreateDashAbility();
-        commandSource = GetCommandSource();
+        isInitialized = true;
+        return true;
     }
 
     private void FixedUpdate()
     {
-        if (!strikerRb) return;
+        if (!isInitialized || !strikerRb) return;
 
         if (!isMovementAllowed)
         {
@@ -90,6 +102,7 @@ public sealed class MovementMotor2D : MonoBehaviour
 
     public void ResetMovementState(Vector2 position)
     {
+        if (!isInitialized) return;
         if (!strikerRb) return;
 
 #if UNITY_6000_0_OR_NEWER
@@ -112,6 +125,8 @@ public sealed class MovementMotor2D : MonoBehaviour
         {
             strikerRb.linearVelocity = Vector2.zero;
         }
+
+        isMovementAllowed = false;
     }
 
     private float GetWorldRadius()
@@ -126,22 +141,6 @@ public sealed class MovementMotor2D : MonoBehaviour
         return side == PlayerSide.Left ? xVelocity > 0f : xVelocity < 0f;
     }
 
-    private IMovementCommandSource GetCommandSource()
-    {
-        if (commandSourceBehaviour is IMovementCommandSource serializedSource)
-            return serializedSource;
-
-        foreach (var behaviour in GetComponents<MonoBehaviour>())
-        {
-            if (behaviour is not IMovementCommandSource source) continue;
-            commandSourceBehaviour = behaviour;
-            return source;
-        }
-
-        Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a command source that implements {nameof(IMovementCommandSource)}.", this);
-        return null;
-    }
-
     private DashAbility CreateDashAbility()
     {
         return new DashAbility(dashSpeed, dashDuration, dashCooldown);
@@ -153,25 +152,25 @@ public sealed class MovementMotor2D : MonoBehaviour
 
         if (!strikerRb && !TryGetComponent(out strikerRb))
         {
-            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(Rigidbody2D)} component.", this);
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a {nameof(Rigidbody2D)} component.", this);
             hasAllReferences = false;
         }
 
         if (!sideOwner && !TryGetComponent(out sideOwner))
         {
-            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(SideOwner)} component.", this);
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a {nameof(SideOwner)} component.", this);
             hasAllReferences = false;
         }
 
         if (!areaLimiter && !TryGetComponent(out areaLimiter))
         {
-            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(HalfFieldAreaLimiter)} component.", this);
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a {nameof(HalfFieldAreaLimiter)} component.", this);
             hasAllReferences = false;
         }
 
         if (!circleCollider && !TryGetComponent(out circleCollider))
         {
-            Debug.LogError($"{nameof(MovementMotor2D)} on {name} requires a {nameof(CircleCollider2D)} component.", this);
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a {nameof(CircleCollider2D)} component.", this);
             hasAllReferences = false;
         }
 

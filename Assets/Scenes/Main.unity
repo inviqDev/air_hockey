@@ -6747,6 +6747,7 @@ MonoBehaviour:
   rightPuckSpawnPoint: {fileID: 1783595228}
   leftStrikerSpawnPoint: {fileID: 1818456561}
   rightStrikerSpawnPoint: {fileID: 1889789905}
+  turnController: {fileID: 6400000000000000008}
   serveManager: {fileID: 6400000000000000006}
   puckRegistry: {fileID: 7000000000000000001}
 --- !u!114 &6400000000000000008

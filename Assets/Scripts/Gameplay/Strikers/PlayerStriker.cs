@@ -16,11 +16,13 @@ public sealed class PlayerStriker : StrikerBase
         if (!inputCommandSource)
             inputCommandSource = GetComponent<PlayerInputCommandSource>();
 
-        inputCommandSource?.SetControlScheme(setupContext.PlayerControlScheme);
+        if (inputCommandSource)
+            inputCommandSource.SetControlScheme(setupContext.PlayerControlScheme);
     }
 
     protected override void ResetCustomStrikerState()
     {
-        inputCommandSource?.ResetState();
+        if (inputCommandSource)
+            inputCommandSource.ResetState();
     }
 }

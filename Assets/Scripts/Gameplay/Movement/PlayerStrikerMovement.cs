@@ -1,27 +1,27 @@
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerInputCommandSource))]
+[RequireComponent(typeof(PlayerInputReader))]
 public sealed class PlayerStrikerMovement : StrikerMovement
 {
-    [SerializeField] private PlayerInputCommandSource inputCommandSource;
+    [SerializeField] private PlayerInputReader inputReader;
 
     private Vector2 currentMoveDirection;
     private bool dashRequested;
 
     private void Reset()
     {
-        if (!inputCommandSource)
-            inputCommandSource = GetComponent<PlayerInputCommandSource>();
+        if (!inputReader)
+            inputReader = GetComponent<PlayerInputReader>();
     }
 
     public bool Initialize(PlayerControlScheme controlScheme, BoxCollider2D strikerBoundsCollider)
     {
-        if (!inputCommandSource)
-            inputCommandSource = GetComponent<PlayerInputCommandSource>();
+        if (!inputReader)
+            inputReader = GetComponent<PlayerInputReader>();
 
-        if (!inputCommandSource)
+        if (!inputReader)
         {
-            Debug.LogError($"{nameof(PlayerStrikerMovement)} on {name} requires a {nameof(PlayerInputCommandSource)} component.", this);
+            Debug.LogError($"{nameof(PlayerStrikerMovement)} on {name} requires a {nameof(PlayerInputReader)} component.", this);
             return false;
         }
 
@@ -30,11 +30,11 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         currentMoveDirection = Vector2.zero;
         dashRequested = false;
 
-        inputCommandSource.Initialize(controlScheme);
-        inputCommandSource.MoveInputChanged += HandleMoveInputChanged;
-        inputCommandSource.DashInputChanged += HandleDashInputChanged;
+        inputReader.Initialize(controlScheme);
+        inputReader.MoveInputChanged += HandleMoveInputChanged;
+        inputReader.DashInputChanged += HandleDashInputChanged;
 
-        currentMoveDirection = inputCommandSource.CurrentMoveInput;
+        currentMoveDirection = inputReader.CurrentMoveInput;
 
         if (!base.InitializeStrikerMovement(strikerBoundsCollider))
         {
@@ -115,11 +115,11 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
     private void DisconnectInputEvents()
     {
-        if (!inputCommandSource) return;
+        if (!inputReader) return;
 
-        inputCommandSource.MoveInputChanged -= HandleMoveInputChanged;
-        inputCommandSource.DashInputChanged -= HandleDashInputChanged;
-        inputCommandSource.Shutdown();
+        inputReader.MoveInputChanged -= HandleMoveInputChanged;
+        inputReader.DashInputChanged -= HandleDashInputChanged;
+        inputReader.Shutdown();
     }
 
     private bool CanMoveThisFrame()

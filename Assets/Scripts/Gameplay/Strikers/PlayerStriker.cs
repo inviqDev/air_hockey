@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerInputCommandSource))]
+[RequireComponent(typeof(PlayerInputReader))]
 [RequireComponent(typeof(PlayerStrikerMovement))]
 public sealed class PlayerStriker : StrikerBase
 {

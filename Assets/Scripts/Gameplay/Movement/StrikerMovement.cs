@@ -36,6 +36,18 @@ public sealed class StrikerMovement : MonoBehaviour
 
     public bool Initialize(IMovementCommandSource movementCommandSource, BoxCollider2D strikerBoundsCollider)
     {
+        if (movementCommandSource == null)
+        {
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a movement command source during initialization.", this);
+            return false;
+        }
+
+        if (!strikerBoundsCollider)
+        {
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a striker bounds collider during initialization.", this);
+            return false;
+        }
+
         centerLineLimiterOffset = CalculateCenterLineLimiterOffset(strikerBoundsCollider);
         
         if (centerLineLimiterOffset <= 0f)
@@ -60,40 +72,13 @@ public sealed class StrikerMovement : MonoBehaviour
     {
         if (!isInitialized || !strikerRb) return;
 
-        if (!isMovementAllowed)
-        {
-            strikerRb.linearVelocity = Vector2.zero;
-            return;
-        }
+        if (!CanMoveThisStep()) return;
 
-        if (commandSource == null)
-        {
-            strikerRb.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        var command = commandSource.ReadCommand();
-        var move = Vector2.ClampMagnitude(command.Move, 1f);
-        var dashVelocity = dashAbility.Step(command.DashPressed, sideOwner.Side, Time.fixedDeltaTime);
-        var velocity = move * moveSpeed + dashVelocity;
-        var predictedPosition = strikerRb.position + velocity * Time.fixedDeltaTime;
-
-        if (areaLimiter.IsPastCenterLine(predictedPosition, sideOwner.Side, centerLineLimiterOffset))
-        {
-            var clampedPosition = areaLimiter.ClampToCenterLine(strikerRb.position, sideOwner.Side, centerLineLimiterOffset);
-
-            if (clampedPosition != strikerRb.position)
-            {
-                strikerRb.MovePosition(clampedPosition);
-            }
-
-            if (IsMovingAcrossCenterLine(velocity.x, sideOwner.Side))
-            {
-                velocity.x = 0f;
-            }
-        }
-
-        strikerRb.linearVelocity = velocity;
+        var command = ReadMovementCommand();
+        var velocity = CalculateVelocity(command);
+        var clampedVelocity = ClampVelocityAtCenterLine(velocity);
+        
+        ApplyVelocity(clampedVelocity);
     }
 
     public void SetMovementAllowed(bool isAllowed)
@@ -101,7 +86,7 @@ public sealed class StrikerMovement : MonoBehaviour
         isMovementAllowed = isAllowed;
 
         if (!isMovementAllowed && strikerRb)
-            strikerRb.linearVelocity = Vector2.zero;
+            StopMovement();
     }
 
     public void ResetMovementState(Vector2 position)
@@ -125,17 +110,65 @@ public sealed class StrikerMovement : MonoBehaviour
 
     private void OnDisable()
     {
-        if (strikerRb)
-        {
-            strikerRb.linearVelocity = Vector2.zero;
-        }
+        StopMovement();
 
         isMovementAllowed = false;
     }
 
-    private static bool IsMovingAcrossCenterLine(float xVelocity, PlayerSide side)
+    private void StopMovement()
     {
-        return side == PlayerSide.Left ? xVelocity > 0f : xVelocity < 0f;
+        if (strikerRb)
+            strikerRb.linearVelocity = Vector2.zero;
+    }
+
+    private bool CanMoveThisStep()
+    {
+        if (isMovementAllowed) return true;
+
+        StopMovement();
+        return false;
+    }
+
+    private MovementCommand ReadMovementCommand()
+    {
+        return commandSource.ReadCommand();
+    }
+
+    private Vector2 CalculateVelocity(MovementCommand command)
+    {
+        var moveVelocity = command.Move * moveSpeed;
+        var dashVelocity = dashAbility.Step(command.DashPressed, sideOwner.Side, Time.fixedDeltaTime);
+        return moveVelocity + dashVelocity;
+    }
+
+    private Vector2 ClampVelocityAtCenterLine(Vector2 velocity)
+    {
+        var side = sideOwner.Side;
+        var predictedPosition = strikerRb.position + velocity * Time.fixedDeltaTime;
+        var allowedCenterLineX = areaLimiter.GetAllowedCenterLineX(side, centerLineLimiterOffset);
+        var isPastCenterLine = side == PlayerSide.Left
+            ? predictedPosition.x > allowedCenterLineX
+            : predictedPosition.x < allowedCenterLineX;
+
+        if (!isPastCenterLine) return velocity;
+
+        ClampPositionToCenterLine(allowedCenterLineX);
+        velocity.x = 0f;
+        return velocity;
+    }
+
+    private void ClampPositionToCenterLine(float allowedCenterLineX)
+    {
+        var clampedPosition = strikerRb.position;
+        clampedPosition.x = allowedCenterLineX;
+
+        if (clampedPosition != strikerRb.position)
+            strikerRb.MovePosition(clampedPosition);
+    }
+
+    private void ApplyVelocity(Vector2 velocity)
+    {
+        strikerRb.linearVelocity = velocity;
     }
 
     private float CalculateCenterLineLimiterOffset(BoxCollider2D strikerBoundsCollider)
@@ -143,11 +176,8 @@ public sealed class StrikerMovement : MonoBehaviour
         var scaleX = Mathf.Abs(transform.lossyScale.x);
         var scaledHalfWidth = strikerBoundsCollider.size.x * scaleX * 0.5f;
         var scaledOffsetX = Mathf.Abs(strikerBoundsCollider.offset.x * scaleX);
-        
-        var calculatedOffset = scaledOffsetX + scaledHalfWidth;
-        print(calculatedOffset);
-        
-        return calculatedOffset;
+
+        return scaledOffsetX + scaledHalfWidth;
     }
 
     private DashAbility CreateDashAbility()

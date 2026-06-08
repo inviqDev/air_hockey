@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
 
-public sealed class PlayerInputCommandSource : MonoBehaviour
+public sealed class PlayerInputReader : MonoBehaviour
 {
     public event Action<Vector2> MoveInputChanged;
     public event Action<bool> DashInputChanged;

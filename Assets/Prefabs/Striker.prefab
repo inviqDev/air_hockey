@@ -189,7 +189,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1799019528874754244}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -220,11 +220,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ee3483641d44073b1cc671ea1ab480f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sideOwner: {fileID: 6100000000000000001}
-  strikerMovement: {fileID: 6100000000000000005}
   strikerBoundsCollider: {fileID: 6100000000000000008}
   strikerCollisionCollider: {fileID: 3865672610394795824}
-  inputCommandSource: {fileID: 6100000000000000002}
+  sideOwner: {fileID: 6100000000000000001}
+  strikerMovement: {fileID: 6100000000000000005}
 --- !u!114 &6100000000000000005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,13 +233,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1799019528874754244}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e75963b72f994e5ca29227ab664f9951, type: 3}
+  m_Script: {fileID: 11500000, guid: e417c357487b4e5fbf6bd7421632c290, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 7
   dashSpeed: 16
   dashDuration: 0.12
   dashCooldown: 0.35
+  inputCommandSource: {fileID: 6100000000000000002}
 --- !u!114 &6100000000000000002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,7 +253,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b662aa27ca384231939dbac2b2cd5239, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlScheme: 0
 --- !u!114 &6100000000000000004
 MonoBehaviour:
   m_ObjectHideFlags: 0

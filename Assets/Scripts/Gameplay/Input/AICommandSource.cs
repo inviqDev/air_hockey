@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public sealed class AICommandSource : MonoBehaviour, IMovementCommandSource
+public sealed class AICommandSource : MonoBehaviour
 {
     [Header("References")] [SerializeField]
     private Puck puck;

@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(AICommandSource))]
+[RequireComponent(typeof(AiStrikerMovement))]
 public sealed class AiStriker : StrikerBase
 {
     [SerializeField] private AICommandSource aiCommandSource;
@@ -29,11 +30,18 @@ public sealed class AiStriker : StrikerBase
             aiCommandSource.ResetState();
     }
 
-    protected override IMovementCommandSource GetMovementCommandSource()
+    protected override bool InitializeStrikerMovement()
     {
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
 
-        return aiCommandSource;
+        var aiMovement = Movement as AiStrikerMovement;
+        if (!aiMovement)
+        {
+            Debug.LogError($"{nameof(AiStriker)} on {name} requires a {nameof(AiStrikerMovement)} component.", this);
+            return false;
+        }
+
+        return aiMovement.InitializeAiStrikerMovement(BoundsCollider);
     }
 }

@@ -1,7 +1,6 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SideOwner))]
-[RequireComponent(typeof(StrikerMovement))]
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Collider2D))]
 public abstract class StrikerBase : MonoBehaviour
@@ -13,6 +12,9 @@ public abstract class StrikerBase : MonoBehaviour
     [Header("References")]
     [SerializeField] private SideOwner sideOwner;
     [SerializeField] private StrikerMovement strikerMovement;
+    
+    protected StrikerMovement Movement => strikerMovement;
+    protected BoxCollider2D BoundsCollider => strikerBoundsCollider;
     
     private TurnController turnController;
 
@@ -36,7 +38,7 @@ public abstract class StrikerBase : MonoBehaviour
         CacheReferences();
     }
 
-    public void Initialize(StrikerSetupContext setupContext, TurnController controller)
+    public void InitializeStriker(StrikerSetupContext setupContext, TurnController controller)
     {
         if (!CacheReferences()) return;
 
@@ -44,15 +46,7 @@ public abstract class StrikerBase : MonoBehaviour
             sideOwner.Side = setupContext.Side;
 
         ApplyStrikerSetup(setupContext);
-
-        var movementCommandSource = GetMovementCommandSource();
-        if (movementCommandSource == null)
-        {
-            Debug.LogError($"{nameof(StrikerBase)} on {name} could not resolve a movement command source.", this);
-            return;
-        }
-
-        if (!strikerMovement.Initialize(movementCommandSource, strikerBoundsCollider)) return;
+        if (!InitializeStrikerMovement()) return;
 
         ConfigureTurnController(controller);
     }
@@ -70,8 +64,9 @@ public abstract class StrikerBase : MonoBehaviour
     {
     }
 
+    protected abstract bool InitializeStrikerMovement();
     protected abstract void ApplyStrikerSetup(StrikerSetupContext setupContext);
-    protected abstract IMovementCommandSource GetMovementCommandSource();
+    
 
     private void OnDestroy()
     {
@@ -116,10 +111,10 @@ public abstract class StrikerBase : MonoBehaviour
 
     private Collider2D GetCollisionCollider()
     {
-        foreach (var collider in GetComponents<Collider2D>())
+        foreach (var col in GetComponents<Collider2D>())
         {
-            if (collider == strikerBoundsCollider) continue;
-            return collider;
+            if (col == strikerBoundsCollider) continue;
+            return col;
         }
 
         return null;

@@ -62,6 +62,7 @@ public sealed class StrikerMovement : MonoBehaviour
         if (!CacheReferences()) return false;
 
         ConfigureBody(strikerRb);
+        
         dashAbility = CreateDashAbility();
         
         isInitialized = true;
@@ -70,11 +71,9 @@ public sealed class StrikerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isInitialized || !strikerRb) return;
-
         if (!CanMoveThisStep()) return;
 
-        var command = ReadMovementCommand();
+        var command = commandSource.ReadCommand();
         var velocity = CalculateVelocity(command);
         var clampedVelocity = ClampVelocityAtCenterLine(velocity);
         
@@ -129,15 +128,11 @@ public sealed class StrikerMovement : MonoBehaviour
         return false;
     }
 
-    private MovementCommand ReadMovementCommand()
-    {
-        return commandSource.ReadCommand();
-    }
-
     private Vector2 CalculateVelocity(MovementCommand command)
     {
         var moveVelocity = command.Move * moveSpeed;
-        var dashVelocity = dashAbility.Step(command.DashPressed, sideOwner.Side, Time.fixedDeltaTime);
+        var dashVelocity = dashAbility.Step(command.DashPressed, command.Move, sideOwner.Side, Time.fixedDeltaTime);
+        
         return moveVelocity + dashVelocity;
     }
 
@@ -182,7 +177,10 @@ public sealed class StrikerMovement : MonoBehaviour
 
     private DashAbility CreateDashAbility()
     {
-        return new DashAbility(dashSpeed, dashDuration, dashCooldown);
+        var dash = new DashAbility(dashSpeed, dashDuration, dashCooldown);
+        dash.ResetState();
+        
+        return dash;
     }
 
     private bool CacheReferences()

@@ -10,6 +10,8 @@ public sealed class DashAbility
     private float remainingCooldownTime;
     private Vector2 activeDashDirection;
 
+    public bool IsDashing => remainingDashTime > 0f;
+
     public DashAbility(float dashSpeed, float dashDuration, float cooldown)
     {
         this.dashSpeed = dashSpeed;

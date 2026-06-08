@@ -120,7 +120,7 @@ public sealed class RoundController : MonoBehaviour
             : SpawnGameplayItem<StrikerBase>(playerStrikerPrefab, position);
 
         if (striker)
-            striker.Initialize(setupContext, turnController);
+            striker.InitializeStriker(setupContext, turnController);
 
         return striker;
     }

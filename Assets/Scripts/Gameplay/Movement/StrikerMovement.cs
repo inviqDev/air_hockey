@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
 [RequireComponent(typeof(HalfFieldAreaLimiter))]
-public sealed class StrikerMovement : MonoBehaviour
+public abstract class StrikerMovement : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 7f;
@@ -15,15 +15,17 @@ public sealed class StrikerMovement : MonoBehaviour
 
     private SideOwner sideOwner;
     private HalfFieldAreaLimiter areaLimiter;
-    private IMovementCommandSource commandSource;
-    
-    private Rigidbody2D strikerRb;
     private DashAbility dashAbility;
     
-    private bool isMovementAllowed;
+    private Rigidbody2D strikerRb;
+
     private bool isInitialized;
-    
+    private bool isMovementAllowed;
     private float centerLineLimiterOffset;
+
+    protected bool IsMovementAllowed => isMovementAllowed;
+    protected bool IsInitialized => isInitialized;
+    protected bool IsDashActive => dashAbility != null && dashAbility.IsDashing;
 
     private void Reset()
     {
@@ -34,58 +36,26 @@ public sealed class StrikerMovement : MonoBehaviour
             ConfigureBody(strikerRb);
     }
 
-    public bool Initialize(IMovementCommandSource movementCommandSource, BoxCollider2D strikerBoundsCollider)
+    protected bool InitializeStrikerMovement(BoxCollider2D strikerBoundsCollider)
     {
-        if (movementCommandSource == null)
-        {
-            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a movement command source during initialization.", this);
-            return false;
-        }
+        if (!InitializeBoundsCollider(strikerBoundsCollider)) return false;
+        if (!EnsureInitialized()) return false;
 
-        if (!strikerBoundsCollider)
-        {
-            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a striker bounds collider during initialization.", this);
-            return false;
-        }
-
-        centerLineLimiterOffset = CalculateCenterLineLimiterOffset(strikerBoundsCollider);
-        
-        if (centerLineLimiterOffset <= 0f)
-        {
-            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a positive center-line extent during initialization.", this);
-            return false;
-        }
-
-        commandSource = movementCommandSource;
-        
-        if (isInitialized) return true;
-        if (!CacheReferences()) return false;
-
-        ConfigureBody(strikerRb);
-        
-        dashAbility = CreateDashAbility();
-        
-        isInitialized = true;
+        UpdateMovementLoopState();
         return true;
-    }
-
-    private void FixedUpdate()
-    {
-        if (!CanMoveThisStep()) return;
-
-        var command = commandSource.ReadCommand();
-        var velocity = CalculateVelocity(command);
-        var clampedVelocity = ClampVelocityAtCenterLine(velocity);
-        
-        ApplyVelocity(clampedVelocity);
     }
 
     public void SetMovementAllowed(bool isAllowed)
     {
         isMovementAllowed = isAllowed;
 
-        if (!isMovementAllowed && strikerRb)
+        if (!isMovementAllowed)
+        {
+            HandleMovementStopped();
             StopMovement();
+        }
+
+        UpdateMovementLoopState();
     }
 
     public void ResetMovementState(Vector2 position)
@@ -105,34 +75,45 @@ public sealed class StrikerMovement : MonoBehaviour
 
         if (dashAbility != null)
             dashAbility.ResetState();
+
+        HandleMovementReset();
+        UpdateMovementLoopState();
     }
 
-    private void OnDisable()
+    protected void ExecuteMovementStep(MovementCommand command)
     {
-        StopMovement();
+        var velocity = CalculateVelocity(command);
+        var clampedVelocity = ClampVelocityAtCenterLine(velocity);
 
-        isMovementAllowed = false;
+        ApplyVelocity(clampedVelocity);
     }
 
-    private void StopMovement()
+    protected void StopMovement()
     {
         if (strikerRb)
             strikerRb.linearVelocity = Vector2.zero;
     }
 
-    private bool CanMoveThisStep()
-    {
-        if (isMovementAllowed) return true;
+    protected abstract void UpdateMovementLoopState();
 
+    protected virtual void HandleMovementStopped()
+    {
+    }
+
+    protected virtual void HandleMovementReset()
+    {
+    }
+
+    private void OnDisable()
+    {
         StopMovement();
-        return false;
     }
 
     private Vector2 CalculateVelocity(MovementCommand command)
     {
         var moveVelocity = command.Move * moveSpeed;
         var dashVelocity = dashAbility.Step(command.DashPressed, command.Move, sideOwner.Side, Time.fixedDeltaTime);
-        
+
         return moveVelocity + dashVelocity;
     }
 
@@ -166,21 +147,33 @@ public sealed class StrikerMovement : MonoBehaviour
         strikerRb.linearVelocity = velocity;
     }
 
-    private float CalculateCenterLineLimiterOffset(BoxCollider2D strikerBoundsCollider)
+    private bool InitializeBoundsCollider(BoxCollider2D strikerBoundsCollider)
     {
-        var scaleX = Mathf.Abs(transform.lossyScale.x);
-        var scaledHalfWidth = strikerBoundsCollider.size.x * scaleX * 0.5f;
-        var scaledOffsetX = Mathf.Abs(strikerBoundsCollider.offset.x * scaleX);
+        if (!strikerBoundsCollider)
+        {
+            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a striker bounds collider during initialization.", this);
+            return false;
+        }
 
-        return scaledOffsetX + scaledHalfWidth;
+        centerLineLimiterOffset = CalculateCenterLineLimiterOffset(strikerBoundsCollider);
+        if (centerLineLimiterOffset > 0f) return true;
+
+        Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a positive center-line extent during initialization.", this);
+        return false;
     }
 
-    private DashAbility CreateDashAbility()
+    private bool EnsureInitialized()
     {
-        var dash = new DashAbility(dashSpeed, dashDuration, dashCooldown);
-        dash.ResetState();
-        
-        return dash;
+        if (isInitialized)
+            return true;
+
+        if (!CacheReferences()) return false;
+
+        ConfigureBody(strikerRb);
+        dashAbility = CreateDashAbility();
+
+        isInitialized = true;
+        return true;
     }
 
     private bool CacheReferences()
@@ -206,6 +199,23 @@ public sealed class StrikerMovement : MonoBehaviour
         }
 
         return hasAllReferences;
+    }
+
+    private float CalculateCenterLineLimiterOffset(BoxCollider2D strikerBoundsCollider)
+    {
+        var scaleX = Mathf.Abs(transform.lossyScale.x);
+        var scaledHalfWidth = strikerBoundsCollider.size.x * scaleX * 0.5f;
+        var scaledOffsetX = Mathf.Abs(strikerBoundsCollider.offset.x * scaleX);
+
+        return scaledOffsetX + scaledHalfWidth;
+    }
+
+    private DashAbility CreateDashAbility()
+    {
+        var dash = new DashAbility(dashSpeed, dashDuration, dashCooldown);
+        dash.ResetState();
+
+        return dash;
     }
 
     private static void ConfigureBody(Rigidbody2D targetBody)

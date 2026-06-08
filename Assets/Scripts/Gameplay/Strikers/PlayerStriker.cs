@@ -1,36 +1,25 @@
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerInputCommandSource))]
+[RequireComponent(typeof(PlayerStrikerMovement))]
 public sealed class PlayerStriker : StrikerBase
 {
-    [SerializeField] private PlayerInputCommandSource inputCommandSource;
-
-    private void Reset()
-    {
-        if (!inputCommandSource)
-            inputCommandSource = GetComponent<PlayerInputCommandSource>();
-    }
+    private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
 
     protected override void ApplyStrikerSetup(StrikerSetupContext setupContext)
     {
-        if (!inputCommandSource)
-            inputCommandSource = GetComponent<PlayerInputCommandSource>();
-
-        if (inputCommandSource)
-            inputCommandSource.SetControlScheme(setupContext.PlayerControlScheme);
+        controlScheme = setupContext.PlayerControlScheme;
     }
 
-    protected override void ResetCustomStrikerState()
+    protected override bool InitializeStrikerMovement()
     {
-        if (inputCommandSource)
-            inputCommandSource.ResetState();
-    }
+        var playerMovement = Movement as PlayerStrikerMovement;
+        if (!playerMovement)
+        {
+            Debug.LogError($"{nameof(PlayerStriker)} on {name} requires a {nameof(PlayerStrikerMovement)} component.", this);
+            return false;
+        }
 
-    protected override IMovementCommandSource GetMovementCommandSource()
-    {
-        if (!inputCommandSource)
-            inputCommandSource = GetComponent<PlayerInputCommandSource>();
-
-        return inputCommandSource;
+        return playerMovement.Initialize(controlScheme, BoundsCollider);
     }
 }

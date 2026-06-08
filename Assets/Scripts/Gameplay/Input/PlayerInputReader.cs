@@ -5,7 +5,7 @@ using System;
 public sealed class PlayerInputReader : MonoBehaviour
 {
     public event Action<Vector2> MoveInputChanged;
-    public event Action<bool> DashInputChanged;
+    public event Action DashPressed;
 
     private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
     
@@ -158,7 +158,7 @@ public sealed class PlayerInputReader : MonoBehaviour
 
     private void OnDashPerformed(InputAction.CallbackContext context)
     {
-        DashInputChanged?.Invoke(true);
+        DashPressed?.Invoke();
     }
 
     private void OnMovePlayerOneChanged(InputAction.CallbackContext context)

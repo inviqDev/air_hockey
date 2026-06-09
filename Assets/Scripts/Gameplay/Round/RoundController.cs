@@ -24,46 +24,63 @@ public sealed class RoundController : MonoBehaviour
     private Puck puck;
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
+    
+    private readonly Pool gameplayItemPool = new();
 
-    public bool HasAllGameItemsSpawned =>
-        IsGameplayItemReady(puck) &&
-        IsGameplayItemReady(leftStriker) &&
-        IsGameplayItemReady(rightStriker);
+    public bool HasAllRoundItemsActive =>
+        IsRoundItemActive(puck) &&
+        IsRoundItemActive(leftStriker) &&
+        IsRoundItemActive(rightStriker);
 
-    public bool SpawnGameItems(MatchConfiguration configuration)
+    public bool ActivateRoundItems(MatchConfiguration configuration)
     {
-        DespawnGameItems();
-        ShowTable();
+        ReturnRoundItemsToPool();
+        SetTableVisible(true);
 
-        puck = SpawnPuck(puckPrefab, GetPosition(leftPuckSpawnPoint));
-        if (puckRegistry)
-            puckRegistry.RegisterPuck(puck);
-
-        leftStriker = SpawnStriker(configuration, PlayerSide.Left, GetPosition(leftStrikerSpawnPoint));
-        rightStriker = SpawnStriker(configuration, PlayerSide.Right, GetPosition(rightStrikerSpawnPoint));
-
-        ResetRound();
-        return HasAllGameItemsSpawned;
-    }
-
-    public bool PrepareTurn()
-    {
-        if (!HasAllGameItemsSpawned) return false;
-
-        ResetRound();
-        return HasAllGameItemsSpawned;
-    }
-
-    public bool RespawnTurnItems(MatchConfiguration configuration)
-    {
-        return SpawnGameItems(configuration);
+        ActivatePuckFromPool();
+        ActivateStrikersFromPool(configuration);
+        
+        ResetRoundItemsForTurn();
+        
+        return HasAllRoundItemsActive;
     }
     
-    public void DespawnGameItems()
+    private void ActivatePuckFromPool()
     {
-        DestroyStriker(leftStriker);
-        DestroyStriker(rightStriker);
-        DestroyPuck(puck);
+        var puckSpawnPosition = GetPosition(leftPuckSpawnPoint);
+        puck = gameplayItemPool.TryGetFromPool(puckPrefab, puckSpawnPosition, Quaternion.identity);
+            
+        if (puckRegistry)
+            puckRegistry.RegisterPuck(puck);
+    }
+
+    private void ActivateStrikersFromPool(MatchConfiguration configuration)
+    {
+        var leftStrikerSpawnPosition = GetPosition(leftStrikerSpawnPoint);
+        leftStriker = ActivateStrikerFromPool(configuration, PlayerSide.Left, leftStrikerSpawnPosition);
+        
+        var rightStrikerSpawnPosition = GetPosition(rightStrikerSpawnPoint);
+        rightStriker = ActivateStrikerFromPool(configuration, PlayerSide.Right, rightStrikerSpawnPosition);
+    }
+
+    public bool ResetRoundItemsForTurn()
+    {
+        if (!HasAllRoundItemsActive) return false;
+
+        ResetRoundItemsToStartPositions();
+        return HasAllRoundItemsActive;
+    }
+
+    public bool RebuildRoundItemsForTurn(MatchConfiguration configuration)
+    {
+        return ActivateRoundItems(configuration);
+    }
+    
+    public void ReturnRoundItemsToPool()
+    {
+        ReturnItemToPool(leftStriker);
+        ReturnItemToPool(rightStriker);
+        ReturnItemToPool(puck);
 
         leftStriker = null;
         rightStriker = null;
@@ -72,16 +89,16 @@ public sealed class RoundController : MonoBehaviour
         if (puckRegistry)
             puckRegistry.Clear();
 
-        HideTable();
+        SetTableVisible(false);
     }
 
-    public void ResetRound()
+    public void ResetRoundItemsToStartPositions()
     {
-        ResetStriker(leftStriker, GetPosition(leftStrikerSpawnPoint));
-        ResetStriker(rightStriker, GetPosition(rightStrikerSpawnPoint));
+        ResetStrikerToStartPosition(leftStriker, GetPosition(leftStrikerSpawnPoint));
+        ResetStrikerToStartPosition(rightStriker, GetPosition(rightStrikerSpawnPoint));
 
         if (serveManager)
-            ResetPuck(puck, serveManager.GetPuckStartPosition(GetPosition(leftPuckSpawnPoint), GetPosition(rightPuckSpawnPoint)));
+            ResetPuckToServePosition(puck, serveManager.GetPuckStartPosition(GetPosition(leftPuckSpawnPoint), GetPosition(rightPuckSpawnPoint)));
     }
 
     private void OnValidate()
@@ -92,22 +109,10 @@ public sealed class RoundController : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
-        DespawnGameItems();
+        ReturnRoundItemsToPool();
     }
 
-    private static T SpawnGameplayItem<T>(T prefab, Vector2 position) where T : Component
-    {
-        if (!prefab) return null;
-        
-        return  Instantiate(prefab, position, Quaternion.identity);
-    }
-
-    private static Puck SpawnPuck(Puck prefab, Vector2 position)
-    {
-        return SpawnGameplayItem(prefab, position);
-    }
-
-    private StrikerBase SpawnStriker(MatchConfiguration configuration, PlayerSide side, Vector2 position)
+    private StrikerBase ActivateStrikerFromPool(MatchConfiguration configuration, PlayerSide side, Vector2 position)
     {
         var player = configuration.GetPlayerForSide(side);
         var isAi = player == MatchPlayer.PlayerTwo &&
@@ -115,9 +120,10 @@ public sealed class RoundController : MonoBehaviour
 
         var controlScheme = GetControlScheme(configuration, player, side);
         var setupContext = new StrikerSetupContext(side, puck, controlScheme);
-        var striker = isAi
-            ? SpawnGameplayItem<StrikerBase>(aiStrikerPrefab, position)
-            : SpawnGameplayItem<StrikerBase>(playerStrikerPrefab, position);
+        
+        StrikerBase striker = isAi
+            ? gameplayItemPool.TryGetFromPool(aiStrikerPrefab, position, Quaternion.identity)
+            : gameplayItemPool.TryGetFromPool(playerStrikerPrefab, position, Quaternion.identity);
 
         if (striker)
             striker.InitializeStriker(setupContext, turnController);
@@ -135,16 +141,10 @@ public sealed class RoundController : MonoBehaviour
             : PlayerControlScheme.Arrows;
     }
 
-    private void ShowTable()
+    private void SetTableVisible(bool isVisible)
     {
         if (tableRoot)
-            tableRoot.SetActive(true);
-    }
-
-    private void HideTable()
-    {
-        if (tableRoot)
-            tableRoot.SetActive(false);
+            tableRoot.SetActive(isVisible);
     }
 
     private static Vector2 GetPosition(Transform point)
@@ -152,37 +152,27 @@ public sealed class RoundController : MonoBehaviour
         return point ? point.position : Vector2.zero;
     }
 
-    private static void DestroyStriker(StrikerBase striker)
+    private void ReturnItemToPool<T>(T item) where T : Component, IPoolable
     {
-        if (!striker) return;
-
-        Destroy(striker.gameObject);
+        if (!item) return;
+        gameplayItemPool.ReturnToPool(item);
     }
 
-    private static void DestroyPuck(Puck puck)
-    {
-        if (!puck) return;
-
-        Destroy(puck.gameObject);
-    }
-
-    private static void ResetStriker(StrikerBase striker, Vector2 position)
+    private static void ResetStrikerToStartPosition(StrikerBase striker, Vector2 position)
     {
         if (!striker) return;
-
         striker.ResetState(position);
     }
 
-    private static void ResetPuck(Puck puck, Vector2 position)
+    private static void ResetPuckToServePosition(Puck puck, Vector2 position)
     {
         if (!puck) return;
-
         puck.ResetState(position);
     }
 
-    private static bool IsGameplayItemReady(Component gameplayItem)
+    private static bool IsRoundItemActive(Component roundItem)
     {
-        return gameplayItem && gameplayItem.gameObject.activeInHierarchy;
+        return roundItem && roundItem.gameObject.activeInHierarchy;
     }
 
     private void ValidateReferences()

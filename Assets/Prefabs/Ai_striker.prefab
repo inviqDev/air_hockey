@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7265830630652106188}
   - component: {fileID: 6200000000000000006}
   - component: {fileID: 6200000000000000005}
+  - component: {fileID: 6200000000000000003}
   - component: {fileID: 6200000000000000002}
   - component: {fileID: 6200000000000000001}
   m_Layer: 8
@@ -172,9 +173,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81eb9b0f7e194ae5a1f4e0fb4ca8f728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strikerCollisionCollider: {fileID: 328060846955090284}
   sideOwner: {fileID: 6200000000000000001}
   strikerMovement: {fileID: 6200000000000000005}
+  strikerTweenAnimator: {fileID: 6200000000000000003}
   aiCommandSource: {fileID: 6200000000000000002}
 --- !u!114 &6200000000000000005
 MonoBehaviour:
@@ -193,6 +194,28 @@ MonoBehaviour:
   dashDuration: 0.12
   dashCooldown: 0.35
   aiCommandSource: {fileID: 6200000000000000002}
+--- !u!114 &6200000000000000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2470998444364862894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1d94f9c6ac4f889c7f1d5ae8f0b123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animateWhenActivated: 1
+  appearAnimationDuration: 1
+  appearStartScaleMultiplier: 0.001
+  appearStartAlpha: 0.01
+  appearAnimationEase: 26
+  appearShakeOffset: {x: 0.05, y: 0.05, z: 0}
+  appearShakeVibrato: 12
+  appearShakeElasticity: 0.5
+  appearShakeStartDelayNormalized: 0.1
+  targetSpriteRenderer: {fileID: 6369059248632716131}
 --- !u!114 &6200000000000000002
 MonoBehaviour:
   m_ObjectHideFlags: 0

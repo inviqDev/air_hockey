@@ -1,11 +1,13 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SideOwner))]
+[RequireComponent(typeof(StrikerTweenAnimator))]
 public abstract class StrikerBase : MonoBehaviour, IPoolable
 {
     [Header("References")]
     [SerializeField] private SideOwner sideOwner;
     [SerializeField] private StrikerMovement strikerMovement;
+    [SerializeField] private StrikerTweenAnimator strikerTweenAnimator;
 
     protected StrikerMovement Movement => strikerMovement;
 
@@ -18,6 +20,9 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         if (!strikerMovement)
             strikerMovement = GetComponent<StrikerMovement>();
+
+        if (!strikerTweenAnimator)
+            strikerTweenAnimator = GetComponent<StrikerTweenAnimator>();
     }
 
     private void Awake()
@@ -44,6 +49,9 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         strikerMovement.ResetMovementState(position);
         ResetCustomState();
+
+        if (strikerTweenAnimator)
+            strikerTweenAnimator.PlayAppearAnimation();
     }
 
     protected virtual void ResetCustomState()
@@ -56,11 +64,17 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     public void OnGetFromPool()
     {
         TryCacheReferences();
+
+        if (strikerTweenAnimator)
+            strikerTweenAnimator.PrepareAppearAnimation();
     }
 
     public void OnMoveToPool()
     {
         if (!TryCacheReferences()) return;
+
+        if (strikerTweenAnimator)
+            strikerTweenAnimator.ResetStrikerVisualState();
 
         SetMovementAllowed(false);
         UnsubscribeFromTurnController();
@@ -85,6 +99,12 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
         if (!strikerMovement && !TryGetComponent(out strikerMovement))
         {
             Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(StrikerMovement)} component.", this);
+            hasAllReferences = false;
+        }
+
+        if (!strikerTweenAnimator && !TryGetComponent(out strikerTweenAnimator))
+        {
+            Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(StrikerTweenAnimator)} component.", this);
             hasAllReferences = false;
         }
 

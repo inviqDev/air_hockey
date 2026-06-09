@@ -11,7 +11,7 @@ public sealed class AiStrikerMovement : StrikerMovement
             aiCommandSource = GetComponent<AICommandSource>();
     }
 
-    public bool InitializeAiStrikerMovement(BoxCollider2D strikerBoundsCollider)
+    public bool InitializeAiStrikerMovement()
     {
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
@@ -22,7 +22,7 @@ public sealed class AiStrikerMovement : StrikerMovement
             return false;
         }
 
-        return base.InitializeStrikerMovement(strikerBoundsCollider);
+        return base.InitializeStrikerMovement();
     }
 
     private void FixedUpdate()

@@ -14,7 +14,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
             inputReader = GetComponent<PlayerInputReader>();
     }
 
-    public bool Initialize(PlayerControlScheme controlScheme, BoxCollider2D strikerBoundsCollider)
+    public bool Initialize(PlayerControlScheme controlScheme)
     {
         if (!inputReader)
             inputReader = GetComponent<PlayerInputReader>();
@@ -36,7 +36,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
         currentMoveDirection = inputReader.CurrentMoveInput;
 
-        if (!base.InitializeStrikerMovement(strikerBoundsCollider))
+        if (!base.InitializeStrikerMovement())
         {
             DisconnectInputEvents();
             return false;

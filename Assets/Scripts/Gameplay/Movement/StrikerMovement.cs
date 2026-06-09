@@ -2,7 +2,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
-[RequireComponent(typeof(HalfFieldAreaLimiter))]
 public abstract class StrikerMovement : MonoBehaviour
 {
     [Header("Movement")]
@@ -14,14 +13,12 @@ public abstract class StrikerMovement : MonoBehaviour
     [SerializeField, Min(0f)] private float dashCooldown = 0.35f;
 
     private SideOwner sideOwner;
-    private HalfFieldAreaLimiter areaLimiter;
     private DashAbility dashAbility;
     
     private Rigidbody2D strikerRb;
 
     private bool isInitialized;
     private bool isMovementAllowed;
-    private float centerLineLimiterOffset;
 
     protected bool IsMovementAllowed => isMovementAllowed;
     protected bool IsInitialized => isInitialized;
@@ -36,9 +33,8 @@ public abstract class StrikerMovement : MonoBehaviour
             ConfigureBody(strikerRb);
     }
 
-    protected bool InitializeStrikerMovement(BoxCollider2D strikerBoundsCollider)
+    protected bool InitializeStrikerMovement()
     {
-        if (!InitializeBoundsCollider(strikerBoundsCollider)) return false;
         if (!EnsureInitialized()) return false;
 
         UpdateMovementLoopState();
@@ -83,9 +79,7 @@ public abstract class StrikerMovement : MonoBehaviour
     protected void ExecuteMovementStep(MovementCommand command)
     {
         var velocity = CalculateVelocity(command);
-        var clampedVelocity = ClampVelocityAtCenterLine(velocity);
-
-        ApplyVelocity(clampedVelocity);
+        ApplyVelocity(velocity);
     }
 
     protected void StopMovement()
@@ -117,49 +111,9 @@ public abstract class StrikerMovement : MonoBehaviour
         return moveVelocity + dashVelocity;
     }
 
-    private Vector2 ClampVelocityAtCenterLine(Vector2 velocity)
-    {
-        var side = sideOwner.Side;
-        var predictedPosition = strikerRb.position + velocity * Time.fixedDeltaTime;
-        var allowedCenterLineX = areaLimiter.GetAllowedCenterLineX(side, centerLineLimiterOffset);
-        var isPastCenterLine = side == PlayerSide.Left
-            ? predictedPosition.x > allowedCenterLineX
-            : predictedPosition.x < allowedCenterLineX;
-
-        if (!isPastCenterLine) return velocity;
-
-        ClampPositionToCenterLine(allowedCenterLineX);
-        velocity.x = 0f;
-        return velocity;
-    }
-
-    private void ClampPositionToCenterLine(float allowedCenterLineX)
-    {
-        var clampedPosition = strikerRb.position;
-        clampedPosition.x = allowedCenterLineX;
-
-        if (clampedPosition != strikerRb.position)
-            strikerRb.MovePosition(clampedPosition);
-    }
-
     private void ApplyVelocity(Vector2 velocity)
     {
         strikerRb.linearVelocity = velocity;
-    }
-
-    private bool InitializeBoundsCollider(BoxCollider2D strikerBoundsCollider)
-    {
-        if (!strikerBoundsCollider)
-        {
-            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a striker bounds collider during initialization.", this);
-            return false;
-        }
-
-        centerLineLimiterOffset = CalculateCenterLineLimiterOffset(strikerBoundsCollider);
-        if (centerLineLimiterOffset > 0f) return true;
-
-        Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a positive center-line extent during initialization.", this);
-        return false;
     }
 
     private bool EnsureInitialized()
@@ -192,22 +146,7 @@ public abstract class StrikerMovement : MonoBehaviour
             hasAllReferences = false;
         }
 
-        if (!areaLimiter && !TryGetComponent(out areaLimiter))
-        {
-            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a {nameof(HalfFieldAreaLimiter)} component.", this);
-            hasAllReferences = false;
-        }
-
         return hasAllReferences;
-    }
-
-    private float CalculateCenterLineLimiterOffset(BoxCollider2D strikerBoundsCollider)
-    {
-        var scaleX = Mathf.Abs(transform.lossyScale.x);
-        var scaledHalfWidth = strikerBoundsCollider.size.x * scaleX * 0.5f;
-        var scaledOffsetX = Mathf.Abs(strikerBoundsCollider.offset.x * scaleX);
-
-        return scaledOffsetX + scaledHalfWidth;
     }
 
     private DashAbility CreateDashAbility()

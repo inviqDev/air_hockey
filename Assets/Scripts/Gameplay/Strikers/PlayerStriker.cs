@@ -6,12 +6,12 @@ public sealed class PlayerStriker : StrikerBase
 {
     private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
 
-    protected override void ApplyStrikerSetup(StrikerSetupContext setupContext)
+    protected override void ApplySetup(StrikerSetupContext setupContext)
     {
         controlScheme = setupContext.PlayerControlScheme;
     }
 
-    protected override bool InitializeStrikerMovement()
+    protected override bool TryInitializeMovement()
     {
         var playerMovement = Movement as PlayerStrikerMovement;
         if (!playerMovement)
@@ -20,6 +20,6 @@ public sealed class PlayerStriker : StrikerBase
             return false;
         }
 
-        return playerMovement.Initialize(controlScheme, BoundsCollider);
+        return playerMovement.Initialize(controlScheme);
     }
 }

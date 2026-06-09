@@ -1,22 +1,15 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SideOwner))]
-[RequireComponent(typeof(BoxCollider2D))]
-[RequireComponent(typeof(Collider2D))]
 public abstract class StrikerBase : MonoBehaviour, IPoolable
 {
-    [Header("Striker colliders")]
-    [SerializeField] private BoxCollider2D strikerBoundsCollider;
-    [SerializeField] private Collider2D strikerCollisionCollider;
-
     [Header("References")]
     [SerializeField] private SideOwner sideOwner;
     [SerializeField] private StrikerMovement strikerMovement;
-    
+
     protected StrikerMovement Movement => strikerMovement;
-    protected BoxCollider2D BoundsCollider => strikerBoundsCollider;
-    
-    private TurnController turnController;
+
+    private TurnController currentTurnController;
 
     private void Reset()
     {
@@ -25,60 +18,53 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         if (!strikerMovement)
             strikerMovement = GetComponent<StrikerMovement>();
-
-        if (!strikerBoundsCollider)
-            strikerBoundsCollider = GetComponent<BoxCollider2D>();
-
-        if (!strikerCollisionCollider)
-            strikerCollisionCollider = GetCollisionCollider();
     }
 
     private void Awake()
     {
-        CacheReferences();
+        TryCacheReferences();
     }
 
     public void InitializeStriker(StrikerSetupContext setupContext, TurnController controller)
     {
-        if (!CacheReferences()) return;
+        if (!TryCacheReferences()) return;
 
         if (sideOwner)
             sideOwner.Side = setupContext.Side;
 
-        ApplyStrikerSetup(setupContext);
-        if (!InitializeStrikerMovement()) return;
+        ApplySetup(setupContext);
+        if (!TryInitializeMovement()) return;
 
-        ConfigureTurnController(controller);
+        ConfigureTurnControllerSubscription(controller);
     }
 
     public void ResetState(Vector2 position)
     {
-        if (!CacheReferences()) return;
+        if (!TryCacheReferences()) return;
 
         strikerMovement.ResetMovementState(position);
-
-        ResetCustomStrikerState();
+        ResetCustomState();
     }
 
-    protected virtual void ResetCustomStrikerState()
+    protected virtual void ResetCustomState()
     {
     }
 
-    protected abstract bool InitializeStrikerMovement();
-    protected abstract void ApplyStrikerSetup(StrikerSetupContext setupContext);
+    protected abstract bool TryInitializeMovement();
+    protected abstract void ApplySetup(StrikerSetupContext setupContext);
 
     public void OnGetFromPool()
     {
-        CacheReferences();
+        TryCacheReferences();
     }
 
     public void OnMoveToPool()
     {
-        if (!CacheReferences()) return;
+        if (!TryCacheReferences()) return;
 
-        strikerMovement.SetMovementAllowed(false);
+        SetMovementAllowed(false);
         UnsubscribeFromTurnController();
-        turnController = null;
+        currentTurnController = null;
     }
 
     private void OnDestroy()
@@ -86,7 +72,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
         UnsubscribeFromTurnController();
     }
 
-    private bool CacheReferences()
+    private bool TryCacheReferences()
     {
         var hasAllReferences = true;
 
@@ -102,40 +88,12 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
             hasAllReferences = false;
         }
 
-        if (!strikerBoundsCollider && !TryGetComponent(out strikerBoundsCollider))
-        {
-            Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(BoxCollider2D)} component.", this);
-            hasAllReferences = false;
-        }
-
-        if (!strikerCollisionCollider)
-        {
-            strikerCollisionCollider = GetCollisionCollider();
-
-            if (!strikerCollisionCollider)
-            {
-                Debug.LogError($"{nameof(StrikerBase)} on {name} requires a collision {nameof(Collider2D)} component.", this);
-                hasAllReferences = false;
-            }
-        }
-
         return hasAllReferences;
     }
 
-    private Collider2D GetCollisionCollider()
+    private void ConfigureTurnControllerSubscription(TurnController newTurnController)
     {
-        foreach (var col in GetComponents<Collider2D>())
-        {
-            if (col == strikerBoundsCollider) continue;
-            return col;
-        }
-
-        return null;
-    }
-
-    private void ConfigureTurnController(TurnController newTurnController)
-    {
-        if (turnController == newTurnController)
+        if (currentTurnController == newTurnController)
         {
             ApplyCurrentTurnState();
             return;
@@ -143,45 +101,47 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         UnsubscribeFromTurnController();
 
-        turnController = newTurnController;
+        currentTurnController = newTurnController;
         SubscribeToTurnController();
-
         ApplyCurrentTurnState();
     }
 
     private void SubscribeToTurnController()
     {
-        if (!turnController) return;
+        if (!currentTurnController) return;
 
-        turnController.TurnStarted += HandleTurnStarted;
-        turnController.TurnEnded += HandleTurnEnded;
+        currentTurnController.TurnStarted += HandleTurnStarted;
+        currentTurnController.TurnEnded += HandleTurnEnded;
     }
 
     private void UnsubscribeFromTurnController()
     {
-        if (!turnController) return;
+        if (!currentTurnController) return;
 
-        turnController.TurnStarted -= HandleTurnStarted;
-        turnController.TurnEnded -= HandleTurnEnded;
+        currentTurnController.TurnStarted -= HandleTurnStarted;
+        currentTurnController.TurnEnded -= HandleTurnEnded;
     }
 
     private void ApplyCurrentTurnState()
     {
+        var isMovementAllowed = currentTurnController && currentTurnController.IsTurnActive;
+        SetMovementAllowed(isMovementAllowed);
+    }
+
+    private void SetMovementAllowed(bool isAllowed)
+    {
         if (!strikerMovement) return;
 
-        var isMovementAllowed = turnController && turnController.IsTurnActive;
-        strikerMovement.SetMovementAllowed(isMovementAllowed);
+        strikerMovement.SetMovementAllowed(isAllowed);
     }
 
     private void HandleTurnStarted()
     {
-        if (strikerMovement)
-            strikerMovement.SetMovementAllowed(true);
+        SetMovementAllowed(true);
     }
 
     private void HandleTurnEnded()
     {
-        if (strikerMovement)
-            strikerMovement.SetMovementAllowed(false);
+        SetMovementAllowed(false);
     }
 }

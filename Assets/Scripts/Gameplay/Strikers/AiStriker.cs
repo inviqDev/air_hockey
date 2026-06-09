@@ -12,7 +12,7 @@ public sealed class AiStriker : StrikerBase
             aiCommandSource = GetComponent<AICommandSource>();
     }
 
-    protected override void ApplyStrikerSetup(StrikerSetupContext setupContext)
+    protected override void ApplySetup(StrikerSetupContext setupContext)
     {
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
@@ -24,13 +24,13 @@ public sealed class AiStriker : StrikerBase
         }
     }
 
-    protected override void ResetCustomStrikerState()
+    protected override void ResetCustomState()
     {
         if (aiCommandSource)
             aiCommandSource.ResetState();
     }
 
-    protected override bool InitializeStrikerMovement()
+    protected override bool TryInitializeMovement()
     {
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
@@ -42,6 +42,6 @@ public sealed class AiStriker : StrikerBase
             return false;
         }
 
-        return aiMovement.InitializeAiStrikerMovement(BoundsCollider);
+        return aiMovement.InitializeAiStrikerMovement();
     }
 }

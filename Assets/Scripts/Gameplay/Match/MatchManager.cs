@@ -47,7 +47,7 @@ public sealed class MatchManager : MonoBehaviour
         if (!turnController) return;
         if (turnController.IsTurnActive) return;
 
-        var canStartTurn = roundController && roundController.HasAllGameItemsSpawned;
+        var canStartTurn = roundController && roundController.HasAllRoundItemsActive;
         if (hasPreparedTurnState && lastPreparedTurnCanStart == canStartTurn) return;
 
         lastPreparedTurnCanStart = canStartTurn;
@@ -80,7 +80,7 @@ public sealed class MatchManager : MonoBehaviour
 
     private bool PrepareCurrentTurn()
     {
-        var canStartTurn = roundController && roundController.PrepareTurn();
+        var canStartTurn = roundController && roundController.ResetRoundItemsForTurn();
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
         
@@ -107,7 +107,7 @@ public sealed class MatchManager : MonoBehaviour
         }
 
         if (roundController)
-            roundController.DespawnGameItems();
+            roundController.ReturnRoundItemsToPool();
 
         HasActiveMatch = false;
     }
@@ -167,8 +167,8 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!roundController) return false;
 
-        roundController.DespawnGameItems();
-        return roundController.SpawnGameItems(configuration);
+        roundController.ReturnRoundItemsToPool();
+        return roundController.ActivateRoundItems(configuration);
     }
 
     private void StopCurrentMatch()
@@ -177,7 +177,7 @@ public sealed class MatchManager : MonoBehaviour
         ResetCurrentMatchProgress();
 
         if (roundController)
-            roundController.DespawnGameItems();
+            roundController.ReturnRoundItemsToPool();
 
         HasActiveMatch = false;
         hasPreparedTurnState = false;
@@ -226,7 +226,7 @@ public sealed class MatchManager : MonoBehaviour
         if (!HasActiveMatch) return;
         if (!hasCurrentConfiguration) return;
 
-        var canStartTurn = roundController && roundController.RespawnTurnItems(currentConfiguration);
+        var canStartTurn = roundController && roundController.RebuildRoundItemsForTurn(currentConfiguration);
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
 

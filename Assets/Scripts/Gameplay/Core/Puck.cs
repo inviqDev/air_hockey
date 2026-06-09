@@ -2,7 +2,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CircleCollider2D))]
-public sealed class Puck : MonoBehaviour
+public sealed class Puck : MonoBehaviour, IPoolable
 {
     private const float DefaultRadius = 0.5f;
 
@@ -44,6 +44,17 @@ public sealed class Puck : MonoBehaviour
         PuckRigidbody.angularVelocity = 0f;
         PuckRigidbody.position = position;
         PuckRigidbody.rotation = 0f;
+    }
+
+    public void OnGetFromPool()
+    {
+        CacheComponents();
+    }
+
+    public void OnMoveToPool()
+    {
+        if (!PuckRigidbody) return;
+        ResetState(PuckRigidbody.position);
     }
 
     private float ResolveRadius()

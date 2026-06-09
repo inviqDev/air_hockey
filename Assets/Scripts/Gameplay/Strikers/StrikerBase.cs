@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(SideOwner))]
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Collider2D))]
-public abstract class StrikerBase : MonoBehaviour
+public abstract class StrikerBase : MonoBehaviour, IPoolable
 {
     [Header("Striker colliders")]
     [SerializeField] private BoxCollider2D strikerBoundsCollider;
@@ -66,7 +66,20 @@ public abstract class StrikerBase : MonoBehaviour
 
     protected abstract bool InitializeStrikerMovement();
     protected abstract void ApplyStrikerSetup(StrikerSetupContext setupContext);
-    
+
+    public void OnGetFromPool()
+    {
+        CacheReferences();
+    }
+
+    public void OnMoveToPool()
+    {
+        if (!CacheReferences()) return;
+
+        strikerMovement.SetMovementAllowed(false);
+        UnsubscribeFromTurnController();
+        turnController = null;
+    }
 
     private void OnDestroy()
     {

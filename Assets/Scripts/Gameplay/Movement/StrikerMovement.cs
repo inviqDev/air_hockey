@@ -1,20 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
+[RequireComponent(typeof(AbilityController))]
+[RequireComponent(typeof(EffectReceiver))]
 public abstract class StrikerMovement : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 7f;
 
-    [Header("Dash")]
-    [SerializeField, Min(0f)] private float dashSpeed = 16f;
-    [SerializeField, Min(0f)] private float dashDuration = 0.12f;
-    [SerializeField, Min(0f)] private float dashCooldown = 0.35f;
-
+    private readonly List<IMovementVelocityEffect> movementEffects = new();
     private SideOwner sideOwner;
-    private DashAbility dashAbility;
-    
+    [SerializeField] private AbilityController abilityController;
+    [SerializeField] private EffectReceiver effectReceiver;
+    private AbilityContext abilityContext;
     private Rigidbody2D strikerRb;
 
     private bool isInitialized;
@@ -22,7 +22,10 @@ public abstract class StrikerMovement : MonoBehaviour
 
     protected bool IsMovementAllowed => isMovementAllowed;
     protected bool IsInitialized => isInitialized;
-    protected bool IsDashActive => dashAbility != null && dashAbility.IsDashing;
+    public AbilityController AbilityController => abilityController;
+    protected bool HasActiveAbilityWork =>
+        (abilityController != null && abilityController.HasActiveAbility) ||
+        (effectReceiver != null && effectReceiver.HasActiveEffects);
 
     private void Reset()
     {
@@ -33,10 +36,11 @@ public abstract class StrikerMovement : MonoBehaviour
             ConfigureBody(strikerRb);
     }
 
-    protected bool InitializeStrikerMovement()
+    protected bool InitializeStrikerMovement(StrikerSetupContext setupContext)
     {
         if (!EnsureInitialized()) return false;
 
+        abilityController.Initialize(abilityContext);
         UpdateMovementLoopState();
         return true;
     }
@@ -59,18 +63,16 @@ public abstract class StrikerMovement : MonoBehaviour
         if (!isInitialized) return;
         if (!strikerRb) return;
 
-#if UNITY_6000_0_OR_NEWER
-        strikerRb.linearVelocity = Vector2.zero;
-#else
-        strikerRb.velocity = Vector2.zero;
-#endif
-
+        SetLinearVelocity(strikerRb, Vector2.zero);
         strikerRb.angularVelocity = 0f;
         strikerRb.position = position;
         strikerRb.rotation = 0f;
 
-        if (dashAbility != null)
-            dashAbility.ResetState();
+        if (abilityController != null)
+            abilityController.ResetState();
+
+        if (effectReceiver != null)
+            effectReceiver.ClearEffects();
 
         HandleMovementReset();
         UpdateMovementLoopState();
@@ -85,7 +87,7 @@ public abstract class StrikerMovement : MonoBehaviour
     protected void StopMovement()
     {
         if (strikerRb)
-            strikerRb.linearVelocity = Vector2.zero;
+            SetLinearVelocity(strikerRb, Vector2.zero);
     }
 
     protected abstract void UpdateMovementLoopState();
@@ -105,15 +107,39 @@ public abstract class StrikerMovement : MonoBehaviour
 
     private Vector2 CalculateVelocity(MovementCommand command)
     {
-        var moveVelocity = command.Move * moveSpeed;
-        var dashVelocity = dashAbility.Step(command.DashPressed, command.Move, sideOwner.Side, Time.fixedDeltaTime);
+        var frameContext = new AbilityFrameContext(
+            abilityContext,
+            command.Move,
+            Time.fixedDeltaTime,
+            command.ActivationTriggers);
 
-        return moveVelocity + dashVelocity;
+        if (command.ActivationTriggers != AbilityActivationTrigger.None)
+            abilityController.RequestAbilityActivation(frameContext);
+
+        var moveVelocity = command.Move * moveSpeed;
+        var resolvedVelocity = ApplyMovementEffects(moveVelocity, command.Move);
+
+        abilityController.TickAbilities(frameContext);
+        effectReceiver.TickEffects(Time.fixedDeltaTime);
+
+        return resolvedVelocity;
+    }
+
+    private Vector2 ApplyMovementEffects(Vector2 baseVelocity, Vector2 moveInput)
+    {
+        var resolvedVelocity = baseVelocity;
+        var movementEffectContext = new MovementVelocityEffectContext(gameObject, transform, moveInput, Time.fixedDeltaTime);
+
+        effectReceiver.GetEffects(movementEffects);
+        for (var i = 0; i < movementEffects.Count; i++)
+            resolvedVelocity = movementEffects[i].ModifyVelocity(resolvedVelocity, movementEffectContext);
+
+        return resolvedVelocity;
     }
 
     private void ApplyVelocity(Vector2 velocity)
     {
-        strikerRb.linearVelocity = velocity;
+        SetLinearVelocity(strikerRb, velocity);
     }
 
     private bool EnsureInitialized()
@@ -124,7 +150,7 @@ public abstract class StrikerMovement : MonoBehaviour
         if (!CacheReferences()) return false;
 
         ConfigureBody(strikerRb);
-        dashAbility = CreateDashAbility();
+        abilityContext = new AbilityContext(gameObject, transform, effectReceiver);
 
         isInitialized = true;
         return true;
@@ -146,15 +172,13 @@ public abstract class StrikerMovement : MonoBehaviour
             hasAllReferences = false;
         }
 
+        if (!abilityController && !TryGetComponent(out abilityController))
+            abilityController = gameObject.AddComponent<AbilityController>();
+
+        if (!effectReceiver && !TryGetComponent(out effectReceiver))
+            effectReceiver = gameObject.AddComponent<EffectReceiver>();
+
         return hasAllReferences;
-    }
-
-    private DashAbility CreateDashAbility()
-    {
-        var dash = new DashAbility(dashSpeed, dashDuration, dashCooldown);
-        dash.ResetState();
-
-        return dash;
     }
 
     private static void ConfigureBody(Rigidbody2D targetBody)
@@ -164,5 +188,14 @@ public abstract class StrikerMovement : MonoBehaviour
         targetBody.interpolation = RigidbodyInterpolation2D.Interpolate;
         targetBody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         targetBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
+
+    private static void SetLinearVelocity(Rigidbody2D body, Vector2 velocity)
+    {
+#if UNITY_6000_0_OR_NEWER
+        body.linearVelocity = velocity;
+#else
+        body.velocity = velocity;
+#endif
     }
 }

@@ -11,7 +11,7 @@ public sealed class PlayerStriker : StrikerBase
         controlScheme = setupContext.PlayerControlScheme;
     }
 
-    protected override bool TryInitializeMovement()
+    protected override bool TryInitializeMovement(StrikerSetupContext setupContext)
     {
         var playerMovement = Movement as PlayerStrikerMovement;
         if (!playerMovement)
@@ -20,6 +20,6 @@ public sealed class PlayerStriker : StrikerBase
             return false;
         }
 
-        return playerMovement.Initialize(controlScheme);
+        return playerMovement.Initialize(controlScheme, setupContext);
     }
 }

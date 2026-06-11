@@ -5,17 +5,21 @@ using System;
 public sealed class PlayerInputReader : MonoBehaviour
 {
     public event Action<Vector2> MoveInputChanged;
-    public event Action DashPressed;
+    public event Action<AbilityActivationTrigger> AbilityActivationPressed;
 
     private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
     
     private InputActions inputActions;
     
     private InputAction moveActionPlayerOne;
-    private InputAction dashActionPlayerOne;
+    private InputAction slotOneActionPlayerOne;
+    private InputAction abilityOneActionPlayerOne;
+    private InputAction abilityTwoActionPlayerOne;
     
     private InputAction moveActionPlayerTwo;
-    private InputAction dashActionPlayerTwo;
+    private InputAction slotOneActionPlayerTwo;
+    private InputAction abilityOneActionPlayerTwo;
+    private InputAction abilityTwoActionPlayerTwo;
 
     private Vector2 playerOneMoveInput;
     private Vector2 playerTwoMoveInput;
@@ -40,7 +44,7 @@ public sealed class PlayerInputReader : MonoBehaviour
         if (!isInitialized && inputActions == null) return;
 
         UnsubscribeMove();
-        UnsubscribeDash();
+        UnsubscribeAbilityActions();
         
         if (inputActions != null)
         {
@@ -51,8 +55,12 @@ public sealed class PlayerInputReader : MonoBehaviour
 
         moveActionPlayerOne = null;
         moveActionPlayerTwo = null;
-        dashActionPlayerOne = null;
-        dashActionPlayerTwo = null;
+        slotOneActionPlayerOne = null;
+        slotOneActionPlayerTwo = null;
+        abilityOneActionPlayerOne = null;
+        abilityOneActionPlayerTwo = null;
+        abilityTwoActionPlayerOne = null;
+        abilityTwoActionPlayerTwo = null;
         
         playerOneMoveInput = Vector2.zero;
         playerTwoMoveInput = Vector2.zero;
@@ -68,7 +76,7 @@ public sealed class PlayerInputReader : MonoBehaviour
     private void ConfigureActions()
     {
         UnsubscribeMove();
-        UnsubscribeDash();
+        UnsubscribeAbilityActions();
 
         if (inputActions == null) return;
 
@@ -77,13 +85,21 @@ public sealed class PlayerInputReader : MonoBehaviour
             ? inputActions.Gameplay.RightPlayerMove
             : null;
 
-        dashActionPlayerOne = GetDashAction(controlScheme);
-        dashActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
+        slotOneActionPlayerOne = GetSlotOneAction(controlScheme);
+        abilityOneActionPlayerOne = GetAbilityOneAction(controlScheme);
+        abilityTwoActionPlayerOne = GetAbilityTwoAction(controlScheme);
+        slotOneActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
             ? inputActions.Gameplay.RightPlayerDash
+            : null;
+        abilityOneActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? inputActions.Gameplay.RightPlayerAbilityOne
+            : null;
+        abilityTwoActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? inputActions.Gameplay.RightPlayerAbilityTwo
             : null;
 
         SubscribeMove();
-        SubscribeDash();
+        SubscribeAbilityActions();
     }
 
     private void UnsubscribeMove()
@@ -116,29 +132,69 @@ public sealed class PlayerInputReader : MonoBehaviour
         }
     }
 
-    private void UnsubscribeDash()
+    private void UnsubscribeAbilityActions()
     {
-        if (dashActionPlayerOne != null)
+        if (slotOneActionPlayerOne != null)
         {
-            dashActionPlayerOne.performed -= OnDashPerformed;
+            slotOneActionPlayerOne.performed -= OnSlotOnePerformed;
         }
 
-        if (dashActionPlayerTwo != null)
+        if (slotOneActionPlayerTwo != null)
         {
-            dashActionPlayerTwo.performed -= OnDashPerformed;
+            slotOneActionPlayerTwo.performed -= OnSlotOnePerformed;
+        }
+
+        if (abilityOneActionPlayerOne != null)
+        {
+            abilityOneActionPlayerOne.performed -= OnAbilityOnePerformed;
+        }
+
+        if (abilityOneActionPlayerTwo != null)
+        {
+            abilityOneActionPlayerTwo.performed -= OnAbilityOnePerformed;
+        }
+
+        if (abilityTwoActionPlayerOne != null)
+        {
+            abilityTwoActionPlayerOne.performed -= OnAbilityTwoPerformed;
+        }
+
+        if (abilityTwoActionPlayerTwo != null)
+        {
+            abilityTwoActionPlayerTwo.performed -= OnAbilityTwoPerformed;
         }
     }
 
-    private void SubscribeDash()
+    private void SubscribeAbilityActions()
     {
-        if (dashActionPlayerOne != null)
+        if (slotOneActionPlayerOne != null)
         {
-            dashActionPlayerOne.performed += OnDashPerformed;
+            slotOneActionPlayerOne.performed += OnSlotOnePerformed;
         }
 
-        if (dashActionPlayerTwo != null)
+        if (slotOneActionPlayerTwo != null)
         {
-            dashActionPlayerTwo.performed += OnDashPerformed;
+            slotOneActionPlayerTwo.performed += OnSlotOnePerformed;
+        }
+
+        if (abilityOneActionPlayerOne != null)
+        {
+            abilityOneActionPlayerOne.performed += OnAbilityOnePerformed;
+        }
+
+        if (abilityOneActionPlayerTwo != null)
+        {
+            abilityOneActionPlayerTwo.performed += OnAbilityOnePerformed;
+        }
+
+        if (abilityTwoActionPlayerOne != null)
+        {
+            abilityTwoActionPlayerOne.performed += OnAbilityTwoPerformed;
+        }
+
+        if (abilityTwoActionPlayerTwo != null)
+        {
+            abilityTwoActionPlayerTwo.performed += OnAbilityTwoPerformed;
         }
     }
 
@@ -149,16 +205,40 @@ public sealed class PlayerInputReader : MonoBehaviour
             : inputActions.Gameplay.LeftPlayerMove;
     }
 
-    private InputAction GetDashAction(PlayerControlScheme scheme)
+    private InputAction GetSlotOneAction(PlayerControlScheme scheme)
     {
         return scheme == PlayerControlScheme.Arrows
             ? inputActions.Gameplay.RightPlayerDash
             : inputActions.Gameplay.LeftPlayerDash;
     }
 
-    private void OnDashPerformed(InputAction.CallbackContext context)
+    private InputAction GetAbilityOneAction(PlayerControlScheme scheme)
     {
-        DashPressed?.Invoke();
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Gameplay.RightPlayerAbilityOne
+            : inputActions.Gameplay.LeftPlayerAbilityOne;
+    }
+
+    private InputAction GetAbilityTwoAction(PlayerControlScheme scheme)
+    {
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Gameplay.RightPlayerAbilityTwo
+            : inputActions.Gameplay.LeftPlayerAbilityTwo;
+    }
+
+    private void OnSlotOnePerformed(InputAction.CallbackContext context)
+    {
+        AbilityActivationPressed?.Invoke(AbilityActivationTrigger.SlotOne);
+    }
+
+    private void OnAbilityOnePerformed(InputAction.CallbackContext context)
+    {
+        AbilityActivationPressed?.Invoke(AbilityActivationTrigger.SlotTwo);
+    }
+
+    private void OnAbilityTwoPerformed(InputAction.CallbackContext context)
+    {
+        AbilityActivationPressed?.Invoke(AbilityActivationTrigger.SlotThree);
     }
 
     private void OnMovePlayerOneChanged(InputAction.CallbackContext context)

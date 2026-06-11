@@ -4,6 +4,7 @@ public sealed class RoundController : MonoBehaviour
 {
     [Header("Scene Objects")]
     [SerializeField] private GameObject tableRoot;
+    [SerializeField] private PlayersZoneLimiter playersZoneLimiter;
 
     [Header("Prefabs")]
     [SerializeField] private Puck puckPrefab;
@@ -21,11 +22,15 @@ public sealed class RoundController : MonoBehaviour
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private PuckRegistry puckRegistry;
 
+    [Header("UI")]
+    [SerializeField] private AbilityBoardView leftAbilityBoard;
+    [SerializeField] private AbilityBoardView rightAbilityBoard;
+
     private Puck puck;
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
     
-    private readonly Pool gameplayItemPool = new();
+    private readonly Pool pool = new();
 
     public bool HasAllRoundItemsActive =>
         IsRoundItemActive(puck) &&
@@ -39,6 +44,7 @@ public sealed class RoundController : MonoBehaviour
 
         ActivatePuckFromPool();
         ActivateStrikersFromPool(configuration);
+        RefreshAbilityBoards();
         
         ResetRoundItemsForTurn();
         
@@ -48,7 +54,7 @@ public sealed class RoundController : MonoBehaviour
     private void ActivatePuckFromPool()
     {
         var puckSpawnPosition = GetPosition(leftPuckSpawnPoint);
-        puck = gameplayItemPool.TryGetFromPool(puckPrefab, puckSpawnPosition, Quaternion.identity);
+        puck = pool.TryGetFromPool(puckPrefab, puckSpawnPosition, Quaternion.identity);
             
         if (puckRegistry)
             puckRegistry.RegisterPuck(puck);
@@ -89,6 +95,7 @@ public sealed class RoundController : MonoBehaviour
         if (puckRegistry)
             puckRegistry.Clear();
 
+        ClearAbilityBoards();
         SetTableVisible(false);
     }
 
@@ -96,6 +103,9 @@ public sealed class RoundController : MonoBehaviour
     {
         ResetStrikerToStartPosition(leftStriker, GetPosition(leftStrikerSpawnPoint));
         ResetStrikerToStartPosition(rightStriker, GetPosition(rightStrikerSpawnPoint));
+
+        if (playersZoneLimiter)
+            playersZoneLimiter.ResetState();
 
         if (serveManager)
             ResetPuckToServePosition(puck, serveManager.GetPuckStartPosition(GetPosition(leftPuckSpawnPoint), GetPosition(rightPuckSpawnPoint)));
@@ -109,6 +119,7 @@ public sealed class RoundController : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
+        CacheAbilityBoards();
         ReturnRoundItemsToPool();
     }
 
@@ -122,8 +133,8 @@ public sealed class RoundController : MonoBehaviour
         var setupContext = new StrikerSetupContext(side, puck, controlScheme);
         
         StrikerBase striker = isAi
-            ? gameplayItemPool.TryGetFromPool(aiStrikerPrefab, position, Quaternion.identity)
-            : gameplayItemPool.TryGetFromPool(playerStrikerPrefab, position, Quaternion.identity);
+            ? pool.TryGetFromPool(aiStrikerPrefab, position, Quaternion.identity)
+            : pool.TryGetFromPool(playerStrikerPrefab, position, Quaternion.identity);
 
         if (striker)
             striker.InitializeStriker(setupContext, turnController);
@@ -155,7 +166,7 @@ public sealed class RoundController : MonoBehaviour
     private void ReturnItemToPool<T>(T item) where T : Component, IPoolable
     {
         if (!item) return;
-        gameplayItemPool.ReturnToPool(item);
+        pool.ReturnToPool(item);
     }
 
     private static void ResetStrikerToStartPosition(StrikerBase striker, Vector2 position)
@@ -175,6 +186,47 @@ public sealed class RoundController : MonoBehaviour
         return roundItem && roundItem.gameObject.activeInHierarchy;
     }
 
+    private void CacheAbilityBoards()
+    {
+        if (leftAbilityBoard && rightAbilityBoard)
+            return;
+
+        var boards = FindObjectsByType<AbilityBoardView>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        for (var i = 0; i < boards.Length; i++)
+        {
+            if (!leftAbilityBoard && boards[i].name.Contains("Left_skill_board"))
+            {
+                leftAbilityBoard = boards[i];
+                continue;
+            }
+
+            if (!rightAbilityBoard && boards[i].name.Contains("Right_skill_board"))
+                rightAbilityBoard = boards[i];
+        }
+    }
+
+    private void RefreshAbilityBoards()
+    {
+        CacheAbilityBoards();
+
+        if (leftAbilityBoard)
+            leftAbilityBoard.Bind(leftStriker ? leftStriker.AbilityController : null);
+
+        if (rightAbilityBoard)
+            rightAbilityBoard.Bind(rightStriker ? rightStriker.AbilityController : null);
+    }
+
+    private void ClearAbilityBoards()
+    {
+        CacheAbilityBoards();
+
+        if (leftAbilityBoard)
+            leftAbilityBoard.ClearBoard();
+
+        if (rightAbilityBoard)
+            rightAbilityBoard.ClearBoard();
+    }
+
     private void ValidateReferences()
     {
         if (!tableRoot)
@@ -182,6 +234,9 @@ public sealed class RoundController : MonoBehaviour
 
         if (!puckPrefab)
             Debug.LogError($"{nameof(RoundController)} requires a puck prefab reference.", this);
+
+        if (!playersZoneLimiter)
+            Debug.LogError($"{nameof(RoundController)} requires a {nameof(PlayersZoneLimiter)} reference.", this);
 
         if (!aiStrikerPrefab)
             Debug.LogError($"{nameof(RoundController)} requires a AI striker prefab reference.", this);

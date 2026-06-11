@@ -30,7 +30,7 @@ public sealed class AiStriker : StrikerBase
             aiCommandSource.ResetState();
     }
 
-    protected override bool TryInitializeMovement()
+    protected override bool TryInitializeMovement(StrikerSetupContext setupContext)
     {
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
@@ -42,6 +42,6 @@ public sealed class AiStriker : StrikerBase
             return false;
         }
 
-        return aiMovement.InitializeAiStrikerMovement();
+        return aiMovement.InitializeAiStrikerMovement(setupContext);
     }
 }

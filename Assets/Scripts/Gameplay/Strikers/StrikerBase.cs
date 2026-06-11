@@ -10,6 +10,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     [SerializeField] private StrikerTweenAnimator strikerTweenAnimator;
 
     protected StrikerMovement Movement => strikerMovement;
+    public AbilityController AbilityController => strikerMovement ? strikerMovement.AbilityController : null;
 
     private TurnController currentTurnController;
 
@@ -38,7 +39,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
             sideOwner.Side = setupContext.Side;
 
         ApplySetup(setupContext);
-        if (!TryInitializeMovement()) return;
+        if (!TryInitializeMovement(setupContext)) return;
 
         ConfigureTurnControllerSubscription(controller);
     }
@@ -58,7 +59,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     {
     }
 
-    protected abstract bool TryInitializeMovement();
+    protected abstract bool TryInitializeMovement(StrikerSetupContext setupContext);
     protected abstract void ApplySetup(StrikerSetupContext setupContext);
 
     public void OnGetFromPool()

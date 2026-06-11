@@ -6,7 +6,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
     [SerializeField] private PlayerInputReader inputReader;
 
     private Vector2 currentMoveDirection;
-    private bool dashRequested;
+    private AbilityActivationTrigger pendingActivationTriggers;
 
     private void Reset()
     {
@@ -14,7 +14,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
             inputReader = GetComponent<PlayerInputReader>();
     }
 
-    public bool Initialize(PlayerControlScheme controlScheme)
+    public bool Initialize(PlayerControlScheme controlScheme, StrikerSetupContext setupContext)
     {
         if (!inputReader)
             inputReader = GetComponent<PlayerInputReader>();
@@ -28,15 +28,15 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         DisconnectInputEvents();
 
         currentMoveDirection = Vector2.zero;
-        dashRequested = false;
+        pendingActivationTriggers = AbilityActivationTrigger.None;
 
         inputReader.Initialize(controlScheme);
         inputReader.MoveInputChanged += HandleMoveInputChanged;
-        inputReader.DashPressed += HandleDashPressed;
+        inputReader.AbilityActivationPressed += HandleAbilityActivationPressed;
 
         currentMoveDirection = inputReader.CurrentMoveInput;
 
-        if (!base.InitializeStrikerMovement())
+        if (!base.InitializeStrikerMovement(setupContext))
         {
             DisconnectInputEvents();
             return false;
@@ -50,8 +50,8 @@ public sealed class PlayerStrikerMovement : StrikerMovement
     {
         if (!CanMoveThisFrame()) return;
 
-        var command = new MovementCommand(currentMoveDirection, dashRequested);
-        dashRequested = false;
+        var command = new MovementCommand(currentMoveDirection, pendingActivationTriggers);
+        pendingActivationTriggers = AbilityActivationTrigger.None;
 
         ExecuteMovementStep(command);
         UpdateMovementLoopState();
@@ -77,19 +77,19 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         }
 
         var hasMoveInput = currentMoveDirection.sqrMagnitude > 0.0001f;
-        var hasDashActivity = dashRequested || IsDashActive;
+        var hasAbilityActivity = pendingActivationTriggers != AbilityActivationTrigger.None || HasActiveAbilityWork;
 
-        enabled = hasMoveInput || hasDashActivity;
+        enabled = hasMoveInput || hasAbilityActivity;
     }
 
     protected override void HandleMovementStopped()
     {
-        dashRequested = false;
+        pendingActivationTriggers = AbilityActivationTrigger.None;
     }
 
     protected override void HandleMovementReset()
     {
-        dashRequested = false;
+        pendingActivationTriggers = AbilityActivationTrigger.None;
     }
 
     private void HandleMoveInputChanged(Vector2 moveDirection)
@@ -98,17 +98,19 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
         if (!IsMovementAllowed) return;
 
-        if (moveDirection.sqrMagnitude <= 0.0001f && !dashRequested && !IsDashActive)
+        if (moveDirection.sqrMagnitude <= 0.0001f &&
+            pendingActivationTriggers == AbilityActivationTrigger.None &&
+            !HasActiveAbilityWork)
             StopMovement();
 
         UpdateMovementLoopState();
     }
 
-    private void HandleDashPressed()
+    private void HandleAbilityActivationPressed(AbilityActivationTrigger activationTrigger)
     {
         if (!IsMovementAllowed) return;
 
-        dashRequested = true;
+        pendingActivationTriggers |= activationTrigger;
         UpdateMovementLoopState();
     }
 
@@ -117,7 +119,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         if (!inputReader) return;
 
         inputReader.MoveInputChanged -= HandleMoveInputChanged;
-        inputReader.DashPressed -= HandleDashPressed;
+        inputReader.AbilityActivationPressed -= HandleAbilityActivationPressed;
         inputReader.Shutdown();
     }
 

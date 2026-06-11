@@ -2,12 +2,12 @@ using UnityEngine;
 
 public readonly struct MovementCommand
 {
-    public MovementCommand(Vector2 move, bool dashPressed)
+    public MovementCommand(Vector2 move, AbilityActivationTrigger activationTriggers)
     {
         Move = move;
-        DashPressed = dashPressed;
+        ActivationTriggers = activationTriggers;
     }
 
     public Vector2 Move { get; }
-    public bool DashPressed { get; }
+    public AbilityActivationTrigger ActivationTriggers { get; }
 }

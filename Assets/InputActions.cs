@@ -127,6 +127,42 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftPlayerAbilityOne"",
+                    ""type"": ""Button"",
+                    ""id"": ""5f7554d7-d2f8-4b95-a0a6-277e7e4e9af1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerAbilityOne"",
+                    ""type"": ""Button"",
+                    ""id"": ""af24f58f-4ba1-43c0-83b2-2a1dc21f98b7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftPlayerAbilityTwo"",
+                    ""type"": ""Button"",
+                    ""id"": ""595d561c-8688-43c9-90fb-c63dc7d68f71"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerAbilityTwo"",
+                    ""type"": ""Button"",
+                    ""id"": ""fd4e0d5a-58c0-41d2-a0e0-8689f646fe8a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -188,7 +224,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""d80f4b4f-5ab3-4c61-b013-49ec96ec0a7b"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -254,11 +290,55 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""4397b0b5-1767-4e89-a983-784d7a629751"",
-                    ""path"": ""<Keyboard>/rightShift"",
+                    ""path"": ""<Keyboard>/numpad4"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""RightPlayerDash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4a8bfb53-4996-44f7-a9e4-194f58e476df"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerAbilityOne"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""53aad0e5-aa9e-4425-9ec5-b56cc4adf88c"",
+                    ""path"": ""<Keyboard>/numpad5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerAbilityOne"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""65c1b7ac-f6e4-4ebe-a181-5a9e1234b251"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerAbilityTwo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c434d4fa-b98c-4b09-b33a-bfc79ff54a81"",
+                    ""path"": ""<Keyboard>/numpad6"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerAbilityTwo"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -334,6 +414,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Gameplay_LeftPlayerDash = m_Gameplay.FindAction("LeftPlayerDash", throwIfNotFound: true);
         m_Gameplay_RightPlayerMove = m_Gameplay.FindAction("RightPlayerMove", throwIfNotFound: true);
         m_Gameplay_RightPlayerDash = m_Gameplay.FindAction("RightPlayerDash", throwIfNotFound: true);
+        m_Gameplay_LeftPlayerAbilityOne = m_Gameplay.FindAction("LeftPlayerAbilityOne", throwIfNotFound: true);
+        m_Gameplay_RightPlayerAbilityOne = m_Gameplay.FindAction("RightPlayerAbilityOne", throwIfNotFound: true);
+        m_Gameplay_LeftPlayerAbilityTwo = m_Gameplay.FindAction("LeftPlayerAbilityTwo", throwIfNotFound: true);
+        m_Gameplay_RightPlayerAbilityTwo = m_Gameplay.FindAction("RightPlayerAbilityTwo", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -418,6 +502,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_LeftPlayerDash;
     private readonly InputAction m_Gameplay_RightPlayerMove;
     private readonly InputAction m_Gameplay_RightPlayerDash;
+    private readonly InputAction m_Gameplay_LeftPlayerAbilityOne;
+    private readonly InputAction m_Gameplay_RightPlayerAbilityOne;
+    private readonly InputAction m_Gameplay_LeftPlayerAbilityTwo;
+    private readonly InputAction m_Gameplay_RightPlayerAbilityTwo;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -445,6 +533,22 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/RightPlayerDash".
         /// </summary>
         public InputAction @RightPlayerDash => m_Wrapper.m_Gameplay_RightPlayerDash;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilityOne".
+        /// </summary>
+        public InputAction @LeftPlayerAbilityOne => m_Wrapper.m_Gameplay_LeftPlayerAbilityOne;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilityOne".
+        /// </summary>
+        public InputAction @RightPlayerAbilityOne => m_Wrapper.m_Gameplay_RightPlayerAbilityOne;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilityTwo".
+        /// </summary>
+        public InputAction @LeftPlayerAbilityTwo => m_Wrapper.m_Gameplay_LeftPlayerAbilityTwo;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilityTwo".
+        /// </summary>
+        public InputAction @RightPlayerAbilityTwo => m_Wrapper.m_Gameplay_RightPlayerAbilityTwo;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -483,6 +587,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerDash.started += instance.OnRightPlayerDash;
             @RightPlayerDash.performed += instance.OnRightPlayerDash;
             @RightPlayerDash.canceled += instance.OnRightPlayerDash;
+            @LeftPlayerAbilityOne.started += instance.OnLeftPlayerAbilityOne;
+            @LeftPlayerAbilityOne.performed += instance.OnLeftPlayerAbilityOne;
+            @LeftPlayerAbilityOne.canceled += instance.OnLeftPlayerAbilityOne;
+            @RightPlayerAbilityOne.started += instance.OnRightPlayerAbilityOne;
+            @RightPlayerAbilityOne.performed += instance.OnRightPlayerAbilityOne;
+            @RightPlayerAbilityOne.canceled += instance.OnRightPlayerAbilityOne;
+            @LeftPlayerAbilityTwo.started += instance.OnLeftPlayerAbilityTwo;
+            @LeftPlayerAbilityTwo.performed += instance.OnLeftPlayerAbilityTwo;
+            @LeftPlayerAbilityTwo.canceled += instance.OnLeftPlayerAbilityTwo;
+            @RightPlayerAbilityTwo.started += instance.OnRightPlayerAbilityTwo;
+            @RightPlayerAbilityTwo.performed += instance.OnRightPlayerAbilityTwo;
+            @RightPlayerAbilityTwo.canceled += instance.OnRightPlayerAbilityTwo;
         }
 
         /// <summary>
@@ -506,6 +622,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerDash.started -= instance.OnRightPlayerDash;
             @RightPlayerDash.performed -= instance.OnRightPlayerDash;
             @RightPlayerDash.canceled -= instance.OnRightPlayerDash;
+            @LeftPlayerAbilityOne.started -= instance.OnLeftPlayerAbilityOne;
+            @LeftPlayerAbilityOne.performed -= instance.OnLeftPlayerAbilityOne;
+            @LeftPlayerAbilityOne.canceled -= instance.OnLeftPlayerAbilityOne;
+            @RightPlayerAbilityOne.started -= instance.OnRightPlayerAbilityOne;
+            @RightPlayerAbilityOne.performed -= instance.OnRightPlayerAbilityOne;
+            @RightPlayerAbilityOne.canceled -= instance.OnRightPlayerAbilityOne;
+            @LeftPlayerAbilityTwo.started -= instance.OnLeftPlayerAbilityTwo;
+            @LeftPlayerAbilityTwo.performed -= instance.OnLeftPlayerAbilityTwo;
+            @LeftPlayerAbilityTwo.canceled -= instance.OnLeftPlayerAbilityTwo;
+            @RightPlayerAbilityTwo.started -= instance.OnRightPlayerAbilityTwo;
+            @RightPlayerAbilityTwo.performed -= instance.OnRightPlayerAbilityTwo;
+            @RightPlayerAbilityTwo.canceled -= instance.OnRightPlayerAbilityTwo;
         }
 
         /// <summary>
@@ -639,5 +767,33 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightPlayerDash(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftPlayerAbilityOne" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerAbilityOne(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerAbilityOne" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerAbilityOne(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftPlayerAbilityTwo" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerAbilityTwo(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerAbilityTwo" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerAbilityTwo(InputAction.CallbackContext context);
     }
 }

@@ -31,12 +31,10 @@ public sealed class AICommandSource : MonoBehaviour
     [SerializeField] private float sideStepDistance = 0.95f;
     [SerializeField] private float goalCenteringWeight = 0.35f;
 
-    [Header("Dash")] [SerializeField] private float dashDistance = 1.35f;
-    [SerializeField] private float dashCooldown = 0.55f;
+    [Header("Ability Requests")] [SerializeField] private float dashDistance = 1.35f;
     [SerializeField, Range(-1f, 1f)] private float dashDirectionThreshold = 0.25f;
 
     private PlayerSide side = PlayerSide.Left;
-    private float remainingDashCooldown;
 
     private Rigidbody2D aiRigidbody;
     private CircleCollider2D aiCircleCollider;
@@ -61,8 +59,6 @@ public sealed class AICommandSource : MonoBehaviour
 
     public MovementCommand ReadCommand()
     {
-        TickCooldown();
-
         if (!puck || !puck.PuckRigidbody)
             return MoveToward(defensivePosition, false);
 
@@ -99,7 +95,6 @@ public sealed class AICommandSource : MonoBehaviour
 
     public void ResetState()
     {
-        remainingDashCooldown = 0f;
     }
 
     public void SetStrikerSide(PlayerSide playerSide)
@@ -109,12 +104,6 @@ public sealed class AICommandSource : MonoBehaviour
         var defensiveX = Mathf.Abs(defensivePosition.x);
         defensivePosition.x = side == PlayerSide.Left ? -defensiveX : defensiveX;
         attackDirection = side == PlayerSide.Left ? Vector2.right : Vector2.left;
-    }
-
-    private void TickCooldown()
-    {
-        if (remainingDashCooldown > 0f)
-            remainingDashCooldown -= Time.fixedDeltaTime;
     }
 
     private bool ShouldReactToPuck(Vector2 puckPosition, Vector2 puckVelocity)
@@ -212,11 +201,6 @@ public sealed class AICommandSource : MonoBehaviour
 
     private bool ShouldDash(Vector2 puckPosition)
     {
-        if (remainingDashCooldown > 0f)
-        {
-            return false;
-        }
-
         var toPuck = puckPosition - aiRigidbody.position;
         var sqrDistanceToPuck = toPuck.sqrMagnitude;
 
@@ -234,7 +218,6 @@ public sealed class AICommandSource : MonoBehaviour
             return false;
         }
 
-        remainingDashCooldown = dashCooldown;
         return true;
     }
 
@@ -271,10 +254,11 @@ public sealed class AICommandSource : MonoBehaviour
     private MovementCommand MoveToward(Vector2 target, bool dashRequested)
     {
         var toTarget = target - aiRigidbody.position;
+        var activationTrigger = dashRequested ? AbilityActivationTrigger.SlotOne : AbilityActivationTrigger.None;
 
         if (toTarget.sqrMagnitude < 0.01f)
         {
-            return new MovementCommand(Vector2.zero, dashRequested);
+            return new MovementCommand(Vector2.zero, activationTrigger);
         }
 
         var distanceToTarget = toTarget.magnitude;
@@ -282,7 +266,7 @@ public sealed class AICommandSource : MonoBehaviour
             ? 1f
             : Mathf.Lerp(0.35f, 1f, distanceToTarget / 1.25f);
         var move = Vector2.ClampMagnitude(toTarget, 1f) * (aggression * desiredSpeedFactor);
-        return new MovementCommand(move, dashRequested);
+        return new MovementCommand(move, activationTrigger);
     }
 
     private float GetCommitDistance()

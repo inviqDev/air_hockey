@@ -41,6 +41,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerAbilityOne",
+                    "type": "Button",
+                    "id": "5f7554d7-d2f8-4b95-a0a6-277e7e4e9af1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilityOne",
+                    "type": "Button",
+                    "id": "af24f58f-4ba1-43c0-83b2-2a1dc21f98b7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerAbilityTwo",
+                    "type": "Button",
+                    "id": "595d561c-8688-43c9-90fb-c63dc7d68f71",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilityTwo",
+                    "type": "Button",
+                    "id": "fd4e0d5a-58c0-41d2-a0e0-8689f646fe8a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -102,7 +138,7 @@
                 {
                     "name": "",
                     "id": "d80f4b4f-5ab3-4c61-b013-49ec96ec0a7b",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/1",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -168,11 +204,55 @@
                 {
                     "name": "",
                     "id": "4397b0b5-1767-4e89-a983-784d7a629751",
-                    "path": "<Keyboard>/rightShift",
+                    "path": "<Keyboard>/numpad4",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "RightPlayerDash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4a8bfb53-4996-44f7-a9e4-194f58e476df",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilityOne",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "53aad0e5-aa9e-4425-9ec5-b56cc4adf88c",
+                    "path": "<Keyboard>/numpad5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilityOne",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "65c1b7ac-f6e4-4ebe-a181-5a9e1234b251",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilityTwo",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c434d4fa-b98c-4b09-b33a-bfc79ff54a81",
+                    "path": "<Keyboard>/numpad6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilityTwo",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -11,7 +11,7 @@ public sealed class AiStrikerMovement : StrikerMovement
             aiCommandSource = GetComponent<AICommandSource>();
     }
 
-    public bool InitializeAiStrikerMovement()
+    public bool InitializeAiStrikerMovement(StrikerSetupContext setupContext)
     {
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
@@ -22,7 +22,7 @@ public sealed class AiStrikerMovement : StrikerMovement
             return false;
         }
 
-        return base.InitializeStrikerMovement();
+        return base.InitializeStrikerMovement(setupContext);
     }
 
     private void FixedUpdate()

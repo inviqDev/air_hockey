@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5241238466708782786}
   - component: {fileID: 1083338351928939836}
   - component: {fileID: 6200000000000000007}
+  - component: {fileID: 6200000000000000008}
   - component: {fileID: 6100000000000000006}
   - component: {fileID: 1809276916621244605}
   - component: {fileID: 1339758494272276980}
@@ -172,11 +173,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a0a6022bb3d454895dc4f4038157e91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 1083338351928939836}
-  circleCollider: {fileID: 5241238466708782786}
   poofParticles: {fileID: 6100000000000000006}
-  minImpactSpeed: 2.2
-  repeatDelay: 0.03
+  effectReceiver: {fileID: 6200000000000000008}
+--- !u!114 &6200000000000000008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1257879466314776656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f044a0d9da743949a266a1eddfcc223, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &6100000000000000006
 MonoBehaviour:
   m_ObjectHideFlags: 0

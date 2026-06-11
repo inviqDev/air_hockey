@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 7265830630652106188}
   - component: {fileID: 6200000000000000006}
   - component: {fileID: 6200000000000000005}
+  - component: {fileID: 6200000000000000008}
+  - component: {fileID: 6200000000000000009}
   - component: {fileID: 6200000000000000003}
   - component: {fileID: 6200000000000000002}
   - component: {fileID: 6200000000000000001}
@@ -187,13 +189,40 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02b09575f9fd4c418fd1df03574970d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   moveSpeed: 8
-  dashSpeed: 16
-  dashDuration: 0.12
-  dashCooldown: 0.35
+  abilityController: {fileID: 6200000000000000008}
+  effectReceiver: {fileID: 6200000000000000009}
   aiCommandSource: {fileID: 6200000000000000002}
+--- !u!114 &6200000000000000008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2470998444364862894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63c23ea31b26455d8f326e60f65a6c58, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  initialAbilities:
+  - {fileID: 11400000, guid: 85de65d9c84b4e4d809f09c70bd0cb71, type: 2}
+  - {fileID: 11400000, guid: 08202ea5a29d4948a5663b66dc782cad, type: 2}
+  - {fileID: 11400000, guid: 1770d7d503d44bc3bf97c05d0584d803, type: 2}
+--- !u!114 &6200000000000000009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2470998444364862894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f044a0d9da743949a266a1eddfcc223, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &6200000000000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,7 +274,6 @@ MonoBehaviour:
   sideStepDistance: 0.95
   goalCenteringWeight: 0.35
   dashDistance: 1.35
-  dashCooldown: 0.55
   dashDirectionThreshold: 0.25
 --- !u!114 &6200000000000000001
 MonoBehaviour:

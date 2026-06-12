@@ -28,6 +28,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         DisconnectInputEvents();
 
         currentMoveDirection = Vector2.zero;
+        SetCurrentMoveDirection(currentMoveDirection);
         dashRequested = false;
 
         inputReader.Initialize(controlScheme);
@@ -35,6 +36,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         inputReader.DashPressed += HandleDashPressed;
 
         currentMoveDirection = inputReader.CurrentMoveInput;
+        SetCurrentMoveDirection(currentMoveDirection);
 
         if (!base.InitializeStrikerMovement())
         {
@@ -96,6 +98,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
     private void HandleMoveInputChanged(Vector2 moveDirection)
     {
         currentMoveDirection = moveDirection;
+        SetCurrentMoveDirection(currentMoveDirection);
 
         if (!IsMovementAllowed) return;
 

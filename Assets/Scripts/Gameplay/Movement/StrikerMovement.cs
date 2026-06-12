@@ -2,7 +2,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
-public abstract class StrikerMovement : MonoBehaviour, IMovable
+public abstract class StrikerMovement : MonoBehaviour, IMovable, IStrikerMovementOverride
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 7f;
@@ -16,14 +16,20 @@ public abstract class StrikerMovement : MonoBehaviour, IMovable
     private SideOwner sideOwner;
     
     private MovableBody movableBody;
-    private DashAbility dashAbility;
+    private StrikerDashMotor commandDashMotor;
+    private Vector2 movementOverrideDirection;
+    private Vector2 movementOverrideVelocity;
+    private bool hasMovementOverride;
 
     protected bool IsInitialized => movableBody != null;
-    public bool IsMovementAllowed => movableBody != null && movableBody.IsMovementAllowed;
-    public Vector2 Position => movableBody != null ? movableBody.Position : Vector2.zero;
-    public Vector2 Velocity => movableBody != null ? movableBody.Velocity : Vector2.zero;
+    protected bool IsDashActive => IsAnyDashActive();
 
-    protected bool IsDashActive => dashAbility != null && dashAbility.IsDashing;
+    public bool IsMovementAllowed => IsMovementCurrentlyAllowed();
+    public Vector2 Position => GetCurrentPosition();
+    public Vector2 Velocity => GetCurrentVelocity();
+    public Vector2 CurrentMoveDirection => movementOverrideDirection;
+    public PlayerSide Side => GetCurrentSide();
+    public bool CanUseMovementOverride => CanBeginMovementOverride();
 
     public void SetMovementAllowed(bool isAllowed)
     {
@@ -32,7 +38,10 @@ public abstract class StrikerMovement : MonoBehaviour, IMovable
         movableBody.SetMovementAllowed(isAllowed);
 
         if (!isAllowed)
+        {
+            EndMovementOverride();
             HandleMovementStopped();
+        }
 
         UpdateMovementLoopState();
     }
@@ -43,8 +52,11 @@ public abstract class StrikerMovement : MonoBehaviour, IMovable
 
         movableBody.ResetMovementState(position);
 
-        if (dashAbility != null)
-            dashAbility.ResetState();
+        if (commandDashMotor != null)
+            commandDashMotor.ResetState();
+
+        EndMovementOverride();
+        movementOverrideDirection = Vector2.zero;
 
         HandleMovementReset();
         UpdateMovementLoopState();
@@ -69,8 +81,42 @@ public abstract class StrikerMovement : MonoBehaviour, IMovable
     {
         if (movableBody == null) return;
 
+        movementOverrideDirection = command.Move;
         var velocity = CalculateVelocity(command);
         movableBody.ApplyVelocity(velocity);
+    }
+
+    public bool TryBeginMovementOverride()
+    {
+        if (!CanUseMovementOverride) return false;
+
+        movementOverrideVelocity = Vector2.zero;
+        hasMovementOverride = true;
+        UpdateMovementLoopState();
+
+        return true;
+    }
+
+    public void SetMovementOverrideVelocity(Vector2 velocity)
+    {
+        if (!hasMovementOverride) return;
+
+        movementOverrideVelocity = velocity;
+        UpdateMovementLoopState();
+    }
+
+    public void EndMovementOverride()
+    {
+        if (!hasMovementOverride) return;
+
+        movementOverrideVelocity = Vector2.zero;
+        hasMovementOverride = false;
+        UpdateMovementLoopState();
+    }
+
+    protected void SetCurrentMoveDirection(Vector2 moveDirection)
+    {
+        movementOverrideDirection = moveDirection;
     }
 
     protected abstract void UpdateMovementLoopState();
@@ -90,12 +136,15 @@ public abstract class StrikerMovement : MonoBehaviour, IMovable
 
     private Vector2 CalculateVelocity(MovementCommand command)
     {
+        if (hasMovementOverride)
+            return movementOverrideVelocity;
+
         var moveVelocity = command.Move * moveSpeed;
-        var dashVelocity = dashAbility != null
-            ? dashAbility.Step(command.DashPressed, command.Move, sideOwner.Side, Time.fixedDeltaTime)
+        var commandDashVelocity = commandDashMotor != null
+            ? commandDashMotor.Step(command.DashPressed, command.Move, sideOwner.Side, Time.fixedDeltaTime)
             : Vector2.zero;
 
-        return moveVelocity + dashVelocity;
+        return moveVelocity + commandDashVelocity;
     }
 
     private void InitializeMovableBody()
@@ -104,7 +153,7 @@ public abstract class StrikerMovement : MonoBehaviour, IMovable
         if (!CacheReferences()) return;
 
         movableBody = new MovableBody(strikerRb);
-        dashAbility = CreateDashAbility();
+        commandDashMotor = CreateDashMotor();
     }
 
     private bool CacheReferences()
@@ -126,11 +175,43 @@ public abstract class StrikerMovement : MonoBehaviour, IMovable
         return hasAllReferences;
     }
 
-    private DashAbility CreateDashAbility()
+    private StrikerDashMotor CreateDashMotor()
     {
-        var dash = new DashAbility(dashSpeed, dashDuration, dashCooldown);
+        var dash = new StrikerDashMotor(dashSpeed, dashDuration, dashCooldown);
         dash.ResetState();
 
         return dash;
+    }
+
+    private bool IsMovementCurrentlyAllowed()
+    {
+        return movableBody != null && movableBody.IsMovementAllowed;
+    }
+
+    private Vector2 GetCurrentPosition()
+    {
+        return movableBody != null ? movableBody.Position : Vector2.zero;
+    }
+
+    private Vector2 GetCurrentVelocity()
+    {
+        return movableBody != null ? movableBody.Velocity : Vector2.zero;
+    }
+
+    private PlayerSide GetCurrentSide()
+    {
+        return sideOwner ? sideOwner.Side : PlayerSide.Left;
+    }
+
+    private bool CanBeginMovementOverride()
+    {
+        return IsMovementAllowed && !hasMovementOverride;
+    }
+
+    private bool IsAnyDashActive()
+    {
+        if (commandDashMotor != null && commandDashMotor.IsDashing) return true;
+
+        return hasMovementOverride;
     }
 }

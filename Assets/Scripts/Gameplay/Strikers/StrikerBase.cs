@@ -12,6 +12,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     protected StrikerMovement Movement => strikerMovement;
 
     private TurnController currentTurnController;
+    private IMovable movable;
 
     private void Reset()
     {
@@ -46,8 +47,9 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     public void ResetState(Vector2 position)
     {
         if (!TryCacheReferences()) return;
+        if (movable == null) return;
 
-        strikerMovement.ResetMovementState(position);
+        movable.ResetMovementState(position);
         ResetCustomState();
 
         if (strikerTweenAnimator)
@@ -102,6 +104,8 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
             hasAllReferences = false;
         }
 
+        movable = strikerMovement;
+
         if (!strikerTweenAnimator && !TryGetComponent(out strikerTweenAnimator))
         {
             Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(StrikerTweenAnimator)} component.", this);
@@ -151,8 +155,9 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     private void SetMovementAllowed(bool isAllowed)
     {
         if (!strikerMovement) return;
+        if (movable == null) return;
 
-        strikerMovement.SetMovementAllowed(isAllowed);
+        movable.SetMovementAllowed(isAllowed);
     }
 
     private void HandleTurnStarted()

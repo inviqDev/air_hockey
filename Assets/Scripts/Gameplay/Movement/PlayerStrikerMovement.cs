@@ -8,8 +8,10 @@ public sealed class PlayerStrikerMovement : StrikerMovement
     private Vector2 currentMoveDirection;
     private bool dashRequested;
 
-    private void Reset()
+    protected override void Reset()
     {
+        base.Reset();
+
         if (!inputReader)
             inputReader = GetComponent<PlayerInputReader>();
     }
@@ -89,6 +91,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
     protected override void HandleMovementReset()
     {
+        base.HandleMovementReset();
         dashRequested = false;
     }
 

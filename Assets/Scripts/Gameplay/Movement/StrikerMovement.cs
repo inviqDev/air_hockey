@@ -1,8 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SideOwner))]
-public abstract class StrikerMovement : MonoBehaviour
+public abstract class StrikerMovement : MovableBody
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 7f;
@@ -14,66 +13,18 @@ public abstract class StrikerMovement : MonoBehaviour
 
     private SideOwner sideOwner;
     private DashAbility dashAbility;
-    
-    private Rigidbody2D strikerRb;
 
-    private bool isInitialized;
-    private bool isMovementAllowed;
-
-    protected bool IsMovementAllowed => isMovementAllowed;
-    protected bool IsInitialized => isInitialized;
     protected bool IsDashActive => dashAbility != null && dashAbility.IsDashing;
-
-    private void Reset()
-    {
-        if (!strikerRb)
-            strikerRb = GetComponent<Rigidbody2D>();
-
-        if (strikerRb)
-            ConfigureBody(strikerRb);
-    }
 
     protected bool InitializeStrikerMovement()
     {
-        if (!EnsureInitialized()) return false;
+        if (!InitializeMovableBody()) return false;
+
+        if (dashAbility == null)
+            dashAbility = CreateDashAbility();
 
         UpdateMovementLoopState();
         return true;
-    }
-
-    public void SetMovementAllowed(bool isAllowed)
-    {
-        isMovementAllowed = isAllowed;
-
-        if (!isMovementAllowed)
-        {
-            HandleMovementStopped();
-            StopMovement();
-        }
-
-        UpdateMovementLoopState();
-    }
-
-    public void ResetMovementState(Vector2 position)
-    {
-        if (!isInitialized) return;
-        if (!strikerRb) return;
-
-#if UNITY_6000_0_OR_NEWER
-        strikerRb.linearVelocity = Vector2.zero;
-#else
-        strikerRb.velocity = Vector2.zero;
-#endif
-
-        strikerRb.angularVelocity = 0f;
-        strikerRb.position = position;
-        strikerRb.rotation = 0f;
-
-        if (dashAbility != null)
-            dashAbility.ResetState();
-
-        HandleMovementReset();
-        UpdateMovementLoopState();
     }
 
     protected void ExecuteMovementStep(MovementCommand command)
@@ -82,63 +33,25 @@ public abstract class StrikerMovement : MonoBehaviour
         ApplyVelocity(velocity);
     }
 
-    protected void StopMovement()
+    protected override void HandleMovementReset()
     {
-        if (strikerRb)
-            strikerRb.linearVelocity = Vector2.zero;
-    }
-
-    protected abstract void UpdateMovementLoopState();
-
-    protected virtual void HandleMovementStopped()
-    {
-    }
-
-    protected virtual void HandleMovementReset()
-    {
-    }
-
-    private void OnDisable()
-    {
-        StopMovement();
+        if (dashAbility != null)
+            dashAbility.ResetState();
     }
 
     private Vector2 CalculateVelocity(MovementCommand command)
     {
         var moveVelocity = command.Move * moveSpeed;
-        var dashVelocity = dashAbility.Step(command.DashPressed, command.Move, sideOwner.Side, Time.fixedDeltaTime);
+        var dashVelocity = dashAbility != null
+            ? dashAbility.Step(command.DashPressed, command.Move, sideOwner.Side, Time.fixedDeltaTime)
+            : Vector2.zero;
 
         return moveVelocity + dashVelocity;
     }
 
-    private void ApplyVelocity(Vector2 velocity)
-    {
-        strikerRb.linearVelocity = velocity;
-    }
-
-    private bool EnsureInitialized()
-    {
-        if (isInitialized)
-            return true;
-
-        if (!CacheReferences()) return false;
-
-        ConfigureBody(strikerRb);
-        dashAbility = CreateDashAbility();
-
-        isInitialized = true;
-        return true;
-    }
-
-    private bool CacheReferences()
+    protected override bool CacheAdditionalReferences()
     {
         var hasAllReferences = true;
-
-        if (!strikerRb && !TryGetComponent(out strikerRb))
-        {
-            Debug.LogError($"{nameof(StrikerMovement)} on {name} requires a {nameof(Rigidbody2D)} component.", this);
-            hasAllReferences = false;
-        }
 
         if (!sideOwner && !TryGetComponent(out sideOwner))
         {
@@ -155,14 +68,5 @@ public abstract class StrikerMovement : MonoBehaviour
         dash.ResetState();
 
         return dash;
-    }
-
-    private static void ConfigureBody(Rigidbody2D targetBody)
-    {
-        targetBody.bodyType = RigidbodyType2D.Dynamic;
-        targetBody.gravityScale = 0f;
-        targetBody.interpolation = RigidbodyInterpolation2D.Interpolate;
-        targetBody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        targetBody.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 }

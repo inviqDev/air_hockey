@@ -5,7 +5,6 @@ using UnityEngine;
 public sealed class TurnController : MonoBehaviour
 {
     [SerializeField] private TurnStartView turnStartView;
-    [SerializeField] private TurnTimer turnTimer;
     [SerializeField] private float goalDelayBeforeNextTurnSeconds = 3f;
     
     private Coroutine goalDelayRoutine;
@@ -70,9 +69,6 @@ public sealed class TurnController : MonoBehaviour
 
         if (turnStartView)
             turnStartView.Cancel();
-
-        if (turnTimer)
-            turnTimer.StopAndReset();
     }
 
     public void ShowTurnPreparation(bool canStartTurn)
@@ -112,9 +108,6 @@ public sealed class TurnController : MonoBehaviour
 
         IsTurnActive = true;
         TurnStarted?.Invoke();
-
-        if (turnTimer)
-            turnTimer.StartTimer();
     }
 
     private void StopGoalDelayRoutine()
@@ -134,8 +127,5 @@ public sealed class TurnController : MonoBehaviour
     {
         if (!turnStartView)
             Debug.LogError($"{nameof(TurnController)} requires a TurnStartView reference.", this);
-
-        if (!turnTimer)
-            Debug.LogError($"{nameof(TurnController)} requires a TurnTimer reference.", this);
     }
 }

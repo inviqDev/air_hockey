@@ -8,6 +8,10 @@ public sealed class MatchUIView : MenuViewBase
     [SerializeField] private TextMeshProUGUI rightScoreText;
     [SerializeField] private TextMeshProUGUI goalInfoText;
 
+    [Header("Turn Timer")]
+    [SerializeField] private TurnController turnController;
+    [SerializeField] private TextMeshProUGUI turnTimerText;
+
     [Header("Goal Info Animation")]
     [SerializeField] private Vector2 goalInfoStartAnchoredPosition = Vector2.zero;
     [SerializeField] private float goalInfoMoveUpDistance = 220f;
@@ -16,6 +20,17 @@ public sealed class MatchUIView : MenuViewBase
     [SerializeField] private Ease goalInfoFadeEase = Ease.InExpo;
 
     private Sequence goalInfoSequence;
+    private readonly Timer turnTimer = new();
+
+    private void Awake()
+    {
+        ConfigureTurnTimer();
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToTurnEvents();
+    }
 
     public void SetScores(int leftScore, int rightScore)
     {
@@ -65,18 +80,49 @@ public sealed class MatchUIView : MenuViewBase
 
     private void OnValidate()
     {
+        ConfigureTurnTimer();
         ValidateReferences();
+    }
+
+    private void Update()
+    {
+        if (!turnTimer.IsRunning) return;
+
+        turnTimer.Tick(Time.deltaTime);
+        UpdateTurnTimerText();
     }
 
     private void OnDisable()
     {
+        UnsubscribeFromTurnEvents();
         StopGoalInfoAnimation();
     }
 
     protected override void HandleAfterInitialize()
     {
+        ConfigureTurnTimer();
         ValidateReferences();
         HideGoalInfoImmediately();
+        UpdateTurnTimerText();
+    }
+
+    public void StartTurnTimer()
+    {
+        ConfigureTurnTimer();
+        turnTimer.Restart();
+        UpdateTurnTimerText();
+    }
+
+    public void RestartTurnTimer()
+    {
+        StartTurnTimer();
+    }
+
+    public void StopAndResetTurnTimer()
+    {
+        turnTimer.Stop();
+        turnTimer.Reset();
+        UpdateTurnTimerText();
     }
 
     private void HideGoalInfoImmediately()
@@ -116,6 +162,44 @@ public sealed class MatchUIView : MenuViewBase
         var color = goalInfoText.color;
         color.a = alpha;
         goalInfoText.color = color;
+    }
+
+    private void ConfigureTurnTimer()
+    {
+        turnTimer.SetIncremental(0f);
+    }
+
+    private void UpdateTurnTimerText()
+    {
+        if (!turnTimerText) return;
+
+        turnTimerText.text = turnTimer.GetFormattedMinutesSeconds();
+    }
+
+    private void SubscribeToTurnEvents()
+    {
+        if (!turnController) return;
+
+        turnController.TurnStarted += HandleTurnStarted;
+        turnController.TurnEnded += HandleTurnEnded;
+    }
+
+    private void UnsubscribeFromTurnEvents()
+    {
+        if (!turnController) return;
+
+        turnController.TurnStarted -= HandleTurnStarted;
+        turnController.TurnEnded -= HandleTurnEnded;
+    }
+
+    private void HandleTurnStarted()
+    {
+        StartTurnTimer();
+    }
+
+    private void HandleTurnEnded()
+    {
+        StopAndResetTurnTimer();
     }
 
     private void ValidateReferences()

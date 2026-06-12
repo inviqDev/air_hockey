@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public sealed class DashAbility
+public sealed class StrikerDashMotor
 {
     private readonly float dashSpeed;
     private readonly float dashDuration;
@@ -12,7 +12,7 @@ public sealed class DashAbility
 
     public bool IsDashing => remainingDashTime > 0f;
 
-    public DashAbility(float dashSpeed, float dashDuration, float cooldown)
+    public StrikerDashMotor(float dashSpeed, float dashDuration, float cooldown)
     {
         this.dashSpeed = dashSpeed;
         this.dashDuration = dashDuration;

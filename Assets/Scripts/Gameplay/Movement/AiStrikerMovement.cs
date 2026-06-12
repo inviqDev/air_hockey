@@ -5,10 +5,8 @@ public sealed class AiStrikerMovement : StrikerMovement
 {
     [SerializeField] private AICommandSource aiCommandSource;
 
-    protected override void Reset()
+    private void Reset()
     {
-        base.Reset();
-
         if (!aiCommandSource)
             aiCommandSource = GetComponent<AICommandSource>();
     }

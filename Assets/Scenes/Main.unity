@@ -9068,6 +9068,8 @@ MonoBehaviour:
   turnController: {fileID: 6400000000000000008}
   serveManager: {fileID: 6400000000000000006}
   puckRegistry: {fileID: 7000000000000000001}
+  leftPlayerAbilityHud: {fileID: 4801122334455667701}
+  rightPlayerAbilityHud: {fileID: 4801122334455667702}
 --- !u!114 &6400000000000000008
 MonoBehaviour:
   m_ObjectHideFlags: 0

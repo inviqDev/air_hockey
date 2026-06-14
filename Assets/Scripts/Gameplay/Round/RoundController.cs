@@ -21,6 +21,10 @@ public sealed class RoundController : MonoBehaviour
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private PuckRegistry puckRegistry;
 
+    [Header("Ability HUD")]
+    [SerializeField] private PlayerAbilityHudView leftPlayerAbilityHud;
+    [SerializeField] private PlayerAbilityHudView rightPlayerAbilityHud;
+
     private Puck puck;
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
@@ -58,9 +62,11 @@ public sealed class RoundController : MonoBehaviour
     {
         var leftStrikerSpawnPosition = GetPosition(leftStrikerSpawnPoint);
         leftStriker = ActivateStrikerFromPool(configuration, PlayerSide.Left, leftStrikerSpawnPosition);
+        BindAbilityHud(PlayerSide.Left, leftStriker);
         
         var rightStrikerSpawnPosition = GetPosition(rightStrikerSpawnPoint);
         rightStriker = ActivateStrikerFromPool(configuration, PlayerSide.Right, rightStrikerSpawnPosition);
+        BindAbilityHud(PlayerSide.Right, rightStriker);
     }
 
     public bool ResetRoundItemsForTurn()
@@ -85,6 +91,8 @@ public sealed class RoundController : MonoBehaviour
         leftStriker = null;
         rightStriker = null;
         puck = null;
+
+        ClearAbilityHuds();
 
         if (puckRegistry)
             puckRegistry.Clear();
@@ -175,6 +183,40 @@ public sealed class RoundController : MonoBehaviour
         return roundItem && roundItem.gameObject.activeInHierarchy;
     }
 
+    private void BindAbilityHud(PlayerSide side, StrikerBase striker)
+    {
+        var hud = GetAbilityHud(side);
+        if (!hud) return;
+
+        if (!striker)
+        {
+            hud.BindAbilityController(null);
+            return;
+        }
+
+        if (striker.TryGetComponent(out PlayerAbilityController abilityController))
+        {
+            hud.BindAbilityController(abilityController);
+            return;
+        }
+
+        hud.BindAbilityController(null);
+    }
+
+    private void ClearAbilityHuds()
+    {
+        if (leftPlayerAbilityHud)
+            leftPlayerAbilityHud.BindAbilityController(null);
+
+        if (rightPlayerAbilityHud)
+            rightPlayerAbilityHud.BindAbilityController(null);
+    }
+
+    private PlayerAbilityHudView GetAbilityHud(PlayerSide side)
+    {
+        return side == PlayerSide.Left ? leftPlayerAbilityHud : rightPlayerAbilityHud;
+    }
+
     private void ValidateReferences()
     {
         if (!tableRoot)
@@ -209,5 +251,11 @@ public sealed class RoundController : MonoBehaviour
 
         if (!puckRegistry)
             Debug.LogError($"{nameof(RoundController)} requires a PuckRegistry reference.", this);
+
+        if (!leftPlayerAbilityHud)
+            Debug.LogError($"{nameof(RoundController)} requires a left player ability HUD reference.", this);
+
+        if (!rightPlayerAbilityHud)
+            Debug.LogError($"{nameof(RoundController)} requires a right player ability HUD reference.", this);
     }
 }

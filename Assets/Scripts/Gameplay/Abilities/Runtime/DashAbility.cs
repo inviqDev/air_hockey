@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public sealed class DashAbility : IAbility
+public sealed class DashAbility : IAbility, IHasCooldown
 {
     public readonly struct Context
     {
@@ -27,9 +27,11 @@ public sealed class DashAbility : IAbility
         this.context = context;
     }
 
+    public AbilityConfig Config => config;
     public string Id => config != null ? config.Id : string.Empty;
-
     public bool CanActivate => CheckCanActivate();
+    public float CooldownDuration => config != null ? config.Cooldown : 0f;
+    public float CooldownRemaining => Mathf.Max(0f, remainingCooldownTime);
 
     public void Activate()
     {

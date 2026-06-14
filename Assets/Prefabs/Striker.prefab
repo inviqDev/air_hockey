@@ -207,7 +207,7 @@ MonoBehaviour:
   dashSpeed: 16
   dashDuration: 0.12
   dashCooldown: 0.35
-  inputReader: {fileID: 0}
+  inputReader: {fileID: 6100000000000000002}
 --- !u!114 &4198581192032882990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,7 +248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TemporaryAbilityGranter
   playerAbilityController: {fileID: 4198581192032882990}
   dashAbilityConfig: {fileID: 11400000, guid: 9ebe212f838c90b4da834934cd991716, type: 2}
-  slotIndex: 0
+  slotNumber: 1
   grantOnStart: 1
   grantKey: 21
 --- !u!114 &6100000000000000003

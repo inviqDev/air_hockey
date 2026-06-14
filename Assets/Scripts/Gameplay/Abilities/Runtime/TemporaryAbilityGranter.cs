@@ -8,7 +8,7 @@ public sealed class TemporaryAbilityGranter : MonoBehaviour
     [SerializeField] private DashAbilityConfig dashAbilityConfig;
 
     [Header("Grant")]
-    [SerializeField, Min(0)] private int slotIndex;
+    [SerializeField, Range(1, 4)] private int slotNumber = 1;
     [SerializeField] private bool grantOnStart = true;
     [SerializeField] private Key grantKey = Key.None;
 
@@ -51,6 +51,7 @@ public sealed class TemporaryAbilityGranter : MonoBehaviour
             return;
         }
 
+        var slotIndex = slotNumber - 1;
         playerAbilityController.AddAbilityToSlot(dashAbilityConfig, slotIndex);
     }
 }

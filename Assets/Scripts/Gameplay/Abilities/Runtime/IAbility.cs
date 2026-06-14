@@ -1,5 +1,6 @@
 public interface IAbility
 {
+    AbilityConfig Config { get; }
     string Id { get; }
     bool CanActivate { get; }
 

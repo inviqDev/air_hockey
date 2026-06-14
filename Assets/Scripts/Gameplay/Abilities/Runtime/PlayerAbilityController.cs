@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public sealed class PlayerAbilityController : MonoBehaviour
 {
@@ -11,8 +12,13 @@ public sealed class PlayerAbilityController : MonoBehaviour
     private readonly IAbility[] abilitySlots = new IAbility[SlotCount];
 
     private AbilityFactory abilityFactory;
+    
     private IStrikerMovementOverride movementOverride;
     private bool isSubscribedToInput;
+
+    public event Action<int> AbilitySlotChanged;
+
+    public int AbilitySlotCount => SlotCount;
 
     private void Reset()
     {
@@ -66,6 +72,7 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
         previousAbility?.Dispose();
         abilitySlots[slotIndex] = ability;
+        AbilitySlotChanged?.Invoke(slotIndex);
     }
 
     public void UseSlot(int slotIndex)
@@ -84,6 +91,36 @@ public sealed class PlayerAbilityController : MonoBehaviour
         if (!IsValidSlotIndex(slotIndex)) return null;
 
         return abilitySlots[slotIndex];
+    }
+
+    public AbilitySlotData GetAbilitySlotData(int slotIndex)
+    {
+        if (!IsValidSlotIndex(slotIndex))
+        {
+            Debug.LogError($"{nameof(PlayerAbilityController)} on {name} cannot provide ability slot data for invalid slot index {slotIndex}.", this);
+            return CreateEmptyAbilitySlotData();
+        }
+
+        var ability = abilitySlots[slotIndex];
+        if (ability == null) return CreateEmptyAbilitySlotData();
+
+        var cooldown = ability as IHasCooldown;
+        var hasCooldown = cooldown != null;
+        var cooldownDuration = 0f;
+        var cooldownRemaining = 0f;
+
+        if (hasCooldown)
+        {
+            cooldownDuration = cooldown.CooldownDuration;
+            cooldownRemaining = cooldown.CooldownRemaining;
+        }
+
+        return new AbilitySlotData(
+            ability.Config,
+            ability.CanActivate,
+            hasCooldown,
+            cooldownDuration,
+            cooldownRemaining);
     }
 
     private void FixedUpdate()
@@ -160,9 +197,23 @@ public sealed class PlayerAbilityController : MonoBehaviour
     {
         for (var i = 0; i < abilitySlots.Length; i++)
         {
-            abilitySlots[i]?.Dispose();
+            var ability = abilitySlots[i];
+            if (ability == null) continue;
+
+            ability.Dispose();
             abilitySlots[i] = null;
+            AbilitySlotChanged?.Invoke(i);
         }
+    }
+
+    private AbilitySlotData CreateEmptyAbilitySlotData()
+    {
+        return new AbilitySlotData(
+            null,
+            false,
+            false,
+            0f,
+            0f);
     }
 
     private static bool IsValidSlotIndex(int slotIndex)

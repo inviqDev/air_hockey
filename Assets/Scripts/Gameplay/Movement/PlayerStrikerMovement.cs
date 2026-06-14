@@ -4,6 +4,7 @@ using UnityEngine;
 public sealed class PlayerStrikerMovement : StrikerMovement
 {
     [SerializeField] private PlayerInputReader inputReader;
+    [SerializeField] private bool useLegacyDirectDash;
 
     private Vector2 currentMoveDirection;
     private bool dashRequested;
@@ -110,6 +111,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
     private void HandleDashPressed()
     {
+        if (!useLegacyDirectDash) return;
         if (!IsMovementAllowed) return;
 
         dashRequested = true;

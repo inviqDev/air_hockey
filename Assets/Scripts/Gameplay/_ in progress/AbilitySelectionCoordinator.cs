@@ -20,6 +20,12 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
             RefreshHud(false);
         }
 
+        public void ResetProgression()
+        {
+            progressState.ResetProgression();
+            RefreshHud(false);
+        }
+
         public void StartRound()
         {
             progressState.StartTurnProgression();
@@ -99,6 +105,12 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
     private void OnValidate()
     {
         ValidateReferences();
+    }
+
+    public void ResetProgression()
+    {
+        leftProgression.ResetProgression();
+        rightProgression.ResetProgression();
     }
 
     private void Update()

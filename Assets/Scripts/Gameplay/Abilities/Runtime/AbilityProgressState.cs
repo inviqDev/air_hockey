@@ -19,6 +19,13 @@ public sealed class AbilityProgressState
         ResetFreeAbilityTimer();
     }
 
+    public void ResetProgression()
+    {
+        AvailableAbilityPoints = 0;
+        nextFreeAbilityDurationSeconds = initialFreeAbilityDurationSeconds;
+        ResetFreeAbilityTimer();
+    }
+
     public void StartTurnProgression()
     {
         nextFreeAbilityDurationSeconds = initialFreeAbilityDurationSeconds;

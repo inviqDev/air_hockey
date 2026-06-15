@@ -8,6 +8,7 @@ public sealed class MatchManager : MonoBehaviour
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private GoalController goalController;
     [SerializeField] private ScoreKeeper scoreKeeper;
+    [SerializeField] private AbilitySelectionCoordinator abilitySelectionCoordinator;
 
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
@@ -160,6 +161,9 @@ public sealed class MatchManager : MonoBehaviour
         if (turnController)
             turnController.EndTurn();
 
+        if (abilitySelectionCoordinator)
+            abilitySelectionCoordinator.ResetProgression();
+
         hasPreparedTurnState = false;
     }
 
@@ -263,5 +267,8 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!turnController)
             Debug.LogError($"{nameof(MatchManager)} requires a TurnController reference.", this);
+
+        if (!abilitySelectionCoordinator)
+            Debug.LogError($"{nameof(MatchManager)} requires an {nameof(AbilitySelectionCoordinator)} reference.", this);
     }
 }

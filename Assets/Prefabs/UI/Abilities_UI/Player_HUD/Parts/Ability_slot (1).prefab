@@ -142,6 +142,9 @@ MonoBehaviour:
   abilityIcon: {fileID: 6270267611824674587}
   emptyAbilityIcon: {fileID: 6408417505435511293, guid: 0d50416c5ce21b344a39ace737dff378, type: 3}
   cooldownSlider: {fileID: 516145273155058347}
+  cooldownBackground: {fileID: 1074096768559752519}
+  activeCooldownBackgroundColor: {r: 0.5882353, g: 0.25433248, b: 0.25433248, a: 1}
+  inactiveCooldownBackgroundColor: {r: 0.5882353, g: 0.5882353, b: 0.5882353, a: 0.49019608}
 --- !u!1 &5432365782546322856
 GameObject:
   m_ObjectHideFlags: 0

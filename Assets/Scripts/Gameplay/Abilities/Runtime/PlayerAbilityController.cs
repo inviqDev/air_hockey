@@ -14,11 +14,17 @@ public sealed class PlayerAbilityController : MonoBehaviour
     private AbilityFactory abilityFactory;
     
     private IStrikerMovementOverride movementOverride;
+    private IPuckScaleController puckScaleController;
     private bool isSubscribedToInput;
 
     public event Action<int> AbilitySlotChanged;
 
     public int AbilitySlotCount => SlotCount;
+
+    public void SetPuckScaleController(IPuckScaleController controller)
+    {
+        puckScaleController = controller;
+    }
 
     private void Reset()
     {
@@ -57,7 +63,7 @@ public sealed class PlayerAbilityController : MonoBehaviour
         if (!config) return;
         if (!EnsureReadyToCreateAbility()) return;
 
-        var ability = abilityFactory.CreateAbility(config, movementOverride);
+        var ability = abilityFactory.CreateAbility(config, movementOverride, puckScaleController);
         if (ability == null) return;
 
         SetAbilityToSlot(ability, slotIndex);

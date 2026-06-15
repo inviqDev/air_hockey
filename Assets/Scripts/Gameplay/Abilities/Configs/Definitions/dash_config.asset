@@ -18,4 +18,4 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 9fb5970e0e24de34eb1ac22352d5a6e6, type: 3}
   dashSpeed: 16
   dashDuration: 0.12
-  cooldown: 0.35
+  cooldown: 2

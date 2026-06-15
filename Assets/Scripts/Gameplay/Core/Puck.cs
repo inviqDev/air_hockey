@@ -7,11 +7,15 @@ public sealed class Puck : MonoBehaviour, IPoolable
     private const float DefaultRadius = 0.5f;
 
     [SerializeField] private PuckPoofParticles poofParticles;
+    
+    private PuckScaleController scaleController;
+
     public Rigidbody2D PuckRigidbody { get; private set; }
     public CircleCollider2D PuckCircleCollider { get; private set; }
     public Vector2 Position => PuckRigidbody ? PuckRigidbody.position : transform.position;
     public Vector2 Velocity => PuckRigidbody ? PuckRigidbody.linearVelocity : Vector2.zero;
     public float Radius => ResolveRadius();
+    public IPuckScaleController ScaleController => scaleController;
 
     private void Reset()
     {
@@ -38,6 +42,7 @@ public sealed class Puck : MonoBehaviour, IPoolable
 
     public void ResetState(Vector2 position)
     {
+        ResetScale();
         if (!PuckRigidbody) return;
 
         PuckRigidbody.linearVelocity = Vector2.zero;
@@ -49,10 +54,13 @@ public sealed class Puck : MonoBehaviour, IPoolable
     public void OnGetFromPool()
     {
         CacheComponents();
+        EnsureScaleController();
+        ResetScale();
     }
 
     public void OnMoveToPool()
     {
+        ResetScale();
         if (!PuckRigidbody) return;
         ResetState(PuckRigidbody.position);
     }
@@ -77,6 +85,20 @@ public sealed class Puck : MonoBehaviour, IPoolable
 
         if (!poofParticles)
             poofParticles = GetComponent<PuckPoofParticles>();
+
+        EnsureScaleController();
+    }
+
+    private void EnsureScaleController()
+    {
+        if (scaleController != null) return;
+
+        scaleController = new PuckScaleController(transform);
+    }
+
+    private void ResetScale()
+    {
+        scaleController?.ResetScale();
     }
 
     private void ValidateReferences()

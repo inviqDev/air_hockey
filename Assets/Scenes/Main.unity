@@ -5144,6 +5144,7 @@ MonoBehaviour:
   serveManager: {fileID: 6400000000000000006}
   goalController: {fileID: 7000000000000000002}
   scoreKeeper: {fileID: 6400000000000000005}
+  abilitySelectionCoordinator: {fileID: 1870022075}
 --- !u!1001 &1428052424
 PrefabInstance:
   m_ObjectHideFlags: 0

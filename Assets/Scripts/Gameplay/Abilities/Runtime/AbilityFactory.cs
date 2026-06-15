@@ -2,7 +2,10 @@ using UnityEngine;
 
 public sealed class AbilityFactory
 {
-    public IAbility CreateAbility(AbilityConfig config, IStrikerMovementOverride movementOverride)
+    public IAbility CreateAbility(
+        AbilityConfig config,
+        IStrikerMovementOverride movementOverride,
+        IPuckScaleController puckScaleController)
     {
         if (!config)
         {
@@ -10,9 +13,19 @@ public sealed class AbilityFactory
             return null;
         }
 
-        if (config is DashAbilityConfig dashConfig)
-            return CreateDashAbility(dashConfig, movementOverride);
+        switch (config)
+        {
+            case DashAbilityConfig dashConfig:
+                return CreateDashAbility(dashConfig, movementOverride);
+            case PuckScaleAbilityConfig puckScaleConfig:
+                return CreatePuckScaleAbility(puckScaleConfig, puckScaleController);
+        }
 
+        return LogErrorInvalidType(config);
+    }
+
+    private static IAbility LogErrorInvalidType(AbilityConfig config)
+    {
         var configTypeName = config.GetType().Name;
         Debug.LogError($"{nameof(AbilityFactory)} does not support ability config type {configTypeName}.");
         return null;
@@ -20,7 +33,7 @@ public sealed class AbilityFactory
 
     private IAbility CreateDashAbility(DashAbilityConfig config, IStrikerMovementOverride movementOverride)
     {
-        if (!HasMovementOverride(movementOverride))
+        if (movementOverride == null)
         {
             Debug.LogError($"{nameof(AbilityFactory)} cannot create {nameof(DashAbility)} because the movement override is missing.");
             return null;
@@ -30,13 +43,15 @@ public sealed class AbilityFactory
         return new DashAbility(config, context);
     }
 
-    private static bool HasMovementOverride(IStrikerMovementOverride movementOverride)
+    private IAbility CreatePuckScaleAbility(PuckScaleAbilityConfig config, IPuckScaleController puckScaleController)
     {
-        if (movementOverride == null) return false;
+        if (puckScaleController == null)
+        {
+            Debug.LogError($"{nameof(AbilityFactory)} cannot create {nameof(PuckScaleAbility)} because the puck scale controller is missing.");
+            return null;
+        }
 
-        var movementObject = movementOverride as Object;
-        if (movementObject == null) return true;
-
-        return movementObject;
+        var context = new PuckScaleAbility.Context(puckScaleController);
+        return new PuckScaleAbility(config, context);
     }
 }

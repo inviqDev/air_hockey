@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public sealed class DashAbility : IAbility, IHasCooldown
+public sealed class DashAbility : AbilityBase, IHasCooldown
 {
     public readonly struct Context
     {
@@ -12,57 +12,48 @@ public sealed class DashAbility : IAbility, IHasCooldown
         public IStrikerMovementOverride Movement { get; }
     }
 
-    private readonly DashAbilityConfig config;
+    private readonly DashAbilityConfig dashConfig;
     private readonly Context context;
 
     private Vector2 dashDirection;
     private float remainingDashTime;
     private float remainingCooldownTime;
-    private bool isDisposed;
     private bool isActive;
 
-    public DashAbility(DashAbilityConfig config, Context context)
+    public DashAbility(DashAbilityConfig config, Context context) : base(config)
     {
-        this.config = config;
+        dashConfig = config;
         this.context = context;
     }
 
-    public AbilityConfig Config => config;
-    public string Id => config != null ? config.Id : string.Empty;
-    public bool CanActivate => CheckCanActivate();
-    public float CooldownDuration => config != null ? config.Cooldown : 0f;
+    public float CooldownDuration => dashConfig != null ? dashConfig.Cooldown : 0f;
     public float CooldownRemaining => Mathf.Max(0f, remainingCooldownTime);
 
-    public void Activate()
-    {
-        if (!CanActivate) return;
-
-        var started = context.Movement.TryBeginMovementOverride();
-        if (!started) return;
-
-        dashDirection = ResolveDashDirection();
-        remainingDashTime = config.DashDuration;
-        remainingCooldownTime = config.Cooldown;
-        isActive = true;
-        ApplyDashVelocity();
-    }
-
-    public void Tick(float deltaTime)
+    public override void Tick(float deltaTime)
     {
         TickCooldown(deltaTime);
         TickActiveDash(deltaTime);
     }
 
-    public void Dispose()
+    protected override void ActivateCore()
     {
-        EndDash();
-        isDisposed = true;
+        var started = context.Movement.TryBeginMovementOverride();
+        if (!started) return;
+
+        dashDirection = ResolveDashDirection();
+        remainingDashTime = dashConfig.DashDuration;
+        remainingCooldownTime = dashConfig.Cooldown;
+        isActive = true;
+        ApplyDashVelocity();
     }
 
-    private bool CheckCanActivate()
+    protected override void DisposeCore()
     {
-        if (isDisposed) return false;
-        if (config == null) return false;
+        EndDash();
+    }
+
+    protected override bool CanActivateCore()
+    {
         if (isActive) return false;
         if (remainingCooldownTime > 0f) return false;
         if (!HasMovement()) return false;
@@ -122,7 +113,7 @@ public sealed class DashAbility : IAbility, IHasCooldown
     {
         if (!isActive) return;
 
-        context.Movement.SetMovementOverrideVelocity(dashDirection * config.DashSpeed);
+        context.Movement.SetMovementOverrideVelocity(dashDirection * dashConfig.DashSpeed);
     }
 
     private void EndDash()

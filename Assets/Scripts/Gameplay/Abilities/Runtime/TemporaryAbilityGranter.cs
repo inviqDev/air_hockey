@@ -3,12 +3,23 @@ using UnityEngine.InputSystem;
 
 public sealed class TemporaryAbilityGranter : MonoBehaviour
 {
+    [System.Serializable]
+    private sealed class AbilityGrant
+    {
+        [SerializeField] private AbilityConfig abilityConfig;
+        [SerializeField, Range(1, 4)] private int slotNumber = 1;
+
+        public AbilityConfig AbilityConfig => abilityConfig;
+        public int SlotIndex => slotNumber - 1;
+    }
+
     [Header("References")]
     [SerializeField] private PlayerAbilityController playerAbilityController;
-    [SerializeField] private DashAbilityConfig dashAbilityConfig;
+
+    [Header("Abilities")]
+    [SerializeField] private AbilityGrant[] abilityGrants;
 
     [Header("Grant")]
-    [SerializeField, Range(1, 4)] private int slotNumber = 1;
     [SerializeField] private bool grantOnStart = true;
     [SerializeField] private Key grantKey = Key.None;
 
@@ -25,7 +36,7 @@ public sealed class TemporaryAbilityGranter : MonoBehaviour
     {
         if (!grantOnStart) return;
 
-        GrantAbility();
+        GrantAbilities();
     }
 
     private void Update()
@@ -34,10 +45,10 @@ public sealed class TemporaryAbilityGranter : MonoBehaviour
         if (Keyboard.current == null) return;
         if (!Keyboard.current[grantKey].wasPressedThisFrame) return;
 
-        GrantAbility();
+        GrantAbilities();
     }
 
-    private void GrantAbility()
+    private void GrantAbilities()
     {
         if (!playerAbilityController)
         {
@@ -45,13 +56,28 @@ public sealed class TemporaryAbilityGranter : MonoBehaviour
             return;
         }
 
-        if (!dashAbilityConfig)
+        if (HasAbilityGrants())
         {
-            Debug.LogError($"{nameof(TemporaryAbilityGranter)} on {name} requires a {nameof(DashAbilityConfig)} reference.", this);
+            GrantConfiguredAbilities();
             return;
         }
 
-        var slotIndex = slotNumber - 1;
-        playerAbilityController.AddAbilityToSlot(dashAbilityConfig, slotIndex);
+        Debug.LogError($"{nameof(TemporaryAbilityGranter)} on {name} requires at least one ability grant.", this);
+    }
+
+    private void GrantConfiguredAbilities()
+    {
+        for (var i = 0; i < abilityGrants.Length; i++)
+        {
+            var grant = abilityGrants[i];
+            if (grant == null || !grant.AbilityConfig) continue;
+
+            playerAbilityController.AddAbilityToSlot(grant.AbilityConfig, grant.SlotIndex);
+        }
+    }
+
+    private bool HasAbilityGrants()
+    {
+        return abilityGrants != null && abilityGrants.Length > 0;
     }
 }

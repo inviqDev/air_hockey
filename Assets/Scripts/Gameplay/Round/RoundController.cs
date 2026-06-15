@@ -196,6 +196,7 @@ public sealed class RoundController : MonoBehaviour
 
         if (striker.TryGetComponent(out PlayerAbilityController abilityController))
         {
+            abilityController.SetPuckScaleController(GetPuckScaleController());
             hud.BindAbilityController(abilityController);
             return;
         }
@@ -215,6 +216,11 @@ public sealed class RoundController : MonoBehaviour
     private AbilityHudView GetAbilityHud(PlayerSide side)
     {
         return side == PlayerSide.Left ? leftAbilityHud : rightAbilityHud;
+    }
+
+    private IPuckScaleController GetPuckScaleController()
+    {
+        return puck ? puck.ScaleController : null;
     }
 
     private void ValidateReferences()

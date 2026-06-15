@@ -1,40 +1,46 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class PlayerAbilityHudView : MonoBehaviour
+public sealed class AbilityHudView : MonoBehaviour
 {
-    private const int ExpectedAbilitySlotCount = 4;
+    private const int SlotCount = 4;
 
     [Header("Free Ability Timer")]
-    [SerializeField] private TextMeshProUGUI freeAbilityTimerText;
+    [SerializeField] private TextMeshProUGUI freeTimerText;
     
     [Header("Add Ability Button")]
-    [SerializeField] private Button addAbilityButton;
-    [SerializeField] private TextMeshProUGUI availableAmountText;
+    [SerializeField] private Button plusButton;
+    [SerializeField] private TextMeshProUGUI availablePointsText;
 
     [Header("Ability Slots")]
-    [SerializeField] private AbilitySlotHudView[] abilitySlotViews;
+    [SerializeField] private AbilitySlotHudView[] abilitySlots;
 
     private PlayerAbilityController abilityController;
     private bool isSubscribed;
 
+    public event Action PlusAbilityButtonClicked;
+
     public void SetFreeAbilityTimerText(string value)
     {
-        if (!freeAbilityTimerText) return;
-        freeAbilityTimerText.text = value;
+        if (!freeTimerText) return;
+        freeTimerText.text = value;
     }
 
     public void SetAvailableAmount(int amount)
     {
-        if (!availableAmountText) return;
+        if (!availablePointsText) return;
 
         var clampedAmount = Mathf.Max(0, amount);
-        availableAmountText.text = clampedAmount.ToString();
+        availablePointsText.text = clampedAmount.ToString();
+    }
 
-        if (!addAbilityButton) return;
+    public void SetAbilityMenuButtonEnabled(bool isEnabled)
+    {
+        if (!plusButton) return;
 
-        addAbilityButton.interactable = clampedAmount > 0;
+        plusButton.interactable = isEnabled;
     }
 
     public void BindAbilityController(PlayerAbilityController controller)
@@ -61,17 +67,24 @@ public sealed class PlayerAbilityHudView : MonoBehaviour
     {
         CacheAbilitySlotViews();
         ValidateReferences();
+        SetAbilityMenuButtonEnabled(false);
         SetAllSlotsEmpty();
     }
 
     private void OnEnable()
     {
+        if (plusButton)
+            plusButton.onClick.AddListener(HandleAbilityMenuButtonClicked);
+
         SubscribeToController();
         RefreshAllSlots();
     }
 
     private void OnDisable()
     {
+        if (plusButton)
+            plusButton.onClick.RemoveListener(HandleAbilityMenuButtonClicked);
+
         UnsubscribeFromController();
     }
 
@@ -82,14 +95,14 @@ public sealed class PlayerAbilityHudView : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (!freeAbilityTimerText)
-            Debug.LogError($"{nameof(PlayerAbilityHudView)} on {name} requires a free ability timer text reference.", this);
+        if (!freeTimerText)
+            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires a free ability timer text reference.", this);
 
-        if (!addAbilityButton)
-            Debug.LogError($"{nameof(PlayerAbilityHudView)} on {name} requires an add ability button reference.", this);
+        if (!plusButton)
+            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires an add ability button reference.", this);
 
-        if (!availableAmountText)
-            Debug.LogError($"{nameof(PlayerAbilityHudView)} on {name} requires an available amount text reference.", this);
+        if (!availablePointsText)
+            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires an available amount text reference.", this);
 
         ValidateSlotCount();
     }
@@ -118,6 +131,11 @@ public sealed class PlayerAbilityHudView : MonoBehaviour
         RefreshSlot(slotIndex);
     }
 
+    private void HandleAbilityMenuButtonClicked()
+    {
+        PlusAbilityButtonClicked?.Invoke();
+    }
+
     private void RefreshAllSlots()
     {
         if (!abilityController)
@@ -132,9 +150,9 @@ public sealed class PlayerAbilityHudView : MonoBehaviour
             RefreshSlot(i);
         }
 
-        for (var i = slotCount; i < abilitySlotViews.Length; i++)
+        for (var i = slotCount; i < abilitySlots.Length; i++)
         {
-            abilitySlotViews[i].SetEmpty();
+            abilitySlots[i].SetEmpty();
         }
     }
 
@@ -143,7 +161,7 @@ public sealed class PlayerAbilityHudView : MonoBehaviour
         if (!IsValidSlotIndex(slotIndex)) return;
 
         var slotData = abilityController.GetAbilitySlotData(slotIndex);
-        ApplySlotData(abilitySlotViews[slotIndex], slotData);
+        ApplySlotData(abilitySlots[slotIndex], slotData);
     }
 
     private void RefreshCooldowns()
@@ -154,7 +172,7 @@ public sealed class PlayerAbilityHudView : MonoBehaviour
         for (var i = 0; i < slotCount; i++)
         {
             var slotData = abilityController.GetAbilitySlotData(i);
-            abilitySlotViews[i].SetCooldown(slotData.HasCooldown, slotData.CooldownNormalized);
+            abilitySlots[i].SetCooldown(slotData.HasCooldown, slotData.CooldownNormalized);
         }
     }
 
@@ -172,42 +190,42 @@ public sealed class PlayerAbilityHudView : MonoBehaviour
 
     private void SetAllSlotsEmpty()
     {
-        for (var i = 0; i < abilitySlotViews.Length; i++)
+        foreach (var slot in abilitySlots)
         {
-            abilitySlotViews[i].SetEmpty();
+            slot.SetEmpty();
         }
     }
 
     private void CacheAbilitySlotViews()
     {
-        if (abilitySlotViews != null && abilitySlotViews.Length == ExpectedAbilitySlotCount) return;
+        if (abilitySlots != null && abilitySlots.Length == SlotCount) return;
 
-        abilitySlotViews = GetComponentsInChildren<AbilitySlotHudView>(true);
+        abilitySlots = GetComponentsInChildren<AbilitySlotHudView>(true);
     }
 
     private void ValidateSlotCount()
     {
-        if (abilitySlotViews == null)
+        if (abilitySlots == null)
         {
-            Debug.LogError($"{nameof(PlayerAbilityHudView)} on {name} requires ability slot view references.", this);
+            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires ability slot view references.", this);
             return;
         }
 
         var expectedSlotCount = abilityController
             ? abilityController.AbilitySlotCount
-            : ExpectedAbilitySlotCount;
+            : SlotCount;
 
-        if (abilitySlotViews.Length != expectedSlotCount)
+        if (abilitySlots.Length != expectedSlotCount)
         {
             Debug.LogError(
-                $"{nameof(PlayerAbilityHudView)} on {name} has {abilitySlotViews.Length} ability slot views, but expected {expectedSlotCount}.",
+                $"{nameof(AbilityHudView)} on {name} has {abilitySlots.Length} ability slot views, but expected {expectedSlotCount}.",
                 this);
         }
     }
 
     private int GetVisibleSlotCount()
     {
-        return Mathf.Min(abilityController.AbilitySlotCount, abilitySlotViews.Length);
+        return Mathf.Min(abilityController.AbilitySlotCount, abilitySlots.Length);
     }
 
     private bool IsValidSlotIndex(int slotIndex)

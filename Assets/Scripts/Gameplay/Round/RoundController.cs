@@ -22,8 +22,8 @@ public sealed class RoundController : MonoBehaviour
     [SerializeField] private PuckRegistry puckRegistry;
 
     [Header("Ability HUD")]
-    [SerializeField] private PlayerAbilityHudView leftPlayerAbilityHud;
-    [SerializeField] private PlayerAbilityHudView rightPlayerAbilityHud;
+    [SerializeField] private AbilityHudView leftAbilityHud;
+    [SerializeField] private AbilityHudView rightAbilityHud;
 
     private Puck puck;
     private StrikerBase leftStriker;
@@ -205,16 +205,16 @@ public sealed class RoundController : MonoBehaviour
 
     private void ClearAbilityHuds()
     {
-        if (leftPlayerAbilityHud)
-            leftPlayerAbilityHud.BindAbilityController(null);
+        if (leftAbilityHud)
+            leftAbilityHud.BindAbilityController(null);
 
-        if (rightPlayerAbilityHud)
-            rightPlayerAbilityHud.BindAbilityController(null);
+        if (rightAbilityHud)
+            rightAbilityHud.BindAbilityController(null);
     }
 
-    private PlayerAbilityHudView GetAbilityHud(PlayerSide side)
+    private AbilityHudView GetAbilityHud(PlayerSide side)
     {
-        return side == PlayerSide.Left ? leftPlayerAbilityHud : rightPlayerAbilityHud;
+        return side == PlayerSide.Left ? leftAbilityHud : rightAbilityHud;
     }
 
     private void ValidateReferences()
@@ -252,10 +252,10 @@ public sealed class RoundController : MonoBehaviour
         if (!puckRegistry)
             Debug.LogError($"{nameof(RoundController)} requires a PuckRegistry reference.", this);
 
-        if (!leftPlayerAbilityHud)
-            Debug.LogError($"{nameof(RoundController)} requires a left player ability HUD reference.", this);
+        if (!leftAbilityHud)
+            Debug.LogError($"{nameof(RoundController)} requires a left ability HUD reference.", this);
 
-        if (!rightPlayerAbilityHud)
-            Debug.LogError($"{nameof(RoundController)} requires a right player ability HUD reference.", this);
+        if (!rightAbilityHud)
+            Debug.LogError($"{nameof(RoundController)} requires a right ability HUD reference.", this);
     }
 }

@@ -128,9 +128,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6b5710cb11f4f4eab8f3f43a2c4a8bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  freeAbilityTimerText: {fileID: 1538353361648151368}
-  addAbilityButton: {fileID: 5166159707048619853}
-  availableAmountText: {fileID: 2864439670442257032}
+  freeTimerText: {fileID: 1538353361648151368}
+  plusButton: {fileID: 5166159707048619853}
+  availablePointsText: {fileID: 2864439670442257032}
+  abilitySlots:
+  - {fileID: 259174370647438200}
+  - {fileID: 1701687351822747865}
+  - {fileID: 9144565298603581402}
+  - {fileID: 4911678810806014650}
 --- !u!1001 &128123201547851073
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -344,11 +349,55 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
+--- !u!114 &259174370647438200 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 171113597092341305, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
+  m_PrefabInstance: {fileID: 128123201547851073}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
+--- !u!114 &1701687351822747865 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1610798820148731288, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
+  m_PrefabInstance: {fileID: 128123201547851073}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
+--- !u!114 &4911678810806014650 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5039218494317070331, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
+  m_PrefabInstance: {fileID: 128123201547851073}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
 --- !u!224 &6922893526511182014 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7049296308258092543, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
   m_PrefabInstance: {fileID: 128123201547851073}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9144565298603581402 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9164590973028633243, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
+  m_PrefabInstance: {fileID: 128123201547851073}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
 --- !u!1001 &4239371087077823271
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -543,6 +592,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1568393901760729970, guid: 2273f5763dc9651439073d71fd8b9ae7, type: 3}
+      propertyPath: m_Name
+      value: Timer_text
+      objectReference: {fileID: 0}
     - target: {fileID: 6774942878303136521, guid: 2273f5763dc9651439073d71fd8b9ae7, type: 3}
       propertyPath: m_Name
       value: Free_ability_timer
@@ -580,6 +633,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Plus_button
       objectReference: {fileID: 0}
+    - target: {fileID: 2008965816432248958, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
+      propertyPath: m_Interactable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008965816432248958, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
+      propertyPath: m_TargetGraphic
+      value: 
+      objectReference: {fileID: 6594228379806984991}
     - target: {fileID: 3434496186387418086, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -670,7 +731,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6595811306337184355, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
       propertyPath: m_Name
-      value: Available_amount
+      value: Available_points
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -699,6 +760,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &6594228379806984991 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 564008661852654636, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
+  m_PrefabInstance: {fileID: 6651998231478232883}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!224 &8356830638196075733 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3434496186387418086, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}

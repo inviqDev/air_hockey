@@ -21,6 +21,7 @@ public sealed class InGameMenuController : MenuViewBase
     public bool IsPaused { get; private set; }
     public event Action RestartClicked;
     public event Action MainMenuClicked;
+    public event Action<bool> PauseStateChanged;
 
     private void OnEnable()
     {
@@ -102,17 +103,13 @@ public sealed class InGameMenuController : MenuViewBase
     [ContextMenu("Pause Game")]
     public void PauseGame()
     {
-        IsPaused = true;
-        Time.timeScale = 0f;
-        UpdatePauseIcon();
+        SetPaused(true);
     }
 
     [ContextMenu("Resume Game")]
     public void ResumeGame()
     {
-        IsPaused = false;
-        Time.timeScale = 1f;
-        UpdatePauseIcon();
+        SetPaused(false);
     }
 
     [ContextMenu("Open Settings")]
@@ -128,10 +125,13 @@ public sealed class InGameMenuController : MenuViewBase
 
     public void ResetState()
     {
+        var wasPaused = IsPaused;
         IsPaused = false;
-        Time.timeScale = 1f;
+        ApplyPauseState();
         settingsView?.ResetState();
-        UpdatePauseIcon();
+
+        if (wasPaused)
+            PauseStateChanged?.Invoke(IsPaused);
     }
 
     private void RestartMatch()
@@ -159,6 +159,21 @@ public sealed class InGameMenuController : MenuViewBase
         if (!pausePlayIconImage) return;
 
         pausePlayIconImage.sprite = IsPaused ? playIcon : pauseIcon;
+    }
+
+    private void SetPaused(bool isPaused)
+    {
+        if (IsPaused == isPaused) return;
+
+        IsPaused = isPaused;
+        ApplyPauseState();
+        PauseStateChanged?.Invoke(IsPaused);
+    }
+
+    private void ApplyPauseState()
+    {
+        Time.timeScale = IsPaused ? 0f : 1f;
+        UpdatePauseIcon();
     }
 
     private void ValidateReferences()

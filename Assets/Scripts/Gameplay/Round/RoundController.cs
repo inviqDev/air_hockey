@@ -28,6 +28,7 @@ public sealed class RoundController : MonoBehaviour
     private Puck puck;
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
+    private bool isAbilityPauseStateActive;
     
     private readonly Pool gameplayItemPool = new();
 
@@ -98,6 +99,13 @@ public sealed class RoundController : MonoBehaviour
             puckRegistry.Clear();
 
         SetTableVisible(false);
+    }
+
+    public void SetAbilityPauseState(bool isPaused)
+    {
+        isAbilityPauseStateActive = isPaused;
+        ApplyAbilityPauseState(leftStriker);
+        ApplyAbilityPauseState(rightStriker);
     }
 
     public void ResetRoundItemsToStartPositions()
@@ -197,6 +205,7 @@ public sealed class RoundController : MonoBehaviour
         if (striker.TryGetComponent(out PlayerAbilityController abilityController))
         {
             abilityController.SetPuckScaleController(GetPuckScaleController());
+            abilityController.SetPaused(isAbilityPauseStateActive);
             hud.BindAbilityController(abilityController);
             return;
         }
@@ -221,6 +230,14 @@ public sealed class RoundController : MonoBehaviour
     private IPuckScaleController GetPuckScaleController()
     {
         return puck ? puck.ScaleController : null;
+    }
+
+    private void ApplyAbilityPauseState(StrikerBase striker)
+    {
+        if (!striker) return;
+
+        var abilityController = striker.AbilityController;
+        abilityController?.SetPaused(isAbilityPauseStateActive);
     }
 
     private void ValidateReferences()

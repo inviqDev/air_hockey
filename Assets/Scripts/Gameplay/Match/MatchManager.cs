@@ -195,10 +195,13 @@ public sealed class MatchManager : MonoBehaviour
             turnController.RespawnItemsRequested += HandleRespawnItemsRequested;
 
         var inGameMenu = uiManager ? uiManager.InGameMenu : null;
+
         if (inGameMenu)
         {
             inGameMenu.RestartClicked += HandleRestartClicked;
             inGameMenu.MainMenuClicked += HandleMainMenuClicked;
+            inGameMenu.PauseStateChanged += HandlePauseStateChanged;
+            HandlePauseStateChanged(inGameMenu.IsPaused);
         }
     }
 
@@ -218,7 +221,14 @@ public sealed class MatchManager : MonoBehaviour
         {
             inGameMenu.RestartClicked -= HandleRestartClicked;
             inGameMenu.MainMenuClicked -= HandleMainMenuClicked;
+            inGameMenu.PauseStateChanged -= HandlePauseStateChanged;
         }
+    }
+
+    private void HandlePauseStateChanged(bool isPaused)
+    {
+        if (roundController)
+            roundController.SetAbilityPauseState(isPaused);
     }
 
     private void HandleRespawnItemsRequested()

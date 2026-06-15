@@ -20,10 +20,23 @@ public sealed class PlayerAbilityController : MonoBehaviour
     public event Action<int> AbilitySlotChanged;
 
     public int AbilitySlotCount => SlotCount;
+    public bool IsAbilityUsageAllowed { get; private set; }
 
     public void SetPuckScaleController(IPuckScaleController controller)
     {
         puckScaleController = controller;
+    }
+
+    public void SetAbilityUsageAllowed(bool isAllowed)
+    {
+        if (IsAbilityUsageAllowed == isAllowed) return;
+
+        IsAbilityUsageAllowed = isAllowed;
+
+        if (!IsAbilityUsageAllowed)
+            CancelAbilities();
+
+        NotifyAllAbilitySlotsChanged();
     }
 
     private void Reset()
@@ -54,6 +67,7 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
     private void OnDisable()
     {
+        SetAbilityUsageAllowed(false);
         UnsubscribeFromInput();
     }
 
@@ -83,6 +97,7 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
     public void UseSlot(int slotIndex)
     {
+        if (!IsAbilityUsageAllowed) return;
         if (!IsValidSlotIndex(slotIndex)) return;
 
         var ability = abilitySlots[slotIndex];
@@ -123,7 +138,7 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
         return new AbilitySlotData(
             ability.Config,
-            ability.CanActivate,
+            IsAbilityUsageAllowed && ability.CanActivate,
             hasCooldown,
             cooldownDuration,
             cooldownRemaining);
@@ -131,6 +146,8 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsAbilityUsageAllowed) return;
+
         var deltaTime = Time.fixedDeltaTime;
 
         for (var i = 0; i < abilitySlots.Length; i++)
@@ -208,6 +225,25 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
             ability.Dispose();
             abilitySlots[i] = null;
+            AbilitySlotChanged?.Invoke(i);
+        }
+    }
+
+    private void CancelAbilities()
+    {
+        for (var i = 0; i < abilitySlots.Length; i++)
+        {
+            var ability = abilitySlots[i];
+            if (ability == null) continue;
+
+            ability.Cancel();
+        }
+    }
+
+    private void NotifyAllAbilitySlotsChanged()
+    {
+        for (var i = 0; i < abilitySlots.Length; i++)
+        {
             AbilitySlotChanged?.Invoke(i);
         }
     }

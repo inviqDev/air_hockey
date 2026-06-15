@@ -22,6 +22,13 @@ public abstract class AbilityBase : IAbility
     {
     }
 
+    public void Cancel()
+    {
+        if (IsDisposed) return;
+
+        CancelCore();
+    }
+
     public void Dispose()
     {
         if (IsDisposed) return;
@@ -32,6 +39,10 @@ public abstract class AbilityBase : IAbility
 
     protected abstract bool CanActivateCore();
     protected abstract void ActivateCore();
+
+    protected virtual void CancelCore()
+    {
+    }
 
     protected virtual void DisposeCore()
     {

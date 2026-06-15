@@ -12,6 +12,8 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
     protected StrikerMovement Movement => strikerMovement;
 
+    public PlayerAbilityController AbilityController => abilityController;
+
     private TurnController currentTurnController;
     private IMovable movable;
 

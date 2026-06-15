@@ -16,11 +16,13 @@ public sealed class PlayerAbilityController : MonoBehaviour
     private IStrikerMovementOverride movementOverride;
     private IPuckScaleController puckScaleController;
     private bool isSubscribedToInput;
+    private bool canUseAbilitiesDuringTurn;
+    private bool isPaused;
 
     public event Action<int> AbilitySlotChanged;
 
     public int AbilitySlotCount => SlotCount;
-    public bool IsAbilityUsageAllowed { get; private set; }
+    public bool IsAbilityUsageAllowed => canUseAbilitiesDuringTurn && !isPaused;
 
     public void SetPuckScaleController(IPuckScaleController controller)
     {
@@ -29,13 +31,21 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
     public void SetAbilityUsageAllowed(bool isAllowed)
     {
-        if (IsAbilityUsageAllowed == isAllowed) return;
+        if (canUseAbilitiesDuringTurn == isAllowed) return;
 
-        IsAbilityUsageAllowed = isAllowed;
+        canUseAbilitiesDuringTurn = isAllowed;
 
-        if (!IsAbilityUsageAllowed)
+        if (!canUseAbilitiesDuringTurn)
             CancelAbilities();
 
+        NotifyAllAbilitySlotsChanged();
+    }
+
+    public void SetPaused(bool isPaused)
+    {
+        if (this.isPaused == isPaused) return;
+
+        this.isPaused = isPaused;
         NotifyAllAbilitySlotsChanged();
     }
 

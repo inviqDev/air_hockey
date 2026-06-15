@@ -8,6 +8,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     [SerializeField] private SideOwner sideOwner;
     [SerializeField] private StrikerMovement strikerMovement;
     [SerializeField] private StrikerTweenAnimator strikerTweenAnimator;
+    [SerializeField] private PlayerAbilityController abilityController;
 
     protected StrikerMovement Movement => strikerMovement;
 
@@ -24,6 +25,9 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         if (!strikerTweenAnimator)
             strikerTweenAnimator = GetComponent<StrikerTweenAnimator>();
+
+        if (!abilityController)
+            abilityController = GetComponent<PlayerAbilityController>();
     }
 
     private void Awake()
@@ -79,6 +83,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
             strikerTweenAnimator.ResetStrikerVisualState();
 
         SetMovementAllowed(false);
+        SetAbilityUsageAllowed(false);
         UnsubscribeFromTurnController();
         currentTurnController = null;
     }
@@ -111,6 +116,9 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
             Debug.LogError($"{nameof(StrikerBase)} on {name} requires a {nameof(StrikerTweenAnimator)} component.", this);
             hasAllReferences = false;
         }
+
+        if (!abilityController)
+            TryGetComponent(out abilityController);
 
         return hasAllReferences;
     }
@@ -148,8 +156,9 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
     private void ApplyCurrentTurnState()
     {
-        var isMovementAllowed = currentTurnController && currentTurnController.IsTurnActive;
-        SetMovementAllowed(isMovementAllowed);
+        var isGameplayAllowed = currentTurnController && currentTurnController.IsTurnActive;
+        SetMovementAllowed(isGameplayAllowed);
+        SetAbilityUsageAllowed(isGameplayAllowed);
     }
 
     private void SetMovementAllowed(bool isAllowed)
@@ -163,10 +172,19 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     private void HandleTurnStarted()
     {
         SetMovementAllowed(true);
+        SetAbilityUsageAllowed(true);
     }
 
     private void HandleTurnEnded()
     {
         SetMovementAllowed(false);
+        SetAbilityUsageAllowed(false);
+    }
+
+    private void SetAbilityUsageAllowed(bool isAllowed)
+    {
+        if (!abilityController) return;
+
+        abilityController.SetAbilityUsageAllowed(isAllowed);
     }
 }

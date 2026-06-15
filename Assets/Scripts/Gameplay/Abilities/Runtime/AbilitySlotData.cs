@@ -28,7 +28,15 @@ public readonly struct AbilitySlotData
     public bool HasCooldown => HasAbility && _hasCooldown;
     public float CooldownDuration => HasCooldown ? Mathf.Max(0f, _cooldownDuration) : 0f;
     public float CooldownRemaining => HasCooldown ? Mathf.Max(0f, _cooldownRemaining) : 0f;
-    public float CooldownNormalized => CooldownDuration > 0f
-        ? Mathf.Clamp01(CooldownRemaining / CooldownDuration)
-        : 0f;
+    public bool ShouldShowCooldown => HasCooldown && CooldownDuration > 0f;
+    public float CooldownNormalized => CalculateCooldownNormalized();
+
+    private float CalculateCooldownNormalized()
+    {
+        if (!ShouldShowCooldown) return 0f;
+        if (CooldownRemaining <= 0f) return 1f;
+
+        var elapsedCooldown = CooldownDuration - CooldownRemaining;
+        return Mathf.Clamp01(elapsedCooldown / CooldownDuration);
+    }
 }

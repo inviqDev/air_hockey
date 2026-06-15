@@ -172,7 +172,7 @@ public sealed class AbilityHudView : MonoBehaviour
         for (var i = 0; i < slotCount; i++)
         {
             var slotData = abilityController.GetAbilitySlotData(i);
-            abilitySlots[i].SetCooldown(slotData.ShouldShowCooldown, slotData.CooldownNormalized);
+            abilitySlots[i].SetCooldown(slotData.ShouldUseActiveCooldownBackground, slotData.CooldownVisualNormalized);
         }
     }
 
@@ -185,7 +185,7 @@ public sealed class AbilityHudView : MonoBehaviour
         }
 
         slotView.SetAbility(slotData.Config);
-        slotView.SetCooldown(slotData.ShouldShowCooldown, slotData.CooldownNormalized);
+        slotView.SetCooldown(slotData.ShouldUseActiveCooldownBackground, slotData.CooldownVisualNormalized);
     }
 
     private void SetAllSlotsEmpty()

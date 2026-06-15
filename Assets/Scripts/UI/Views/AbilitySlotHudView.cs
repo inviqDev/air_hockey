@@ -8,6 +8,9 @@ public sealed class AbilitySlotHudView : MonoBehaviour
     [SerializeField] private Sprite emptyAbilityIcon;
     
     [SerializeField] private Slider cooldownSlider;
+    [SerializeField] private Image sliderBackground;
+    [SerializeField] private Color activeBackgroundColor;
+    [SerializeField] private Color inactiveBackgroundColor;
 
     public void SetEmpty()
     {
@@ -32,13 +35,20 @@ public sealed class AbilitySlotHudView : MonoBehaviour
         SetAbilityIcon(icon);
     }
 
-    public void SetCooldown(bool hasCooldown, float normalized)
+    public void SetCooldown(bool useActiveBackground, float normalized)
     {
         if (!cooldownSlider) return;
 
         var clampedNormalized = Mathf.Clamp01(normalized);
-        cooldownSlider.value = hasCooldown ? clampedNormalized : 0f;
-        cooldownSlider.gameObject.SetActive(hasCooldown);
+        cooldownSlider.gameObject.SetActive(true);
+        cooldownSlider.value = clampedNormalized;
+
+        if (sliderBackground)
+        {
+            sliderBackground.color = useActiveBackground
+                ? activeBackgroundColor
+                : inactiveBackgroundColor;
+        }
     }
 
     private void OnValidate()
@@ -70,5 +80,8 @@ public sealed class AbilitySlotHudView : MonoBehaviour
 
         if (!cooldownSlider)
             Debug.LogError($"{nameof(AbilitySlotHudView)} on {name} requires a cooldown slider reference.", this);
+
+        if (!sliderBackground)
+            Debug.LogError($"{nameof(AbilitySlotHudView)} on {name} requires a cooldown background image reference.", this);
     }
 }

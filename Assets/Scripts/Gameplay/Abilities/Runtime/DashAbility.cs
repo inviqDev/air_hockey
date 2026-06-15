@@ -47,9 +47,15 @@ public sealed class DashAbility : AbilityBase, IHasCooldown
         ApplyDashVelocity();
     }
 
-    protected override void DisposeCore()
+    protected override void CancelCore()
     {
         EndDash();
+        remainingCooldownTime = 0f;
+    }
+
+    protected override void DisposeCore()
+    {
+        CancelCore();
     }
 
     protected override bool CanActivateCore()

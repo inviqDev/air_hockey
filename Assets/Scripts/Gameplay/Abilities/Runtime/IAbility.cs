@@ -6,5 +6,6 @@ public interface IAbility
 
     void Activate();
     void Tick(float deltaTime);
+    void Cancel();
     void Dispose();
 }

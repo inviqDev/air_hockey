@@ -15,6 +15,7 @@
 /[Uu]ser[Ss]ettings/
 /[Mm]emoryCaptures/
 /[Rr]ecordings/
+/[Cc]rashes/
 *.log
 sysinfo.txt
 mono_crash.*
@@ -53,6 +54,7 @@ InitTestScene*.unity*
 *.apk
 *.aab
 *.app
+*.symbols.zip
 *.unitypackage
 *.unitypackage.meta
 
@@ -99,10 +101,10 @@ crashlytics-build.properties
 Thumbs.db
 Desktop.ini
 
-# Local-only notes and planning
-/FutureIdeas/
-/Docs/
+# Local-only AI workflow, instructions, planning, preferences, and ideas
+/Docs/AI/
 /AGENTS.md
+/cuts.md
 
-# Optional Unity Asset Store tools
-# /[Aa]ssets/AssetStoreTools*
+# Unity Asset Store tools
+/[Aa]ssets/AssetStoreTools*

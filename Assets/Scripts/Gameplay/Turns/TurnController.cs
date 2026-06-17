@@ -10,6 +10,7 @@ public sealed class TurnController : MonoBehaviour
     private Coroutine goalDelayRoutine;
 
     public bool IsTurnActive { get; private set; }
+    public float GoalDelayBeforeNextTurnSeconds => Mathf.Max(0f, goalDelayBeforeNextTurnSeconds);
     public event Action TurnStarted;
     public event Action TurnEnded;
     public event Action RespawnItemsRequested;

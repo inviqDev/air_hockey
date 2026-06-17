@@ -7233,11 +7233,11 @@ MonoBehaviour:
   turnController: {fileID: 6400000000000000008}
   leftProgression:
     abilityHud: {fileID: 4801122334455667701}
-    initialDurationSeconds: 30
+    initialDurationSeconds: 5
     durationMultiplier: 1.5
   rightProgression:
     abilityHud: {fileID: 4801122334455667702}
-    initialDurationSeconds: 5
+    initialDurationSeconds: 3
     durationMultiplier: 1.5
 --- !u!1 &1879605501
 GameObject:

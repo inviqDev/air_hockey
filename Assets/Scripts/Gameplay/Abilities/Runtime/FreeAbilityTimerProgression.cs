@@ -26,14 +26,12 @@ public sealed class FreeAbilityTimerProgression
 
     public void StartTurnProgression()
     {
-        nextTimerDuration = initialTimerDuration;
-        freeAbilityTimer.SetDecremental(nextTimerDuration);
-        freeAbilityTimer.Restart();
+        freeAbilityTimer.Start();
     }
 
     public void StopTurnProgression()
     {
-        ResetFreeAbilityTimer();
+        freeAbilityTimer.Stop();
     }
 
     public bool Tick(float deltaTime)

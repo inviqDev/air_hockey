@@ -1,7 +1,17 @@
 using UnityEngine;
+using System.Collections;
 
 public sealed class MatchManager : MonoBehaviour
 {
+    private enum MatchFlowState
+    {
+        Inactive,
+        TurnPreparation,
+        TurnActive,
+        RoundBreak,
+        MatchComplete
+    }
+
     [Header("References")]
     [SerializeField] private RoundController roundController;
     [SerializeField] private TurnController turnController;
@@ -21,6 +31,8 @@ public sealed class MatchManager : MonoBehaviour
     private bool hasCurrentConfiguration;
     private bool hasPreparedTurnState;
     private bool lastPreparedTurnCanStart;
+    private MatchFlowState matchFlowState = MatchFlowState.Inactive;
+    private Coroutine roundBreakDelayRoutine;
 
     private bool isInitialized;
 
@@ -46,6 +58,7 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!HasActiveMatch) return;
         if (!turnController) return;
+        if (matchFlowState != MatchFlowState.TurnPreparation) return;
         if (turnController.IsTurnActive) return;
 
         var canStartTurn = roundController && roundController.HasAllRoundItemsActive;
@@ -75,6 +88,9 @@ public sealed class MatchManager : MonoBehaviour
     private void PrepareNextTurn()
     {
         if (!turnController) return;
+
+        StopRoundBreakDelayRoutine();
+        matchFlowState = MatchFlowState.TurnPreparation;
         hasPreparedTurnState = false;
         turnController.PrepareTurn(PrepareCurrentTurn);
     }
@@ -101,15 +117,15 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!result.HasWinner)
         {
-            if (turnController)
-                turnController.PrepareTurnAfterGoalDelay(PrepareCurrentTurn);
-
+            EnterRoundBreak();
             return;
         }
 
         if (roundController)
             roundController.ReturnRoundItemsToPool();
 
+        StopRoundBreakDelayRoutine();
+        matchFlowState = MatchFlowState.MatchComplete;
         HasActiveMatch = false;
     }
 
@@ -140,6 +156,7 @@ public sealed class MatchManager : MonoBehaviour
         SpawnConfiguredMatch(configuration);
 
         HasActiveMatch = true;
+        matchFlowState = MatchFlowState.Inactive;
 
         if (uiManager)
             uiManager.ShowMatchState(this);
@@ -149,6 +166,8 @@ public sealed class MatchManager : MonoBehaviour
 
     private void ResetCurrentMatchProgress()
     {
+        StopRoundBreakDelayRoutine();
+
         if (goalController)
             goalController.StartGoalLockoutPeriod();
 
@@ -165,6 +184,7 @@ public sealed class MatchManager : MonoBehaviour
             abilitySelectionCoordinator.ResetProgression();
 
         hasPreparedTurnState = false;
+        matchFlowState = MatchFlowState.Inactive;
     }
 
     private bool SpawnConfiguredMatch(MatchConfiguration configuration)
@@ -185,6 +205,7 @@ public sealed class MatchManager : MonoBehaviour
 
         HasActiveMatch = false;
         hasPreparedTurnState = false;
+        matchFlowState = MatchFlowState.Inactive;
     }
 
     private void SubscribeToGameFlow()
@@ -196,7 +217,10 @@ public sealed class MatchManager : MonoBehaviour
             uiManager.MatchConfigurationSelected += HandleMatchConfigurationSelected;
 
         if (turnController)
+        {
+            turnController.TurnStarted += HandleTurnStarted;
             turnController.RespawnItemsRequested += HandleRespawnItemsRequested;
+        }
 
         var inGameMenu = uiManager ? uiManager.InGameMenu : null;
 
@@ -218,7 +242,10 @@ public sealed class MatchManager : MonoBehaviour
             uiManager.MatchConfigurationSelected -= HandleMatchConfigurationSelected;
 
         if (turnController)
+        {
+            turnController.TurnStarted -= HandleTurnStarted;
             turnController.RespawnItemsRequested -= HandleRespawnItemsRequested;
+        }
 
         var inGameMenu = uiManager ? uiManager.InGameMenu : null;
         if (inGameMenu)
@@ -249,6 +276,41 @@ public sealed class MatchManager : MonoBehaviour
 
         if (turnController)
             turnController.ShowTurnPreparation(canStartTurn);
+    }
+
+    private void HandleTurnStarted()
+    {
+        matchFlowState = MatchFlowState.TurnActive;
+    }
+
+    private void EnterRoundBreak()
+    {
+        StopRoundBreakDelayRoutine();
+        matchFlowState = MatchFlowState.RoundBreak;
+        roundBreakDelayRoutine = StartCoroutine(ReleaseRoundBreakAfterDelayRoutine());
+    }
+
+    private IEnumerator ReleaseRoundBreakAfterDelayRoutine()
+    {
+        var delaySeconds = turnController ? turnController.GoalDelayBeforeNextTurnSeconds : 0f;
+
+        if (delaySeconds > 0f)
+            yield return new WaitForSeconds(delaySeconds);
+
+        roundBreakDelayRoutine = null;
+
+        if (!HasActiveMatch) yield break;
+        if (matchFlowState != MatchFlowState.RoundBreak) yield break;
+
+        PrepareNextTurn();
+    }
+
+    private void StopRoundBreakDelayRoutine()
+    {
+        if (roundBreakDelayRoutine == null) return;
+
+        StopCoroutine(roundBreakDelayRoutine);
+        roundBreakDelayRoutine = null;
     }
 
     private void ValidateReferences()

@@ -4,44 +4,27 @@ using UnityEngine;
 public sealed class AbilitySelectionCoordinator : MonoBehaviour
 {
     [Serializable]
-    private sealed class ParticipantProgression
+    private sealed class ParticipantProgressionBinding
     {
         [SerializeField] private AbilityHudView abilityHud;
         [SerializeField, Min(1f)] private float initialDurationSeconds = 30f;
         [SerializeField, Min(1f)] private float durationMultiplier = 1.5f;
 
-        private readonly AbilityProgressState progressState = new();
+        public event Action<ParticipantProgressionBinding> AbilityMenuRequested;
 
-        public event Action<ParticipantProgression> AbilityMenuRequested;
-
-        public void Initialize()
+        public ParticipantAbilityProgression CreateRuntimeProgression()
         {
-            progressState.ConfigureFreeAbilityTimer(initialDurationSeconds, durationMultiplier);
-            RefreshHud(false);
+            return new ParticipantAbilityProgression(initialDurationSeconds, durationMultiplier);
         }
 
-        public void ResetProgression()
+        public void RefreshHud(ParticipantAbilityProgression progression, bool canOpenAbilityMenu)
         {
-            progressState.ResetProgression();
-            RefreshHud(false);
-        }
+            if (progression == null) return;
+            if (!abilityHud) return;
 
-        public void StartRound()
-        {
-            progressState.StartTurnProgression();
-            RefreshHud(false);
-        }
-
-        public void StopRound()
-        {
-            progressState.StopTurnProgression();
-            RefreshHud(true);
-        }
-
-        public void Tick(float deltaTime, bool canOpenAbilityMenu)
-        {
-            progressState.Tick(deltaTime);
-            RefreshHud(canOpenAbilityMenu);
+            abilityHud.SetFreeAbilityTimerText(progression.FreeAbilityTimerText);
+            abilityHud.SetAvailableAmount(progression.AvailableAbilityPoints);
+            abilityHud.SetAbilityMenuButtonEnabled(canOpenAbilityMenu && progression.AvailableAbilityPoints > 0);
         }
 
         public void SubscribeToHud()
@@ -64,15 +47,6 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
                 Debug.LogError($"{nameof(AbilitySelectionCoordinator)} on {context.name} requires a {nameof(AbilityHudView)} reference for {fieldName}.", context);
         }
 
-        private void RefreshHud(bool canOpenAbilityMenu)
-        {
-            if (!abilityHud) return;
-
-            abilityHud.SetFreeAbilityTimerText(progressState.FreeAbilityTimerText);
-            abilityHud.SetAvailableAmount(progressState.AvailableAbilityPoints);
-            abilityHud.SetAbilityMenuButtonEnabled(canOpenAbilityMenu && progressState.AvailableAbilityPoints > 0);
-        }
-
         private void HandlePlusAbilityButtonClicked()
         {
             AbilityMenuRequested?.Invoke(this);
@@ -80,14 +54,18 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
     }
 
     [SerializeField] private TurnController turnController;
-    [SerializeField] private ParticipantProgression leftProgression = new();
-    [SerializeField] private ParticipantProgression rightProgression = new();
+    [SerializeField] private ParticipantProgressionBinding leftProgression = new();
+    [SerializeField] private ParticipantProgressionBinding rightProgression = new();
+
+    private ParticipantAbilityProgression leftParticipant;
+    private ParticipantAbilityProgression rightParticipant;
 
     private void Awake()
     {
         ValidateReferences();
-        leftProgression.Initialize();
-        rightProgression.Initialize();
+        leftParticipant = leftProgression.CreateRuntimeProgression();
+        rightParticipant = rightProgression.CreateRuntimeProgression();
+        RefreshAllHud(false);
     }
 
     private void OnEnable()
@@ -109,16 +87,18 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
 
     public void ResetProgression()
     {
-        leftProgression.ResetProgression();
-        rightProgression.ResetProgression();
+        leftParticipant.ResetProgression();
+        rightParticipant.ResetProgression();
+        RefreshAllHud(false);
     }
 
     private void Update()
     {
         var deltaTime = Time.deltaTime;
         var canOpenAbilityMenu = turnController && !turnController.IsTurnActive;
-        leftProgression.Tick(deltaTime, canOpenAbilityMenu);
-        rightProgression.Tick(deltaTime, canOpenAbilityMenu);
+        leftParticipant.Tick(deltaTime);
+        rightParticipant.Tick(deltaTime);
+        RefreshAllHud(canOpenAbilityMenu);
     }
 
     private void SubscribeToTurnEvents()
@@ -139,14 +119,16 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
 
     private void HandleTurnStarted()
     {
-        leftProgression.StartRound();
-        rightProgression.StartRound();
+        leftParticipant.StartTurnProgression();
+        rightParticipant.StartTurnProgression();
+        RefreshAllHud(false);
     }
 
     private void HandleTurnEnded()
     {
-        leftProgression.StopRound();
-        rightProgression.StopRound();
+        leftParticipant.StopTurnProgression();
+        rightParticipant.StopTurnProgression();
+        RefreshAllHud(true);
     }
 
     private void SubscribeToHudEvents()
@@ -165,8 +147,14 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         rightProgression.AbilityMenuRequested -= HandleAbilityMenuRequested;
     }
 
-    private void HandleAbilityMenuRequested(ParticipantProgression progression)
+    private void HandleAbilityMenuRequested(ParticipantProgressionBinding progression)
     {
+    }
+
+    private void RefreshAllHud(bool canOpenAbilityMenu)
+    {
+        leftProgression.RefreshHud(leftParticipant, canOpenAbilityMenu);
+        rightProgression.RefreshHud(rightParticipant, canOpenAbilityMenu);
     }
 
     private void ValidateReferences()

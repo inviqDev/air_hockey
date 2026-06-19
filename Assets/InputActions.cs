@@ -147,6 +147,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""LeftPlayerAbilityMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""d08bc474-eab1-4be9-9b53-3aa2a3a5ecb0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""RightPlayerMove"",
                     ""type"": ""Value"",
                     ""id"": ""f74e8e15-8999-4df6-b418-d0da01a6ee3e"",
@@ -195,6 +204,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""name"": ""RightPlayerAbilitySlot4"",
                     ""type"": ""Button"",
                     ""id"": ""fa76ee90-a464-4382-b9f4-c78f1798a7f5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerAbilityMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""93f00e86-ac4d-40f6-b0b2-e81987a8d8f5"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -313,6 +331,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
+                    ""name"": """",
+                    ""id"": ""ba97f913-9ec2-4f98-82d0-ac4252ec8f6e"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerAbilityMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
                     ""name"": ""2D Vector"",
                     ""id"": ""d0843077-c98a-43bb-a4ea-f0c4e4ace888"",
                     ""path"": ""2DVector"",
@@ -421,6 +450,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""RightPlayerAbilitySlot4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6dcd3224-3413-4519-9e80-fd34e71de6e5"",
+                    ""path"": ""<Keyboard>/numpad0"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerAbilityMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -496,12 +536,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Gameplay_LeftPlayerAbilitySlot2 = m_Gameplay.FindAction("LeftPlayerAbilitySlot2", throwIfNotFound: true);
         m_Gameplay_LeftPlayerAbilitySlot3 = m_Gameplay.FindAction("LeftPlayerAbilitySlot3", throwIfNotFound: true);
         m_Gameplay_LeftPlayerAbilitySlot4 = m_Gameplay.FindAction("LeftPlayerAbilitySlot4", throwIfNotFound: true);
+        m_Gameplay_LeftPlayerAbilityMenu = m_Gameplay.FindAction("LeftPlayerAbilityMenu", throwIfNotFound: true);
         m_Gameplay_RightPlayerMove = m_Gameplay.FindAction("RightPlayerMove", throwIfNotFound: true);
         m_Gameplay_RightPlayerDash = m_Gameplay.FindAction("RightPlayerDash", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot1 = m_Gameplay.FindAction("RightPlayerAbilitySlot1", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot2 = m_Gameplay.FindAction("RightPlayerAbilitySlot2", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot3 = m_Gameplay.FindAction("RightPlayerAbilitySlot3", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot4 = m_Gameplay.FindAction("RightPlayerAbilitySlot4", throwIfNotFound: true);
+        m_Gameplay_RightPlayerAbilityMenu = m_Gameplay.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -588,12 +630,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot2;
     private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot3;
     private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot4;
+    private readonly InputAction m_Gameplay_LeftPlayerAbilityMenu;
     private readonly InputAction m_Gameplay_RightPlayerMove;
     private readonly InputAction m_Gameplay_RightPlayerDash;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot1;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot2;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot3;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot4;
+    private readonly InputAction m_Gameplay_RightPlayerAbilityMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -630,6 +674,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @LeftPlayerAbilitySlot4 => m_Wrapper.m_Gameplay_LeftPlayerAbilitySlot4;
         /// <summary>
+        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilityMenu".
+        /// </summary>
+        public InputAction @LeftPlayerAbilityMenu => m_Wrapper.m_Gameplay_LeftPlayerAbilityMenu;
+        /// <summary>
         /// Provides access to the underlying input action "Gameplay/RightPlayerMove".
         /// </summary>
         public InputAction @RightPlayerMove => m_Wrapper.m_Gameplay_RightPlayerMove;
@@ -653,6 +701,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/RightPlayerAbilitySlot4".
         /// </summary>
         public InputAction @RightPlayerAbilitySlot4 => m_Wrapper.m_Gameplay_RightPlayerAbilitySlot4;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilityMenu".
+        /// </summary>
+        public InputAction @RightPlayerAbilityMenu => m_Wrapper.m_Gameplay_RightPlayerAbilityMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -697,6 +749,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerAbilitySlot4.started += instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.performed += instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.canceled += instance.OnLeftPlayerAbilitySlot4;
+            @LeftPlayerAbilityMenu.started += instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.performed += instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.canceled += instance.OnLeftPlayerAbilityMenu;
             @RightPlayerMove.started += instance.OnRightPlayerMove;
             @RightPlayerMove.performed += instance.OnRightPlayerMove;
             @RightPlayerMove.canceled += instance.OnRightPlayerMove;
@@ -715,6 +770,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerAbilitySlot4.started += instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.performed += instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.canceled += instance.OnRightPlayerAbilitySlot4;
+            @RightPlayerAbilityMenu.started += instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.performed += instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.canceled += instance.OnRightPlayerAbilityMenu;
         }
 
         /// <summary>
@@ -744,6 +802,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerAbilitySlot4.started -= instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.performed -= instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.canceled -= instance.OnLeftPlayerAbilitySlot4;
+            @LeftPlayerAbilityMenu.started -= instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.performed -= instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.canceled -= instance.OnLeftPlayerAbilityMenu;
             @RightPlayerMove.started -= instance.OnRightPlayerMove;
             @RightPlayerMove.performed -= instance.OnRightPlayerMove;
             @RightPlayerMove.canceled -= instance.OnRightPlayerMove;
@@ -762,6 +823,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerAbilitySlot4.started -= instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.performed -= instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.canceled -= instance.OnRightPlayerAbilitySlot4;
+            @RightPlayerAbilityMenu.started -= instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.performed -= instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.canceled -= instance.OnRightPlayerAbilityMenu;
         }
 
         /// <summary>
@@ -910,6 +974,13 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLeftPlayerAbilitySlot4(InputAction.CallbackContext context);
         /// <summary>
+        /// Method invoked when associated input action "LeftPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerAbilityMenu(InputAction.CallbackContext context);
+        /// <summary>
         /// Method invoked when associated input action "RightPlayerMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -951,5 +1022,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightPlayerAbilitySlot4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerAbilityMenu(InputAction.CallbackContext context);
     }
 }

@@ -23,6 +23,8 @@ public sealed class MatchManager : MonoBehaviour
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
     public bool IsTurnActive => turnController && turnController.IsTurnActive;
+    public bool IsRoundBreakActive => matchFlowState == MatchFlowState.RoundBreak;
+    public bool IsAbilityMenuInteractionAllowed => HasActiveMatch && IsRoundBreakActive && !IsPauseOrSettingsBlocking();
     public bool HasActiveMatch { get; private set; }
 
     private UIManager uiManager;
@@ -39,6 +41,8 @@ public sealed class MatchManager : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
+        if (abilitySelectionCoordinator)
+            abilitySelectionCoordinator.SetMatchManager(this);
     }
 
     private void OnEnable()
@@ -210,6 +214,9 @@ public sealed class MatchManager : MonoBehaviour
 
     private void SubscribeToGameFlow()
     {
+        if (abilitySelectionCoordinator)
+            abilitySelectionCoordinator.SetMatchManager(this);
+
         if (goalController)
             goalController.GoalResolved += HandleGoalResult;
 
@@ -332,5 +339,13 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!abilitySelectionCoordinator)
             Debug.LogError($"{nameof(MatchManager)} requires an {nameof(AbilitySelectionCoordinator)} reference.", this);
+    }
+
+    private bool IsPauseOrSettingsBlocking()
+    {
+        var inGameMenu = uiManager ? uiManager.InGameMenu : null;
+        if (!inGameMenu) return false;
+
+        return inGameMenu.IsPaused || inGameMenu.IsSettingsOpen;
     }
 }

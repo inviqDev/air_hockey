@@ -7,6 +7,7 @@ public sealed class PlayerInputReader : MonoBehaviour
     public event Action<Vector2> MoveInputChanged;
     public event Action DashPressed;
     public event Action<int> AbilitySlotPressed;
+    public event Action AbilitySelectionMenuPressed;
 
     private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
     
@@ -17,11 +18,16 @@ public sealed class PlayerInputReader : MonoBehaviour
     
     private InputAction moveActionPlayerTwo;
     private InputAction dashActionPlayerTwo;
+    
     private InputAction[] abilitySlotActionsPlayerOne;
     private InputAction[] abilitySlotActionsPlayerTwo;
+    
+    private InputAction abilityMenuActionPlayerOne;
+    private InputAction abilityMenuActionPlayerTwo;
 
     private Vector2 playerOneMoveInput;
     private Vector2 playerTwoMoveInput;
+    
     private bool isInitialized;
 
     public Vector2 CurrentMoveInput => ResolveCurrentMoveInput();
@@ -45,6 +51,7 @@ public sealed class PlayerInputReader : MonoBehaviour
         UnsubscribeMove();
         UnsubscribeDash();
         UnsubscribeAbilitySlots();
+        UnsubscribeAbilityMenu();
         
         if (inputActions != null)
         {
@@ -59,6 +66,8 @@ public sealed class PlayerInputReader : MonoBehaviour
         dashActionPlayerTwo = null;
         abilitySlotActionsPlayerOne = null;
         abilitySlotActionsPlayerTwo = null;
+        abilityMenuActionPlayerOne = null;
+        abilityMenuActionPlayerTwo = null;
         
         playerOneMoveInput = Vector2.zero;
         playerTwoMoveInput = Vector2.zero;
@@ -76,6 +85,7 @@ public sealed class PlayerInputReader : MonoBehaviour
         UnsubscribeMove();
         UnsubscribeDash();
         UnsubscribeAbilitySlots();
+        UnsubscribeAbilityMenu();
 
         if (inputActions == null) return;
 
@@ -94,9 +104,15 @@ public sealed class PlayerInputReader : MonoBehaviour
             ? GetAbilitySlotActions(PlayerControlScheme.Arrows)
             : null;
 
+        abilityMenuActionPlayerOne = GetAbilityMenuAction(controlScheme);
+        abilityMenuActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? GetAbilityMenuAction(PlayerControlScheme.Arrows)
+            : null;
+
         SubscribeMove();
         SubscribeDash();
         SubscribeAbilitySlots();
+        SubscribeAbilityMenu();
     }
 
     private void UnsubscribeMove()
@@ -155,6 +171,24 @@ public sealed class PlayerInputReader : MonoBehaviour
         }
     }
 
+    private void UnsubscribeAbilityMenu()
+    {
+        if (abilityMenuActionPlayerOne != null)
+            abilityMenuActionPlayerOne.performed -= OnAbilityMenuPerformed;
+
+        if (abilityMenuActionPlayerTwo != null)
+            abilityMenuActionPlayerTwo.performed -= OnAbilityMenuPerformed;
+    }
+
+    private void SubscribeAbilityMenu()
+    {
+        if (abilityMenuActionPlayerOne != null)
+            abilityMenuActionPlayerOne.performed += OnAbilityMenuPerformed;
+
+        if (abilityMenuActionPlayerTwo != null)
+            abilityMenuActionPlayerTwo.performed += OnAbilityMenuPerformed;
+    }
+
     private void UnsubscribeAbilitySlots()
     {
         UnsubscribeAbilitySlots(abilitySlotActionsPlayerOne, HandleAbilitySlotPressedPlayerOne);
@@ -203,9 +237,21 @@ public sealed class PlayerInputReader : MonoBehaviour
         };
     }
 
+    private InputAction GetAbilityMenuAction(PlayerControlScheme scheme)
+    {
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Gameplay.RightPlayerAbilityMenu
+            : inputActions.Gameplay.LeftPlayerAbilityMenu;
+    }
+
     private void OnDashPerformed(InputAction.CallbackContext context)
     {
         DashPressed?.Invoke();
+    }
+
+    private void OnAbilityMenuPerformed(InputAction.CallbackContext context)
+    {
+        AbilitySelectionMenuPressed?.Invoke();
     }
 
     private void HandleAbilitySlotPressedPlayerOne(InputAction.CallbackContext context)

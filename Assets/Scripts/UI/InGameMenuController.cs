@@ -19,6 +19,7 @@ public sealed class InGameMenuController : MenuViewBase
     [SerializeField] private bool pauseWhenSettingsOpen = true;
 
     public bool IsPaused { get; private set; }
+    public bool IsSettingsOpen => settingsView && settingsView.IsVisible;
     public event Action RestartClicked;
     public event Action MainMenuClicked;
     public event Action<bool> PauseStateChanged;
@@ -115,7 +116,8 @@ public sealed class InGameMenuController : MenuViewBase
     [ContextMenu("Open Settings")]
     public void OpenSettings()
     {
-        settingsView?.Open();
+        if (settingsView)
+            settingsView.Open();
 
         if (pauseWhenSettingsOpen)
         {
@@ -128,7 +130,8 @@ public sealed class InGameMenuController : MenuViewBase
         var wasPaused = IsPaused;
         IsPaused = false;
         ApplyPauseState();
-        settingsView?.ResetState();
+        if (settingsView)
+            settingsView.ResetState();
 
         if (wasPaused)
             PauseStateChanged?.Invoke(IsPaused);

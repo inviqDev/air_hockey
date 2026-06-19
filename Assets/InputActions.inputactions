@@ -61,6 +61,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "LeftPlayerAbilityMenu",
+                    "type": "Button",
+                    "id": "d08bc474-eab1-4be9-9b53-3aa2a3a5ecb0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "RightPlayerMove",
                     "type": "Value",
                     "id": "f74e8e15-8999-4df6-b418-d0da01a6ee3e",
@@ -109,6 +118,15 @@
                     "name": "RightPlayerAbilitySlot4",
                     "type": "Button",
                     "id": "fa76ee90-a464-4382-b9f4-c78f1798a7f5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilityMenu",
+                    "type": "Button",
+                    "id": "93f00e86-ac4d-40f6-b0b2-e81987a8d8f5",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -227,6 +245,17 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "",
+                    "id": "ba97f913-9ec2-4f98-82d0-ac4252ec8f6e",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilityMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "2D Vector",
                     "id": "d0843077-c98a-43bb-a4ea-f0c4e4ace888",
                     "path": "2DVector",
@@ -333,6 +362,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "RightPlayerAbilitySlot4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6dcd3224-3413-4519-9e80-fd34e71de6e5",
+                    "path": "<Keyboard>/numpad0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilityMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -5,19 +5,18 @@ using System;
 public sealed class PlayerInputReader : MonoBehaviour
 {
     public event Action<Vector2> MoveInputChanged;
-    public event Action DashPressed;
     public event Action<int> AbilitySlotPressed;
     public event Action AbilitySelectionMenuPressed;
 
     private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
     
     private InputActions inputActions;
+    private bool isGameplayInputEnabled;
+    private bool isRoundBreakInputEnabled;
     
     private InputAction moveActionPlayerOne;
-    private InputAction dashActionPlayerOne;
     
     private InputAction moveActionPlayerTwo;
-    private InputAction dashActionPlayerTwo;
     
     private InputAction[] abilitySlotActionsPlayerOne;
     private InputAction[] abilitySlotActionsPlayerTwo;
@@ -39,7 +38,6 @@ public sealed class PlayerInputReader : MonoBehaviour
         controlScheme = scheme;
         inputActions = new InputActions();
         ConfigureActions();
-        inputActions.Gameplay.Enable();
         RefreshCurrentMoveInput();
         isInitialized = true;
     }
@@ -49,21 +47,19 @@ public sealed class PlayerInputReader : MonoBehaviour
         if (!isInitialized && inputActions == null) return;
 
         UnsubscribeMove();
-        UnsubscribeDash();
         UnsubscribeAbilitySlots();
         UnsubscribeAbilityMenu();
         
         if (inputActions != null)
         {
             inputActions.Gameplay.Disable();
+            inputActions.RoundBreak.Disable();
             inputActions.Dispose();
             inputActions = null;
         }
 
         moveActionPlayerOne = null;
         moveActionPlayerTwo = null;
-        dashActionPlayerOne = null;
-        dashActionPlayerTwo = null;
         abilitySlotActionsPlayerOne = null;
         abilitySlotActionsPlayerTwo = null;
         abilityMenuActionPlayerOne = null;
@@ -71,6 +67,8 @@ public sealed class PlayerInputReader : MonoBehaviour
         
         playerOneMoveInput = Vector2.zero;
         playerTwoMoveInput = Vector2.zero;
+        isGameplayInputEnabled = false;
+        isRoundBreakInputEnabled = false;
         
         isInitialized = false;
     }
@@ -83,7 +81,6 @@ public sealed class PlayerInputReader : MonoBehaviour
     private void ConfigureActions()
     {
         UnsubscribeMove();
-        UnsubscribeDash();
         UnsubscribeAbilitySlots();
         UnsubscribeAbilityMenu();
 
@@ -94,23 +91,17 @@ public sealed class PlayerInputReader : MonoBehaviour
             ? inputActions.Gameplay.RightPlayerMove
             : null;
 
-        dashActionPlayerOne = GetDashAction(controlScheme);
-        dashActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? inputActions.Gameplay.RightPlayerDash
-            : null;
-
         abilitySlotActionsPlayerOne = GetAbilitySlotActions(controlScheme);
         abilitySlotActionsPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
             ? GetAbilitySlotActions(PlayerControlScheme.Arrows)
             : null;
 
-        abilityMenuActionPlayerOne = GetAbilityMenuAction(controlScheme);
+        abilityMenuActionPlayerOne = GetRoundBreakAbilityMenuAction(controlScheme);
         abilityMenuActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetAbilityMenuAction(PlayerControlScheme.Arrows)
+            ? GetRoundBreakAbilityMenuAction(PlayerControlScheme.Arrows)
             : null;
 
         SubscribeMove();
-        SubscribeDash();
         SubscribeAbilitySlots();
         SubscribeAbilityMenu();
     }
@@ -142,32 +133,6 @@ public sealed class PlayerInputReader : MonoBehaviour
         {
             moveActionPlayerTwo.performed += OnMovePlayerTwoChanged;
             moveActionPlayerTwo.canceled += OnMovePlayerTwoChanged;
-        }
-    }
-
-    private void UnsubscribeDash()
-    {
-        if (dashActionPlayerOne != null)
-        {
-            dashActionPlayerOne.performed -= OnDashPerformed;
-        }
-
-        if (dashActionPlayerTwo != null)
-        {
-            dashActionPlayerTwo.performed -= OnDashPerformed;
-        }
-    }
-
-    private void SubscribeDash()
-    {
-        if (dashActionPlayerOne != null)
-        {
-            dashActionPlayerOne.performed += OnDashPerformed;
-        }
-
-        if (dashActionPlayerTwo != null)
-        {
-            dashActionPlayerTwo.performed += OnDashPerformed;
         }
     }
 
@@ -208,13 +173,6 @@ public sealed class PlayerInputReader : MonoBehaviour
             : inputActions.Gameplay.LeftPlayerMove;
     }
 
-    private InputAction GetDashAction(PlayerControlScheme scheme)
-    {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Gameplay.RightPlayerDash
-            : inputActions.Gameplay.LeftPlayerDash;
-    }
-
     private InputAction[] GetAbilitySlotActions(PlayerControlScheme scheme)
     {
         if (scheme == PlayerControlScheme.Arrows)
@@ -237,16 +195,11 @@ public sealed class PlayerInputReader : MonoBehaviour
         };
     }
 
-    private InputAction GetAbilityMenuAction(PlayerControlScheme scheme)
+    private InputAction GetRoundBreakAbilityMenuAction(PlayerControlScheme scheme)
     {
         return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Gameplay.RightPlayerAbilityMenu
-            : inputActions.Gameplay.LeftPlayerAbilityMenu;
-    }
-
-    private void OnDashPerformed(InputAction.CallbackContext context)
-    {
-        DashPressed?.Invoke();
+            ? inputActions.RoundBreak.RightPlayerAbilityMenu
+            : inputActions.RoundBreak.LeftPlayerAbilityMenu;
     }
 
     private void OnAbilityMenuPerformed(InputAction.CallbackContext context)
@@ -289,6 +242,50 @@ public sealed class PlayerInputReader : MonoBehaviour
         MoveInputChanged?.Invoke(ResolveCurrentMoveInput());
     }
 
+    public void SetGameplayInputEnabled(bool isEnabled)
+    {
+        if (inputActions == null)
+        {
+            isGameplayInputEnabled = false;
+            return;
+        }
+
+        if (isGameplayInputEnabled == isEnabled) return;
+
+        isGameplayInputEnabled = isEnabled;
+
+        if (isGameplayInputEnabled)
+        {
+            inputActions.Gameplay.Enable();
+            RefreshCurrentMoveInput();
+            return;
+        }
+
+        inputActions.Gameplay.Disable();
+        ClearCurrentMoveInput();
+    }
+
+    public void SetRoundBreakInputEnabled(bool isEnabled)
+    {
+        if (inputActions == null)
+        {
+            isRoundBreakInputEnabled = false;
+            return;
+        }
+
+        if (isRoundBreakInputEnabled == isEnabled) return;
+
+        isRoundBreakInputEnabled = isEnabled;
+
+        if (isRoundBreakInputEnabled)
+        {
+            inputActions.RoundBreak.Enable();
+            return;
+        }
+
+        inputActions.RoundBreak.Disable();
+    }
+
     private Vector2 ResolveCurrentMoveInput()
     {
         var move = playerOneMoveInput;
@@ -296,6 +293,13 @@ public sealed class PlayerInputReader : MonoBehaviour
 
         move += playerTwoMoveInput;
         return Vector2.ClampMagnitude(move, 1f);
+    }
+
+    private void ClearCurrentMoveInput()
+    {
+        playerOneMoveInput = Vector2.zero;
+        playerTwoMoveInput = Vector2.zero;
+        MoveInputChanged?.Invoke(Vector2.zero);
     }
 
     private void NotifyAbilitySlotPressed(InputAction.CallbackContext context, InputAction[] slotActions)

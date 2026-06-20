@@ -102,15 +102,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""LeftPlayerDash"",
-                    ""type"": ""Button"",
-                    ""id"": ""980e05e2-fd24-4930-a092-c1d1aaa1b8e4"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""LeftPlayerAbilitySlot1"",
                     ""type"": ""Button"",
                     ""id"": ""5ce00bb7-2251-49d4-a70d-92d9054cbc9c"",
@@ -147,15 +138,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftPlayerAbilityMenu"",
-                    ""type"": ""Button"",
-                    ""id"": ""d08bc474-eab1-4be9-9b53-3aa2a3a5ecb0"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""RightPlayerMove"",
                     ""type"": ""Value"",
                     ""id"": ""f74e8e15-8999-4df6-b418-d0da01a6ee3e"",
@@ -163,15 +145,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""RightPlayerDash"",
-                    ""type"": ""Button"",
-                    ""id"": ""7ab9853f-9668-4628-b16a-0eda0d7a9344"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""RightPlayerAbilitySlot1"",
@@ -204,15 +177,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""name"": ""RightPlayerAbilitySlot4"",
                     ""type"": ""Button"",
                     ""id"": ""fa76ee90-a464-4382-b9f4-c78f1798a7f5"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerAbilityMenu"",
-                    ""type"": ""Button"",
-                    ""id"": ""93f00e86-ac4d-40f6-b0b2-e81987a8d8f5"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -277,17 +241,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""d80f4b4f-5ab3-4c61-b013-49ec96ec0a7b"",
-                    ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerDash"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""d1cf03e8-52f2-4e0f-a46a-84f31b4b064f"",
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
@@ -327,17 +280,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""LeftPlayerAbilitySlot4"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ba97f913-9ec2-4f98-82d0-ac4252ec8f6e"",
-                    ""path"": ""<Keyboard>/tab"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerAbilityMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -398,17 +340,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4397b0b5-1767-4e89-a983-784d7a629751"",
-                    ""path"": ""<Keyboard>/rightShift"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerDash"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""728ce9c8-d3af-4e5f-9ad4-fb66ad2c2099"",
                     ""path"": ""<Keyboard>/numpad4"",
                     ""interactions"": """",
@@ -448,6 +379,43 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""RightPlayerAbilitySlot4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""RoundBreak"",
+            ""id"": ""4fe67938-3798-4b79-b7ca-57a99f465085"",
+            ""actions"": [
+                {
+                    ""name"": ""LeftPlayerAbilityMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""d08bc474-eab1-4be9-9b53-3aa2a3a5ecb0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerAbilityMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""93f00e86-ac4d-40f6-b0b2-e81987a8d8f5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""ba97f913-9ec2-4f98-82d0-ac4252ec8f6e"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerAbilityMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -531,24 +499,25 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         // Gameplay
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_LeftPlayerMove = m_Gameplay.FindAction("LeftPlayerMove", throwIfNotFound: true);
-        m_Gameplay_LeftPlayerDash = m_Gameplay.FindAction("LeftPlayerDash", throwIfNotFound: true);
         m_Gameplay_LeftPlayerAbilitySlot1 = m_Gameplay.FindAction("LeftPlayerAbilitySlot1", throwIfNotFound: true);
         m_Gameplay_LeftPlayerAbilitySlot2 = m_Gameplay.FindAction("LeftPlayerAbilitySlot2", throwIfNotFound: true);
         m_Gameplay_LeftPlayerAbilitySlot3 = m_Gameplay.FindAction("LeftPlayerAbilitySlot3", throwIfNotFound: true);
         m_Gameplay_LeftPlayerAbilitySlot4 = m_Gameplay.FindAction("LeftPlayerAbilitySlot4", throwIfNotFound: true);
-        m_Gameplay_LeftPlayerAbilityMenu = m_Gameplay.FindAction("LeftPlayerAbilityMenu", throwIfNotFound: true);
         m_Gameplay_RightPlayerMove = m_Gameplay.FindAction("RightPlayerMove", throwIfNotFound: true);
-        m_Gameplay_RightPlayerDash = m_Gameplay.FindAction("RightPlayerDash", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot1 = m_Gameplay.FindAction("RightPlayerAbilitySlot1", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot2 = m_Gameplay.FindAction("RightPlayerAbilitySlot2", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot3 = m_Gameplay.FindAction("RightPlayerAbilitySlot3", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot4 = m_Gameplay.FindAction("RightPlayerAbilitySlot4", throwIfNotFound: true);
-        m_Gameplay_RightPlayerAbilityMenu = m_Gameplay.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
+        // RoundBreak
+        m_RoundBreak = asset.FindActionMap("RoundBreak", throwIfNotFound: true);
+        m_RoundBreak_LeftPlayerAbilityMenu = m_RoundBreak.FindAction("LeftPlayerAbilityMenu", throwIfNotFound: true);
+        m_RoundBreak_RightPlayerAbilityMenu = m_RoundBreak.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
     }
 
     ~@InputActions()
     {
         UnityEngine.Debug.Assert(!m_Gameplay.enabled, "This will cause a leak and performance issues, InputActions.Gameplay.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_RoundBreak.enabled, "This will cause a leak and performance issues, InputActions.RoundBreak.Disable() has not been called.");
     }
 
     /// <summary>
@@ -625,19 +594,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Gameplay;
     private List<IGameplayActions> m_GameplayActionsCallbackInterfaces = new List<IGameplayActions>();
     private readonly InputAction m_Gameplay_LeftPlayerMove;
-    private readonly InputAction m_Gameplay_LeftPlayerDash;
     private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot1;
     private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot2;
     private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot3;
     private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot4;
-    private readonly InputAction m_Gameplay_LeftPlayerAbilityMenu;
     private readonly InputAction m_Gameplay_RightPlayerMove;
-    private readonly InputAction m_Gameplay_RightPlayerDash;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot1;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot2;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot3;
     private readonly InputAction m_Gameplay_RightPlayerAbilitySlot4;
-    private readonly InputAction m_Gameplay_RightPlayerAbilityMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -653,10 +618,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/LeftPlayerMove".
         /// </summary>
         public InputAction @LeftPlayerMove => m_Wrapper.m_Gameplay_LeftPlayerMove;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/LeftPlayerDash".
-        /// </summary>
-        public InputAction @LeftPlayerDash => m_Wrapper.m_Gameplay_LeftPlayerDash;
         /// <summary>
         /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilitySlot1".
         /// </summary>
@@ -674,17 +635,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @LeftPlayerAbilitySlot4 => m_Wrapper.m_Gameplay_LeftPlayerAbilitySlot4;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilityMenu".
-        /// </summary>
-        public InputAction @LeftPlayerAbilityMenu => m_Wrapper.m_Gameplay_LeftPlayerAbilityMenu;
-        /// <summary>
         /// Provides access to the underlying input action "Gameplay/RightPlayerMove".
         /// </summary>
         public InputAction @RightPlayerMove => m_Wrapper.m_Gameplay_RightPlayerMove;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/RightPlayerDash".
-        /// </summary>
-        public InputAction @RightPlayerDash => m_Wrapper.m_Gameplay_RightPlayerDash;
         /// <summary>
         /// Provides access to the underlying input action "Gameplay/RightPlayerAbilitySlot1".
         /// </summary>
@@ -701,10 +654,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/RightPlayerAbilitySlot4".
         /// </summary>
         public InputAction @RightPlayerAbilitySlot4 => m_Wrapper.m_Gameplay_RightPlayerAbilitySlot4;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilityMenu".
-        /// </summary>
-        public InputAction @RightPlayerAbilityMenu => m_Wrapper.m_Gameplay_RightPlayerAbilityMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -734,9 +683,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerMove.started += instance.OnLeftPlayerMove;
             @LeftPlayerMove.performed += instance.OnLeftPlayerMove;
             @LeftPlayerMove.canceled += instance.OnLeftPlayerMove;
-            @LeftPlayerDash.started += instance.OnLeftPlayerDash;
-            @LeftPlayerDash.performed += instance.OnLeftPlayerDash;
-            @LeftPlayerDash.canceled += instance.OnLeftPlayerDash;
             @LeftPlayerAbilitySlot1.started += instance.OnLeftPlayerAbilitySlot1;
             @LeftPlayerAbilitySlot1.performed += instance.OnLeftPlayerAbilitySlot1;
             @LeftPlayerAbilitySlot1.canceled += instance.OnLeftPlayerAbilitySlot1;
@@ -749,15 +695,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerAbilitySlot4.started += instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.performed += instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.canceled += instance.OnLeftPlayerAbilitySlot4;
-            @LeftPlayerAbilityMenu.started += instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.performed += instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.canceled += instance.OnLeftPlayerAbilityMenu;
             @RightPlayerMove.started += instance.OnRightPlayerMove;
             @RightPlayerMove.performed += instance.OnRightPlayerMove;
             @RightPlayerMove.canceled += instance.OnRightPlayerMove;
-            @RightPlayerDash.started += instance.OnRightPlayerDash;
-            @RightPlayerDash.performed += instance.OnRightPlayerDash;
-            @RightPlayerDash.canceled += instance.OnRightPlayerDash;
             @RightPlayerAbilitySlot1.started += instance.OnRightPlayerAbilitySlot1;
             @RightPlayerAbilitySlot1.performed += instance.OnRightPlayerAbilitySlot1;
             @RightPlayerAbilitySlot1.canceled += instance.OnRightPlayerAbilitySlot1;
@@ -770,9 +710,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerAbilitySlot4.started += instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.performed += instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.canceled += instance.OnRightPlayerAbilitySlot4;
-            @RightPlayerAbilityMenu.started += instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.performed += instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.canceled += instance.OnRightPlayerAbilityMenu;
         }
 
         /// <summary>
@@ -787,9 +724,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerMove.started -= instance.OnLeftPlayerMove;
             @LeftPlayerMove.performed -= instance.OnLeftPlayerMove;
             @LeftPlayerMove.canceled -= instance.OnLeftPlayerMove;
-            @LeftPlayerDash.started -= instance.OnLeftPlayerDash;
-            @LeftPlayerDash.performed -= instance.OnLeftPlayerDash;
-            @LeftPlayerDash.canceled -= instance.OnLeftPlayerDash;
             @LeftPlayerAbilitySlot1.started -= instance.OnLeftPlayerAbilitySlot1;
             @LeftPlayerAbilitySlot1.performed -= instance.OnLeftPlayerAbilitySlot1;
             @LeftPlayerAbilitySlot1.canceled -= instance.OnLeftPlayerAbilitySlot1;
@@ -802,15 +736,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerAbilitySlot4.started -= instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.performed -= instance.OnLeftPlayerAbilitySlot4;
             @LeftPlayerAbilitySlot4.canceled -= instance.OnLeftPlayerAbilitySlot4;
-            @LeftPlayerAbilityMenu.started -= instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.performed -= instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.canceled -= instance.OnLeftPlayerAbilityMenu;
             @RightPlayerMove.started -= instance.OnRightPlayerMove;
             @RightPlayerMove.performed -= instance.OnRightPlayerMove;
             @RightPlayerMove.canceled -= instance.OnRightPlayerMove;
-            @RightPlayerDash.started -= instance.OnRightPlayerDash;
-            @RightPlayerDash.performed -= instance.OnRightPlayerDash;
-            @RightPlayerDash.canceled -= instance.OnRightPlayerDash;
             @RightPlayerAbilitySlot1.started -= instance.OnRightPlayerAbilitySlot1;
             @RightPlayerAbilitySlot1.performed -= instance.OnRightPlayerAbilitySlot1;
             @RightPlayerAbilitySlot1.canceled -= instance.OnRightPlayerAbilitySlot1;
@@ -823,9 +751,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerAbilitySlot4.started -= instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.performed -= instance.OnRightPlayerAbilitySlot4;
             @RightPlayerAbilitySlot4.canceled -= instance.OnRightPlayerAbilitySlot4;
-            @RightPlayerAbilityMenu.started -= instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.performed -= instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.canceled -= instance.OnRightPlayerAbilityMenu;
         }
 
         /// <summary>
@@ -859,6 +784,113 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="GameplayActions" /> instance referencing this action map.
     /// </summary>
     public GameplayActions @Gameplay => new GameplayActions(this);
+
+    // RoundBreak
+    private readonly InputActionMap m_RoundBreak;
+    private List<IRoundBreakActions> m_RoundBreakActionsCallbackInterfaces = new List<IRoundBreakActions>();
+    private readonly InputAction m_RoundBreak_LeftPlayerAbilityMenu;
+    private readonly InputAction m_RoundBreak_RightPlayerAbilityMenu;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "RoundBreak".
+    /// </summary>
+    public struct RoundBreakActions
+    {
+        private @InputActions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public RoundBreakActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "RoundBreak/LeftPlayerAbilityMenu".
+        /// </summary>
+        public InputAction @LeftPlayerAbilityMenu => m_Wrapper.m_RoundBreak_LeftPlayerAbilityMenu;
+        /// <summary>
+        /// Provides access to the underlying input action "RoundBreak/RightPlayerAbilityMenu".
+        /// </summary>
+        public InputAction @RightPlayerAbilityMenu => m_Wrapper.m_RoundBreak_RightPlayerAbilityMenu;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_RoundBreak; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="RoundBreakActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(RoundBreakActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="RoundBreakActions" />
+        public void AddCallbacks(IRoundBreakActions instance)
+        {
+            if (instance == null || m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Add(instance);
+            @LeftPlayerAbilityMenu.started += instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.performed += instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.canceled += instance.OnLeftPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.started += instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.performed += instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.canceled += instance.OnRightPlayerAbilityMenu;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="RoundBreakActions" />
+        private void UnregisterCallbacks(IRoundBreakActions instance)
+        {
+            @LeftPlayerAbilityMenu.started -= instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.performed -= instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerAbilityMenu.canceled -= instance.OnLeftPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.started -= instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.performed -= instance.OnRightPlayerAbilityMenu;
+            @RightPlayerAbilityMenu.canceled -= instance.OnRightPlayerAbilityMenu;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="RoundBreakActions.UnregisterCallbacks(IRoundBreakActions)" />.
+        /// </summary>
+        /// <seealso cref="RoundBreakActions.UnregisterCallbacks(IRoundBreakActions)" />
+        public void RemoveCallbacks(IRoundBreakActions instance)
+        {
+            if (m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="RoundBreakActions.AddCallbacks(IRoundBreakActions)" />
+        /// <seealso cref="RoundBreakActions.RemoveCallbacks(IRoundBreakActions)" />
+        /// <seealso cref="RoundBreakActions.UnregisterCallbacks(IRoundBreakActions)" />
+        public void SetCallbacks(IRoundBreakActions instance)
+        {
+            foreach (var item in m_Wrapper.m_RoundBreakActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="RoundBreakActions" /> instance referencing this action map.
+    /// </summary>
+    public RoundBreakActions @RoundBreak => new RoundBreakActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -939,13 +971,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLeftPlayerMove(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerDash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerDash(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "LeftPlayerAbilitySlot1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -974,26 +999,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLeftPlayerAbilitySlot4(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerAbilityMenu(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "RightPlayerMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightPlayerMove(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerDash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerDash(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "RightPlayerAbilitySlot1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -1022,6 +1033,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightPlayerAbilitySlot4(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "RoundBreak" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="RoundBreakActions.AddCallbacks(IRoundBreakActions)" />
+    /// <seealso cref="RoundBreakActions.RemoveCallbacks(IRoundBreakActions)" />
+    public interface IRoundBreakActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "LeftPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerAbilityMenu(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "RightPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

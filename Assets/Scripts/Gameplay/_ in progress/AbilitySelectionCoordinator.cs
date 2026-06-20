@@ -13,7 +13,9 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         [SerializeField, Min(1f)] private float durationMultiplier = 1.5f;
 
         public event Action<ParticipantProgressionBinding> AbilitySelectionMenuRequested;
+        public event Action<ParticipantProgressionBinding, int> OfferClicked;
         private PlayerInputReader inputReader;
+        private bool isRoundBreakInputEnabled;
 
         public AbilitySelectionMenu AbilitySelectionMenu => abilitySelectionMenu;
         public PlayerAbilityController AbilityController => abilityHud ? abilityHud.AbilityController : null;
@@ -47,26 +49,38 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
             abilityHud.PlusAbilityButtonClicked -= HandlePlusAbilityButtonClicked;
         }
 
-        public void UpdateInputReaderSubscription()
+        public void UpdateInputReaderSubscription(bool shouldEnableRoundBreakInput)
         {
             var nextInputReader = AbilityController ? AbilityController.InputReader : null;
-            if (inputReader == nextInputReader) return;
+            if (inputReader == nextInputReader && isRoundBreakInputEnabled == shouldEnableRoundBreakInput)
+                return;
 
             if (inputReader)
+            {
                 inputReader.AbilitySelectionMenuPressed -= HandleAbilitySelectionMenuPressed;
 
+                if (inputReader != nextInputReader)
+                    inputReader.SetRoundBreakInputEnabled(false);
+            }
+
             inputReader = nextInputReader;
+            isRoundBreakInputEnabled = shouldEnableRoundBreakInput;
 
             if (inputReader)
+            {
                 inputReader.AbilitySelectionMenuPressed += HandleAbilitySelectionMenuPressed;
+                inputReader.SetRoundBreakInputEnabled(isRoundBreakInputEnabled);
+            }
         }
 
         public void ClearInputReaderSubscription()
         {
             if (!inputReader) return;
 
+            inputReader.SetRoundBreakInputEnabled(false);
             inputReader.AbilitySelectionMenuPressed -= HandleAbilitySelectionMenuPressed;
             inputReader = null;
+            isRoundBreakInputEnabled = false;
         }
 
         public void Validate(string fieldName, UnityEngine.Object context)
@@ -87,6 +101,25 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         {
             AbilitySelectionMenuRequested?.Invoke(this);
         }
+
+        public void SubscribeToMenu()
+        {
+            if (!abilitySelectionMenu) return;
+
+            abilitySelectionMenu.OfferClicked += HandleOfferClicked;
+        }
+
+        public void UnsubscribeFromMenu()
+        {
+            if (!abilitySelectionMenu) return;
+
+            abilitySelectionMenu.OfferClicked -= HandleOfferClicked;
+        }
+
+        private void HandleOfferClicked(int offerIndex)
+        {
+            OfferClicked?.Invoke(this, offerIndex);
+        }
     }
 
     [SerializeField] private TurnController turnController;
@@ -98,6 +131,8 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
 
     private ParticipantAbilityProgression leftParticipant;
     private ParticipantAbilityProgression rightParticipant;
+    private ParticipantAbilitySelectionSession leftSelectionSession;
+    private ParticipantAbilitySelectionSession rightSelectionSession;
     private MatchManager matchManager;
 
     private void Awake()
@@ -105,6 +140,8 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         ValidateReferences();
         leftParticipant = leftProgression.CreateRuntimeProgression();
         rightParticipant = rightProgression.CreateRuntimeProgression();
+        leftSelectionSession = new ParticipantAbilitySelectionSession();
+        rightSelectionSession = new ParticipantAbilitySelectionSession();
         RefreshAllHud();
     }
 
@@ -123,8 +160,7 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
     {
         UnsubscribeFromHudEvents();
         UnsubscribeFromTurnEvents();
-        CloseMenu(leftProgression);
-        CloseMenu(rightProgression);
+        CloseAllMenus();
     }
 
     private void OnValidate()
@@ -136,8 +172,7 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
     {
         leftParticipant.ResetProgression();
         rightParticipant.ResetProgression();
-        CloseMenu(leftProgression);
-        CloseMenu(rightProgression);
+        CloseAllMenus();
         RefreshAllHud();
     }
 
@@ -146,10 +181,10 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         var deltaTime = Time.deltaTime;
         leftParticipant.Tick(deltaTime);
         rightParticipant.Tick(deltaTime);
-        leftProgression.UpdateInputReaderSubscription();
-        rightProgression.UpdateInputReaderSubscription();
+        leftProgression.UpdateInputReaderSubscription(CanOpenMenu(leftProgression, leftParticipant));
+        rightProgression.UpdateInputReaderSubscription(CanOpenMenu(rightProgression, rightParticipant));
         RefreshAllHud();
-        CloseMenusWhenUnavailable();
+        CloseMenusWhenLifecycleRequiresIt();
     }
 
     private void SubscribeToTurnEvents()
@@ -172,8 +207,7 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
     {
         leftParticipant.StartTurnProgression();
         rightParticipant.StartTurnProgression();
-        CloseMenu(leftProgression);
-        CloseMenu(rightProgression);
+        CloseAllMenus();
         RefreshAllHud();
     }
 
@@ -188,47 +222,52 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
     {
         leftProgression.AbilitySelectionMenuRequested += HandleAbilitySelectionMenuRequested;
         rightProgression.AbilitySelectionMenuRequested += HandleAbilitySelectionMenuRequested;
-        
-        if (leftProgression.AbilitySelectionMenu)
-            leftProgression.AbilitySelectionMenu.OfferSelected += HandleOfferSelected;
-        
-        if (rightProgression.AbilitySelectionMenu)
-            rightProgression.AbilitySelectionMenu.OfferSelected += HandleOfferSelected;
-        
+        leftProgression.OfferClicked += HandleOfferClicked;
+        rightProgression.OfferClicked += HandleOfferClicked;
         leftProgression.SubscribeToHud();
         rightProgression.SubscribeToHud();
+        leftProgression.SubscribeToMenu();
+        rightProgression.SubscribeToMenu();
     }
 
     private void UnsubscribeFromHudEvents()
     {
         leftProgression.UnsubscribeFromHud();
         rightProgression.UnsubscribeFromHud();
+        leftProgression.UnsubscribeFromMenu();
+        rightProgression.UnsubscribeFromMenu();
         leftProgression.ClearInputReaderSubscription();
         rightProgression.ClearInputReaderSubscription();
-        
         leftProgression.AbilitySelectionMenuRequested -= HandleAbilitySelectionMenuRequested;
         rightProgression.AbilitySelectionMenuRequested -= HandleAbilitySelectionMenuRequested;
-        
-        if (leftProgression.AbilitySelectionMenu)
-            leftProgression.AbilitySelectionMenu.OfferSelected -= HandleOfferSelected;
-        
-        if (rightProgression.AbilitySelectionMenu)
-            rightProgression.AbilitySelectionMenu.OfferSelected -= HandleOfferSelected;
+        leftProgression.OfferClicked -= HandleOfferClicked;
+        rightProgression.OfferClicked -= HandleOfferClicked;
     }
 
     private void HandleAbilitySelectionMenuRequested(ParticipantProgressionBinding binding)
     {
-        var participant = GetParticipantProgression(binding);
-        if (participant == null) return;
+        if (!TryGetParticipantContext(binding, out var participant, out var session)) return;
+
+        if (session.State == ParticipantAbilitySelectionSession.SessionState.SelectingOffer)
+        {
+            CloseMenu(binding, session);
+            return;
+        }
+
         if (!CanOpenMenu(binding, participant)) return;
 
         var offers = BuildOffers(binding);
-        if (binding.AbilitySelectionMenu)
-            binding.AbilitySelectionMenu.Toggle(offers);
+        if (!session.TryOpen(offers)) return;
+
+        RenderMenu(binding, session);
     }
 
-    private void HandleOfferSelected(AbilityOffer offer)
+    private void HandleOfferClicked(ParticipantProgressionBinding binding, int offerIndex)
     {
+        if (!TryGetParticipantContext(binding, out _, out var session)) return;
+        if (!session.TrySelectOffer(offerIndex)) return;
+
+        RenderMenu(binding, session);
     }
 
     private void RefreshAllHud()
@@ -288,33 +327,97 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         return null;
     }
 
+    private ParticipantAbilitySelectionSession GetSelectionSession(ParticipantProgressionBinding binding)
+    {
+        if (ReferenceEquals(binding, leftProgression))
+            return leftSelectionSession;
+
+        if (ReferenceEquals(binding, rightProgression))
+            return rightSelectionSession;
+
+        return null;
+    }
+
+    private bool TryGetParticipantContext(
+        ParticipantProgressionBinding binding,
+        out ParticipantAbilityProgression participant,
+        out ParticipantAbilitySelectionSession session)
+    {
+        participant = GetParticipantProgression(binding);
+        session = GetSelectionSession(binding);
+        return participant != null && session != null;
+    }
+
     private bool CanOpenMenu(ParticipantProgressionBinding binding, ParticipantAbilityProgression participant)
     {
         if (binding == null) return false;
         if (participant == null) return false;
         if (participant.AvailableAbilityPoints <= 0) return false;
-        if (!binding.AbilityController) return false;
-        if (!binding.AbilityController.InputReader) return false;
         if (!binding.AbilitySelectionMenu) return false;
         if (!matchManager) return false;
+
+        var abilityController = binding.AbilityController;
+        if (!abilityController) return false;
+
+        var inputReader = abilityController.InputReader;
+        if (!inputReader) return false;
 
         return matchManager.IsAbilityMenuInteractionAllowed;
     }
 
-    private void CloseMenusWhenUnavailable()
+    private void CloseMenusWhenLifecycleRequiresIt()
     {
-        if (!CanOpenMenu(leftProgression, leftParticipant))
-            CloseMenu(leftProgression);
+        if (ShouldCloseMenuForLifecycle(leftProgression, leftSelectionSession))
+            CloseMenu(leftProgression, leftSelectionSession);
 
-        if (!CanOpenMenu(rightProgression, rightParticipant))
-            CloseMenu(rightProgression);
+        if (ShouldCloseMenuForLifecycle(rightProgression, rightSelectionSession))
+            CloseMenu(rightProgression, rightSelectionSession);
     }
 
-    private static void CloseMenu(ParticipantProgressionBinding binding)
+    private bool ShouldCloseMenuForLifecycle(ParticipantProgressionBinding binding, ParticipantAbilitySelectionSession session)
     {
+        if (binding == null || session == null) return false;
+        if (session.State != ParticipantAbilitySelectionSession.SessionState.SelectingOffer) return false;
+        if (!binding.AbilitySelectionMenu) return true;
+        if (!matchManager) return true;
+
+        var abilityController = binding.AbilityController;
+        if (!abilityController) return true;
+
+        var inputReader = abilityController.InputReader;
+        if (!inputReader) return true;
+
+        return !matchManager.IsAbilityMenuInteractionAllowed;
+    }
+
+    private void CloseAllMenus()
+    {
+        CloseMenu(leftProgression, leftSelectionSession);
+        CloseMenu(rightProgression, rightSelectionSession);
+    }
+
+    private static void CloseMenu(ParticipantProgressionBinding binding, ParticipantAbilitySelectionSession session)
+    {
+        if (session == null) return;
+
+        session.Close();
+
         if (binding == null) return;
         if (!binding.AbilitySelectionMenu) return;
-
         binding.AbilitySelectionMenu.Close();
+    }
+
+    private static void RenderMenu(ParticipantProgressionBinding binding, ParticipantAbilitySelectionSession session)
+    {
+        if (binding == null || session == null) return;
+        if (!binding.AbilitySelectionMenu) return;
+
+        if (session.State != ParticipantAbilitySelectionSession.SessionState.SelectingOffer)
+        {
+            binding.AbilitySelectionMenu.Close();
+            return;
+        }
+
+        binding.AbilitySelectionMenu.Show(session.Offers, session.SelectedOfferIndex);
     }
 }

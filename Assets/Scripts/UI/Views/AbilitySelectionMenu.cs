@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public sealed class AbilitySelectionMenu : MonoBehaviour
@@ -12,15 +11,14 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
     [SerializeField] private TMP_Text descriptionLabel;
     [SerializeField] private Transform selectionButtonsRoot;
     [SerializeField] private Button[] offerButtons;
+    [SerializeField] private TMP_Text[] offerButtonLabels;
 
-    public event Action<AbilityOffer> OfferSelected;
+    public event Action<int> OfferClicked;
 
     public bool IsOpen => gameObject.activeSelf;
 
-    private readonly List<AbilityOffer> currentOffers = new(3);
     private readonly Dictionary<Button, int> buttonIndexes = new();
     private readonly Dictionary<Button, UnityEngine.Events.UnityAction> buttonClickHandlers = new();
-    private int selectedOfferIndex = -1;
 
     private void Awake()
     {
@@ -36,7 +34,6 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeFromButtons();
-        selectedOfferIndex = -1;
     }
 
     private void OnValidate()
@@ -45,127 +42,55 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
         RebuildButtonIndexMap();
     }
 
-    private void Update()
-    {
-        if (!IsOpen) return;
-
-        var selectedObject = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
-        if (!selectedObject) return;
-
-        if (!selectedObject.TryGetComponent(out Button selectedButton)) return;
-        if (!buttonIndexes.TryGetValue(selectedButton, out var buttonIndex)) return;
-        if (buttonIndex >= currentOffers.Count) return;
-        if (selectedOfferIndex == buttonIndex) return;
-
-        SelectOffer(buttonIndex, false);
-    }
-
-    public void ShowOffers(IReadOnlyList<AbilityOffer> offers)
+    public void Show(IReadOnlyList<AbilityOffer> offers, int selectedOfferIndex)
     {
         CacheReferences();
-        currentOffers.Clear();
-
-        if (offers != null)
-        {
-            for (var i = 0; i < offers.Count; i++)
-            {
-                currentOffers.Add(offers[i]);
-            }
-        }
-
         gameObject.SetActive(true);
-        ApplyOffers();
-        SelectFirstAvailableOffer();
+        Render(offers, selectedOfferIndex);
     }
 
     public void Close()
     {
-        selectedOfferIndex = -1;
         gameObject.SetActive(false);
     }
 
-    public void Toggle(IReadOnlyList<AbilityOffer> offers)
+    public void Render(IReadOnlyList<AbilityOffer> offers, int selectedOfferIndex)
     {
-        if (IsOpen)
-        {
-            Close();
-            return;
-        }
-
-        ShowOffers(offers);
-    }
-
-    private void ApplyOffers()
-    {
-        if (selectionLabel)
-            selectionLabel.text = "Ability Offers";
-
         for (var i = 0; i < offerButtons.Length; i++)
         {
-            var hasOffer = i < currentOffers.Count;
+            var hasOffer = offers != null && i < offers.Count;
             var button = offerButtons[i];
             if (!button) continue;
 
             button.gameObject.SetActive(hasOffer);
             button.interactable = hasOffer;
 
-            var text = button.GetComponentInChildren<TMP_Text>(true);
+            var text = i < offerButtonLabels.Length
+                ? offerButtonLabels[i]
+                : null;
+
             if (!text) continue;
 
             text.text = hasOffer
-                ? GetOfferButtonText(currentOffers[i])
+                ? GetOfferButtonText(offers[i])
                 : string.Empty;
         }
 
+        if (selectionLabel)
+            selectionLabel.text = "Ability Offers";
+
         if (descriptionLabel)
         {
-            descriptionLabel.text = currentOffers.Count > 0
-                ? GetOfferDescriptionText(currentOffers[0])
+            descriptionLabel.text = IsValidOfferIndex(offers, selectedOfferIndex)
+                ? GetOfferDescriptionText(offers[selectedOfferIndex])
                 : "No offers available.";
         }
-    }
-
-    private void SelectFirstAvailableOffer()
-    {
-        selectedOfferIndex = -1;
-
-        for (var i = 0; i < offerButtons.Length; i++)
-        {
-            var button = offerButtons[i];
-            if (!button) continue;
-            if (!button.gameObject.activeInHierarchy) continue;
-            if (!button.interactable) continue;
-
-            SelectOffer(i, false);
-
-            if (EventSystem.current)
-                EventSystem.current.SetSelectedGameObject(button.gameObject);
-
-            return;
-        }
-
-        if (EventSystem.current)
-            EventSystem.current.SetSelectedGameObject(null);
-    }
-
-    private void SelectOffer(int buttonIndex, bool notifySelection)
-    {
-        if (buttonIndex < 0 || buttonIndex >= currentOffers.Count) return;
-
-        selectedOfferIndex = buttonIndex;
-
-        if (descriptionLabel)
-            descriptionLabel.text = GetOfferDescriptionText(currentOffers[buttonIndex]);
-
-        if (!notifySelection) return;
-
-        OfferSelected?.Invoke(currentOffers[buttonIndex]);
     }
 
     private void HandleOfferButtonClicked(Button clickedButton)
     {
         if (!buttonIndexes.TryGetValue(clickedButton, out var buttonIndex)) return;
-        SelectOffer(buttonIndex, true);
+        OfferClicked?.Invoke(buttonIndex);
     }
 
     private void CacheReferences()
@@ -184,6 +109,19 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
             offerButtons = selectionButtonsRoot
                 ? selectionButtonsRoot.GetComponentsInChildren<Button>(true)
                 : Array.Empty<Button>();
+        }
+
+        if (offerButtonLabels == null || offerButtonLabels.Length != offerButtons.Length)
+        {
+            offerButtonLabels = new TMP_Text[offerButtons.Length];
+
+            for (var i = 0; i < offerButtons.Length; i++)
+            {
+                var button = offerButtons[i];
+                offerButtonLabels[i] = button
+                    ? button.GetComponentInChildren<TMP_Text>(true)
+                    : null;
+            }
         }
     }
 
@@ -275,5 +213,10 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
             return $"{kindLabel}\n{abilityName}";
 
         return $"{kindLabel}\n{abilityName}\n\n{description}";
+    }
+
+    private static bool IsValidOfferIndex(IReadOnlyList<AbilityOffer> offers, int index)
+    {
+        return offers != null && index >= 0 && index < offers.Count;
     }
 }

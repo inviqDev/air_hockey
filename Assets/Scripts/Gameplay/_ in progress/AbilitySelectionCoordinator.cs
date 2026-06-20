@@ -15,7 +15,6 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         public event Action<ParticipantProgressionBinding> AbilitySelectionMenuRequested;
         public event Action<ParticipantProgressionBinding, int> OfferClicked;
         private PlayerInputReader inputReader;
-        private bool isRoundBreakInputEnabled;
 
         public AbilitySelectionMenu AbilitySelectionMenu => abilitySelectionMenu;
         public PlayerAbilityController AbilityController => abilityHud ? abilityHud.AbilityController : null;
@@ -49,38 +48,28 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
             abilityHud.PlusAbilityButtonClicked -= HandlePlusAbilityButtonClicked;
         }
 
-        public void UpdateInputReaderSubscription(bool shouldEnableRoundBreakInput)
+        public void RefreshInputReaderSubscription()
         {
             var nextInputReader = AbilityController ? AbilityController.InputReader : null;
-            if (inputReader == nextInputReader && isRoundBreakInputEnabled == shouldEnableRoundBreakInput)
-                return;
+            if (inputReader == nextInputReader) return;
 
             if (inputReader)
             {
                 inputReader.AbilitySelectionMenuPressed -= HandleAbilitySelectionMenuPressed;
-
-                if (inputReader != nextInputReader)
-                    inputReader.SetRoundBreakInputEnabled(false);
             }
 
             inputReader = nextInputReader;
-            isRoundBreakInputEnabled = shouldEnableRoundBreakInput;
 
             if (inputReader)
-            {
                 inputReader.AbilitySelectionMenuPressed += HandleAbilitySelectionMenuPressed;
-                inputReader.SetRoundBreakInputEnabled(isRoundBreakInputEnabled);
-            }
         }
 
         public void ClearInputReaderSubscription()
         {
             if (!inputReader) return;
 
-            inputReader.SetRoundBreakInputEnabled(false);
             inputReader.AbilitySelectionMenuPressed -= HandleAbilitySelectionMenuPressed;
             inputReader = null;
-            isRoundBreakInputEnabled = false;
         }
 
         public void Validate(string fieldName, UnityEngine.Object context)
@@ -142,6 +131,7 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         rightParticipant = rightProgression.CreateRuntimeProgression();
         leftSelectionSession = new ParticipantAbilitySelectionSession();
         rightSelectionSession = new ParticipantAbilitySelectionSession();
+        RefreshRuntimeBindings();
         RefreshAllHud();
     }
 
@@ -150,10 +140,17 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         matchManager = manager;
     }
 
+    public void RefreshRuntimeBindings()
+    {
+        leftProgression.RefreshInputReaderSubscription();
+        rightProgression.RefreshInputReaderSubscription();
+    }
+
     private void OnEnable()
     {
         SubscribeToTurnEvents();
         SubscribeToHudEvents();
+        RefreshRuntimeBindings();
     }
 
     private void OnDisable()
@@ -181,8 +178,6 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         var deltaTime = Time.deltaTime;
         leftParticipant.Tick(deltaTime);
         rightParticipant.Tick(deltaTime);
-        leftProgression.UpdateInputReaderSubscription(CanOpenMenu(leftProgression, leftParticipant));
-        rightProgression.UpdateInputReaderSubscription(CanOpenMenu(rightProgression, rightParticipant));
         RefreshAllHud();
         CloseMenusWhenLifecycleRequiresIt();
     }

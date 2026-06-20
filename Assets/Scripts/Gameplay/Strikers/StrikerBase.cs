@@ -16,8 +16,6 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
     private TurnController currentTurnController;
     private IMovable movable;
-    private PlayerInputReader playerInputReader;
-
     private void Reset()
     {
         if (!sideOwner)
@@ -87,8 +85,6 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         SetMovementAllowed(false);
         SetAbilityUsageAllowed(false);
-        SetGameplayInputEnabled(false);
-        SetRoundBreakInputEnabled(false);
         UnsubscribeFromTurnController();
         currentTurnController = null;
     }
@@ -124,9 +120,6 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         if (!abilityController)
             TryGetComponent(out abilityController);
-
-        if (!playerInputReader)
-            TryGetComponent(out playerInputReader);
 
         return hasAllReferences;
     }
@@ -167,10 +160,6 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
         var isGameplayAllowed = currentTurnController && currentTurnController.IsTurnActive;
         SetMovementAllowed(isGameplayAllowed);
         SetAbilityUsageAllowed(isGameplayAllowed);
-        SetGameplayInputEnabled(isGameplayAllowed);
-
-        if (isGameplayAllowed)
-            SetRoundBreakInputEnabled(false);
     }
 
     private void SetMovementAllowed(bool isAllowed)
@@ -185,16 +174,12 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     {
         SetMovementAllowed(true);
         SetAbilityUsageAllowed(true);
-        SetGameplayInputEnabled(true);
-        SetRoundBreakInputEnabled(false);
     }
 
     private void HandleTurnEnded()
     {
         SetMovementAllowed(false);
         SetAbilityUsageAllowed(false);
-        SetGameplayInputEnabled(false);
-        SetRoundBreakInputEnabled(false);
     }
 
     private void SetAbilityUsageAllowed(bool isAllowed)
@@ -202,19 +187,5 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
         if (!abilityController) return;
 
         abilityController.SetAbilityUsageAllowed(isAllowed);
-    }
-
-    private void SetGameplayInputEnabled(bool isAllowed)
-    {
-        if (!playerInputReader) return;
-
-        playerInputReader.SetGameplayInputEnabled(isAllowed);
-    }
-
-    private void SetRoundBreakInputEnabled(bool isAllowed)
-    {
-        if (!playerInputReader) return;
-
-        playerInputReader.SetRoundBreakInputEnabled(isAllowed);
     }
 }

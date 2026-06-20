@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class InGameMenuController : MenuViewBase
+public sealed class InGameMenu : MenuViewBase
 {
     [Header("Top Menu Buttons")]
     [SerializeField] private Button settingsButton;
@@ -16,13 +16,16 @@ public sealed class InGameMenuController : MenuViewBase
 
     [Header("Settings Flow")]
     [SerializeField] private InGameSettingsView settingsView;
-    [SerializeField] private bool pauseWhenSettingsOpen = true;
 
-    public bool IsPaused { get; private set; }
-    public bool IsSettingsOpen => settingsView && settingsView.IsVisible;
+    public bool IsPaused => currentOverlay == GameOverlay.Pause;
+    public bool IsSettingsOpen => currentOverlay == GameOverlay.Settings;
     public event Action RestartClicked;
     public event Action MainMenuClicked;
-    public event Action<bool> PauseStateChanged;
+    public event Action PauseToggleRequested;
+    public event Action SettingsOpenRequested;
+    public event Action SettingsCloseRequested;
+
+    private GameOverlay currentOverlay;
 
     private void OnEnable()
     {
@@ -71,10 +74,7 @@ public sealed class InGameMenuController : MenuViewBase
             settingsView.MainMenuClicked -= HandleMainMenuClicked;
         }
 
-        if (IsPaused)
-        {
-            ResumeGame();
-        }
+        ApplyOverlayVisualState(GameOverlay.None);
     }
 
     private void OnValidate()
@@ -92,68 +92,50 @@ public sealed class InGameMenuController : MenuViewBase
     [ContextMenu("Toggle Pause")]
     public void TogglePause()
     {
-        if (IsPaused)
-        {
-            ResumeGame();
-            return;
-        }
-
-        PauseGame();
+        PauseToggleRequested?.Invoke();
     }
 
     [ContextMenu("Pause Game")]
     public void PauseGame()
     {
-        SetPaused(true);
+        PauseToggleRequested?.Invoke();
     }
 
     [ContextMenu("Resume Game")]
     public void ResumeGame()
     {
-        SetPaused(false);
+        PauseToggleRequested?.Invoke();
     }
 
     [ContextMenu("Open Settings")]
     public void OpenSettings()
     {
-        if (settingsView)
-            settingsView.Open();
-
-        if (pauseWhenSettingsOpen)
-        {
-            PauseGame();
-        }
+        SettingsOpenRequested?.Invoke();
     }
 
     public void ResetState()
     {
-        var wasPaused = IsPaused;
-        IsPaused = false;
-        ApplyPauseState();
-        if (settingsView)
-            settingsView.ResetState();
+        ApplyOverlayState(GameOverlay.None);
+    }
 
-        if (wasPaused)
-            PauseStateChanged?.Invoke(IsPaused);
+    public void ApplyOverlayState(GameOverlay overlay)
+    {
+        currentOverlay = overlay;
+        ApplyOverlayVisualState(currentOverlay);
     }
 
     private void RestartMatch()
     {
-        ResetState();
         RestartClicked?.Invoke();
     }
 
     private void HandleSettingsBackClicked()
     {
-        if (pauseWhenSettingsOpen)
-        {
-            ResumeGame();
-        }
+        SettingsCloseRequested?.Invoke();
     }
 
     private void HandleMainMenuClicked()
     {
-        ResetState();
         MainMenuClicked?.Invoke();
     }
 
@@ -164,18 +146,21 @@ public sealed class InGameMenuController : MenuViewBase
         pausePlayIconImage.sprite = IsPaused ? playIcon : pauseIcon;
     }
 
-    private void SetPaused(bool isPaused)
+    private void ApplyOverlayVisualState(GameOverlay overlay)
     {
-        if (IsPaused == isPaused) return;
+        var isBlockingGameplay = overlay != GameOverlay.None;
+        Time.timeScale = isBlockingGameplay ? 0f : 1f;
 
-        IsPaused = isPaused;
-        ApplyPauseState();
-        PauseStateChanged?.Invoke(IsPaused);
-    }
+        if (overlay == GameOverlay.Settings)
+        {
+            if (settingsView && !settingsView.IsVisible)
+                settingsView.Open();
+        }
+        else if (settingsView && settingsView.IsVisible)
+        {
+            settingsView.Close();
+        }
 
-    private void ApplyPauseState()
-    {
-        Time.timeScale = IsPaused ? 0f : 1f;
         UpdatePauseIcon();
     }
 
@@ -183,37 +168,37 @@ public sealed class InGameMenuController : MenuViewBase
     {
         if (!pausePlayButton)
         {
-            Debug.LogError($"{nameof(InGameMenuController)} requires a pause/play button reference.", this);
+            Debug.LogError($"{nameof(InGameMenu)} requires a pause/play button reference.", this);
         }
 
         if (!pausePlayIconImage)
         {
-            Debug.LogError($"{nameof(InGameMenuController)} requires a pause/play icon image reference.", this);
+            Debug.LogError($"{nameof(InGameMenu)} requires a pause/play icon image reference.", this);
         }
 
         if (!pauseIcon)
         {
-            Debug.LogError($"{nameof(InGameMenuController)} requires a pause icon sprite.", this);
+            Debug.LogError($"{nameof(InGameMenu)} requires a pause icon sprite.", this);
         }
 
         if (!playIcon)
         {
-            Debug.LogError($"{nameof(InGameMenuController)} requires a play icon sprite.", this);
+            Debug.LogError($"{nameof(InGameMenu)} requires a play icon sprite.", this);
         }
 
         if (!restartButton)
         {
-            Debug.LogError($"{nameof(InGameMenuController)} requires a restart button reference.", this);
+            Debug.LogError($"{nameof(InGameMenu)} requires a restart button reference.", this);
         }
 
         if (!settingsButton)
         {
-            Debug.LogError($"{nameof(InGameMenuController)} requires a settings button reference.", this);
+            Debug.LogError($"{nameof(InGameMenu)} requires a settings button reference.", this);
         }
 
         if (!settingsView)
         {
-            Debug.LogError($"{nameof(InGameMenuController)} requires a settings menu controller reference.", this);
+            Debug.LogError($"{nameof(InGameMenu)} requires a settings menu controller reference.", this);
         }
     }
 }

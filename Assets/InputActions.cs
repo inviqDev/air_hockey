@@ -385,7 +385,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             ]
         },
         {
-            ""name"": ""RoundBreak"",
+            ""name"": ""Intermission"",
             ""id"": ""4fe67938-3798-4b79-b7ca-57a99f465085"",
             ""actions"": [
                 {
@@ -508,16 +508,16 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Gameplay_RightPlayerAbilitySlot2 = m_Gameplay.FindAction("RightPlayerAbilitySlot2", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot3 = m_Gameplay.FindAction("RightPlayerAbilitySlot3", throwIfNotFound: true);
         m_Gameplay_RightPlayerAbilitySlot4 = m_Gameplay.FindAction("RightPlayerAbilitySlot4", throwIfNotFound: true);
-        // RoundBreak
-        m_RoundBreak = asset.FindActionMap("RoundBreak", throwIfNotFound: true);
-        m_RoundBreak_LeftPlayerAbilityMenu = m_RoundBreak.FindAction("LeftPlayerAbilityMenu", throwIfNotFound: true);
-        m_RoundBreak_RightPlayerAbilityMenu = m_RoundBreak.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
+        // Intermission
+        m_Intermission = asset.FindActionMap("Intermission", throwIfNotFound: true);
+        m_Intermission_LeftPlayerAbilityMenu = m_Intermission.FindAction("LeftPlayerAbilityMenu", throwIfNotFound: true);
+        m_Intermission_RightPlayerAbilityMenu = m_Intermission.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
     }
 
     ~@InputActions()
     {
         UnityEngine.Debug.Assert(!m_Gameplay.enabled, "This will cause a leak and performance issues, InputActions.Gameplay.Disable() has not been called.");
-        UnityEngine.Debug.Assert(!m_RoundBreak.enabled, "This will cause a leak and performance issues, InputActions.RoundBreak.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Intermission.enabled, "This will cause a leak and performance issues, InputActions.Intermission.Disable() has not been called.");
     }
 
     /// <summary>
@@ -785,34 +785,34 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     /// </summary>
     public GameplayActions @Gameplay => new GameplayActions(this);
 
-    // RoundBreak
-    private readonly InputActionMap m_RoundBreak;
-    private List<IRoundBreakActions> m_RoundBreakActionsCallbackInterfaces = new List<IRoundBreakActions>();
-    private readonly InputAction m_RoundBreak_LeftPlayerAbilityMenu;
-    private readonly InputAction m_RoundBreak_RightPlayerAbilityMenu;
+    // Intermission
+    private readonly InputActionMap m_Intermission;
+    private List<IIntermissionActions> m_IntermissionActionsCallbackInterfaces = new List<IIntermissionActions>();
+    private readonly InputAction m_Intermission_LeftPlayerAbilityMenu;
+    private readonly InputAction m_Intermission_RightPlayerAbilityMenu;
     /// <summary>
-    /// Provides access to input actions defined in input action map "RoundBreak".
+    /// Provides access to input actions defined in input action map "Intermission".
     /// </summary>
-    public struct RoundBreakActions
+    public struct IntermissionActions
     {
         private @InputActions m_Wrapper;
 
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
-        public RoundBreakActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        public IntermissionActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "RoundBreak/LeftPlayerAbilityMenu".
+        /// Provides access to the underlying input action "Intermission/LeftPlayerAbilityMenu".
         /// </summary>
-        public InputAction @LeftPlayerAbilityMenu => m_Wrapper.m_RoundBreak_LeftPlayerAbilityMenu;
+        public InputAction @LeftPlayerAbilityMenu => m_Wrapper.m_Intermission_LeftPlayerAbilityMenu;
         /// <summary>
-        /// Provides access to the underlying input action "RoundBreak/RightPlayerAbilityMenu".
+        /// Provides access to the underlying input action "Intermission/RightPlayerAbilityMenu".
         /// </summary>
-        public InputAction @RightPlayerAbilityMenu => m_Wrapper.m_RoundBreak_RightPlayerAbilityMenu;
+        public InputAction @RightPlayerAbilityMenu => m_Wrapper.m_Intermission_RightPlayerAbilityMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
-        public InputActionMap Get() { return m_Wrapper.m_RoundBreak; }
+        public InputActionMap Get() { return m_Wrapper.m_Intermission; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
@@ -820,9 +820,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
-        /// Implicitly converts an <see ref="RoundBreakActions" /> to an <see ref="InputActionMap" /> instance.
+        /// Implicitly converts an <see ref="IntermissionActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        public static implicit operator InputActionMap(RoundBreakActions set) { return set.Get(); }
+        public static implicit operator InputActionMap(IntermissionActions set) { return set.Get(); }
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -830,11 +830,11 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
         /// </remarks>
-        /// <seealso cref="RoundBreakActions" />
-        public void AddCallbacks(IRoundBreakActions instance)
+        /// <seealso cref="IntermissionActions" />
+        public void AddCallbacks(IIntermissionActions instance)
         {
-            if (instance == null || m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_IntermissionActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_IntermissionActionsCallbackInterfaces.Add(instance);
             @LeftPlayerAbilityMenu.started += instance.OnLeftPlayerAbilityMenu;
             @LeftPlayerAbilityMenu.performed += instance.OnLeftPlayerAbilityMenu;
             @LeftPlayerAbilityMenu.canceled += instance.OnLeftPlayerAbilityMenu;
@@ -849,8 +849,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
         /// </remarks>
-        /// <seealso cref="RoundBreakActions" />
-        private void UnregisterCallbacks(IRoundBreakActions instance)
+        /// <seealso cref="IntermissionActions" />
+        private void UnregisterCallbacks(IIntermissionActions instance)
         {
             @LeftPlayerAbilityMenu.started -= instance.OnLeftPlayerAbilityMenu;
             @LeftPlayerAbilityMenu.performed -= instance.OnLeftPlayerAbilityMenu;
@@ -861,12 +861,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         }
 
         /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="RoundBreakActions.UnregisterCallbacks(IRoundBreakActions)" />.
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="IntermissionActions.UnregisterCallbacks(IIntermissionActions)" />.
         /// </summary>
-        /// <seealso cref="RoundBreakActions.UnregisterCallbacks(IRoundBreakActions)" />
-        public void RemoveCallbacks(IRoundBreakActions instance)
+        /// <seealso cref="IntermissionActions.UnregisterCallbacks(IIntermissionActions)" />
+        public void RemoveCallbacks(IIntermissionActions instance)
         {
-            if (m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_IntermissionActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
@@ -876,21 +876,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
         /// </remarks>
-        /// <seealso cref="RoundBreakActions.AddCallbacks(IRoundBreakActions)" />
-        /// <seealso cref="RoundBreakActions.RemoveCallbacks(IRoundBreakActions)" />
-        /// <seealso cref="RoundBreakActions.UnregisterCallbacks(IRoundBreakActions)" />
-        public void SetCallbacks(IRoundBreakActions instance)
+        /// <seealso cref="IntermissionActions.AddCallbacks(IIntermissionActions)" />
+        /// <seealso cref="IntermissionActions.RemoveCallbacks(IIntermissionActions)" />
+        /// <seealso cref="IntermissionActions.UnregisterCallbacks(IIntermissionActions)" />
+        public void SetCallbacks(IIntermissionActions instance)
         {
-            foreach (var item in m_Wrapper.m_RoundBreakActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_IntermissionActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_RoundBreakActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_IntermissionActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
     /// <summary>
-    /// Provides a new <see cref="RoundBreakActions" /> instance referencing this action map.
+    /// Provides a new <see cref="IntermissionActions" /> instance referencing this action map.
     /// </summary>
-    public RoundBreakActions @RoundBreak => new RoundBreakActions(this);
+    public IntermissionActions @Intermission => new IntermissionActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -1035,11 +1035,11 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnRightPlayerAbilitySlot4(InputAction.CallbackContext context);
     }
     /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "RoundBreak" which allows adding and removing callbacks.
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Intermission" which allows adding and removing callbacks.
     /// </summary>
-    /// <seealso cref="RoundBreakActions.AddCallbacks(IRoundBreakActions)" />
-    /// <seealso cref="RoundBreakActions.RemoveCallbacks(IRoundBreakActions)" />
-    public interface IRoundBreakActions
+    /// <seealso cref="IntermissionActions.AddCallbacks(IIntermissionActions)" />
+    /// <seealso cref="IntermissionActions.RemoveCallbacks(IIntermissionActions)" />
+    public interface IIntermissionActions
     {
         /// <summary>
         /// Method invoked when associated input action "LeftPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.

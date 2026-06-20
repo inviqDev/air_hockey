@@ -2,26 +2,32 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
 
+public enum PlayerInputMode
+{
+    Disabled,
+    Gameplay,
+    Intermission
+}
+
 public sealed class PlayerInputReader : MonoBehaviour
 {
     public event Action<Vector2> MoveInputChanged;
     public event Action<int> AbilitySlotPressed;
     public event Action AbilitySelectionMenuPressed;
 
-    private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
     
     private InputActions inputActions;
-    private bool isGameplayInputEnabled;
-    private bool isRoundBreakInputEnabled;
+    
+    private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
+    private PlayerInputMode currentInputMode = PlayerInputMode.Disabled;
     
     private InputAction moveActionPlayerOne;
-    
     private InputAction moveActionPlayerTwo;
     
     private InputAction[] abilitySlotActionsPlayerOne;
     private InputAction[] abilitySlotActionsPlayerTwo;
     
-    private InputAction abilityMenuActionPlayerOne;
+    private InputAction leftAbilitySelectionMenuAction;
     private InputAction abilityMenuActionPlayerTwo;
 
     private Vector2 playerOneMoveInput;
@@ -48,12 +54,12 @@ public sealed class PlayerInputReader : MonoBehaviour
 
         UnsubscribeMove();
         UnsubscribeAbilitySlots();
-        UnsubscribeAbilityMenu();
+        UnsubscribeAbilitySelectionMenu();
         
         if (inputActions != null)
         {
             inputActions.Gameplay.Disable();
-            inputActions.RoundBreak.Disable();
+            inputActions.Intermission.Disable();
             inputActions.Dispose();
             inputActions = null;
         }
@@ -62,13 +68,12 @@ public sealed class PlayerInputReader : MonoBehaviour
         moveActionPlayerTwo = null;
         abilitySlotActionsPlayerOne = null;
         abilitySlotActionsPlayerTwo = null;
-        abilityMenuActionPlayerOne = null;
+        leftAbilitySelectionMenuAction = null;
         abilityMenuActionPlayerTwo = null;
         
         playerOneMoveInput = Vector2.zero;
         playerTwoMoveInput = Vector2.zero;
-        isGameplayInputEnabled = false;
-        isRoundBreakInputEnabled = false;
+        currentInputMode = PlayerInputMode.Disabled;
         
         isInitialized = false;
     }
@@ -82,7 +87,7 @@ public sealed class PlayerInputReader : MonoBehaviour
     {
         UnsubscribeMove();
         UnsubscribeAbilitySlots();
-        UnsubscribeAbilityMenu();
+        UnsubscribeAbilitySelectionMenu();
 
         if (inputActions == null) return;
 
@@ -96,9 +101,9 @@ public sealed class PlayerInputReader : MonoBehaviour
             ? GetAbilitySlotActions(PlayerControlScheme.Arrows)
             : null;
 
-        abilityMenuActionPlayerOne = GetRoundBreakAbilityMenuAction(controlScheme);
+        leftAbilitySelectionMenuAction = GetIntermissionAbilityMenuAction(controlScheme);
         abilityMenuActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetRoundBreakAbilityMenuAction(PlayerControlScheme.Arrows)
+            ? GetIntermissionAbilityMenuAction(PlayerControlScheme.Arrows)
             : null;
 
         SubscribeMove();
@@ -136,22 +141,22 @@ public sealed class PlayerInputReader : MonoBehaviour
         }
     }
 
-    private void UnsubscribeAbilityMenu()
+    private void UnsubscribeAbilitySelectionMenu()
     {
-        if (abilityMenuActionPlayerOne != null)
-            abilityMenuActionPlayerOne.performed -= OnAbilityMenuPerformed;
+        if (leftAbilitySelectionMenuAction != null)
+            leftAbilitySelectionMenuAction.performed -= OnLeftAbilitySelectionMenuPerformed;
 
         if (abilityMenuActionPlayerTwo != null)
-            abilityMenuActionPlayerTwo.performed -= OnAbilityMenuPerformed;
+            abilityMenuActionPlayerTwo.performed -= OnLeftAbilitySelectionMenuPerformed;
     }
 
     private void SubscribeAbilityMenu()
     {
-        if (abilityMenuActionPlayerOne != null)
-            abilityMenuActionPlayerOne.performed += OnAbilityMenuPerformed;
+        if (leftAbilitySelectionMenuAction != null)
+            leftAbilitySelectionMenuAction.performed += OnLeftAbilitySelectionMenuPerformed;
 
         if (abilityMenuActionPlayerTwo != null)
-            abilityMenuActionPlayerTwo.performed += OnAbilityMenuPerformed;
+            abilityMenuActionPlayerTwo.performed += OnLeftAbilitySelectionMenuPerformed;
     }
 
     private void UnsubscribeAbilitySlots()
@@ -195,14 +200,14 @@ public sealed class PlayerInputReader : MonoBehaviour
         };
     }
 
-    private InputAction GetRoundBreakAbilityMenuAction(PlayerControlScheme scheme)
+    private InputAction GetIntermissionAbilityMenuAction(PlayerControlScheme scheme)
     {
         return scheme == PlayerControlScheme.Arrows
-            ? inputActions.RoundBreak.RightPlayerAbilityMenu
-            : inputActions.RoundBreak.LeftPlayerAbilityMenu;
+            ? inputActions.Intermission.RightPlayerAbilityMenu
+            : inputActions.Intermission.LeftPlayerAbilityMenu;
     }
 
-    private void OnAbilityMenuPerformed(InputAction.CallbackContext context)
+    private void OnLeftAbilitySelectionMenuPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionMenuPressed?.Invoke();
     }
@@ -242,48 +247,41 @@ public sealed class PlayerInputReader : MonoBehaviour
         MoveInputChanged?.Invoke(ResolveCurrentMoveInput());
     }
 
-    public void SetGameplayInputEnabled(bool isEnabled)
+    public void SetInputMode(PlayerInputMode inputMode)
     {
         if (inputActions == null)
         {
-            isGameplayInputEnabled = false;
+            currentInputMode = PlayerInputMode.Disabled;
+            ClearCurrentMoveInput();
             return;
         }
 
-        if (isGameplayInputEnabled == isEnabled) return;
+        if (currentInputMode == inputMode) return;
 
-        isGameplayInputEnabled = isEnabled;
-
-        if (isGameplayInputEnabled)
-        {
-            inputActions.Gameplay.Enable();
-            RefreshCurrentMoveInput();
-            return;
-        }
+        var wasGameplayActive = currentInputMode == PlayerInputMode.Gameplay;
+        currentInputMode = inputMode;
 
         inputActions.Gameplay.Disable();
-        ClearCurrentMoveInput();
-    }
+        inputActions.Intermission.Disable();
 
-    public void SetRoundBreakInputEnabled(bool isEnabled)
-    {
-        if (inputActions == null)
+        if (wasGameplayActive && currentInputMode != PlayerInputMode.Gameplay)
         {
-            isRoundBreakInputEnabled = false;
-            return;
+            ClearCurrentMoveInput();
         }
 
-        if (isRoundBreakInputEnabled == isEnabled) return;
-
-        isRoundBreakInputEnabled = isEnabled;
-
-        if (isRoundBreakInputEnabled)
+        switch (currentInputMode)
         {
-            inputActions.RoundBreak.Enable();
-            return;
+            case PlayerInputMode.Gameplay:
+                inputActions.Gameplay.Enable();
+                RefreshCurrentMoveInput();
+                break;
+            case PlayerInputMode.Intermission:
+                inputActions.Intermission.Enable();
+                break;
+            case PlayerInputMode.Disabled:
+            default:
+                break;
         }
-
-        inputActions.RoundBreak.Disable();
     }
 
     private Vector2 ResolveCurrentMoveInput()

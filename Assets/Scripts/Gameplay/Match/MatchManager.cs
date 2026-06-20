@@ -1,17 +1,25 @@
+using System;
 using UnityEngine;
 using System.Collections;
 
+public enum GamePhase
+{
+    NoActiveMatch,
+    TurnPreparation,
+    TurnActive,
+    RoundBreak,
+    MatchComplete
+}
+
+public enum GameOverlay
+{
+    None,
+    Pause,
+    Settings
+}
+
 public sealed class MatchManager : MonoBehaviour
 {
-    private enum MatchFlowState
-    {
-        Inactive,
-        TurnPreparation,
-        TurnActive,
-        RoundBreak,
-        MatchComplete
-    }
-
     [Header("References")]
     [SerializeField] private RoundController roundController;
     [SerializeField] private TurnController turnController;
@@ -23,9 +31,14 @@ public sealed class MatchManager : MonoBehaviour
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
     public bool IsTurnActive => turnController && turnController.IsTurnActive;
-    public bool IsRoundBreakActive => matchFlowState == MatchFlowState.RoundBreak;
-    public bool IsAbilityMenuInteractionAllowed => HasActiveMatch && IsRoundBreakActive && !IsPauseOrSettingsBlocking();
+    public bool IsRoundBreakActive => CurrentPhase == GamePhase.RoundBreak;
+    public bool IsAbilityMenuInteractionAllowed => HasActiveMatch && CurrentPhase == GamePhase.RoundBreak && CurrentOverlay == GameOverlay.None;
     public bool HasActiveMatch { get; private set; }
+    public GamePhase CurrentPhase { get; private set; } = GamePhase.NoActiveMatch;
+    public GameOverlay CurrentOverlay { get; private set; } = GameOverlay.None;
+
+    public event Action<GamePhase, GamePhase> PhaseChanged;
+    public event Action<GameOverlay, GameOverlay> OverlayChanged;
 
     private UIManager uiManager;
 
@@ -33,8 +46,8 @@ public sealed class MatchManager : MonoBehaviour
     private bool hasCurrentConfiguration;
     private bool hasPreparedTurnState;
     private bool lastPreparedTurnCanStart;
-    private MatchFlowState matchFlowState = MatchFlowState.Inactive;
     private Coroutine roundBreakDelayRoutine;
+    private GameOverlay overlayToRestoreAfterSettings = GameOverlay.None;
 
     private bool isInitialized;
 
@@ -43,6 +56,8 @@ public sealed class MatchManager : MonoBehaviour
         ValidateReferences();
         if (abilitySelectionCoordinator)
             abilitySelectionCoordinator.SetMatchManager(this);
+
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
     }
 
     private void OnEnable()
@@ -54,7 +69,6 @@ public sealed class MatchManager : MonoBehaviour
     private void OnDisable()
     {
         if (!isInitialized) return;
-
         UnsubscribeFromGameFlow();
     }
 
@@ -62,7 +76,7 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!HasActiveMatch) return;
         if (!turnController) return;
-        if (matchFlowState != MatchFlowState.TurnPreparation) return;
+        if (CurrentPhase != GamePhase.TurnPreparation) return;
         if (turnController.IsTurnActive) return;
 
         var canStartTurn = roundController && roundController.HasAllRoundItemsActive;
@@ -94,7 +108,7 @@ public sealed class MatchManager : MonoBehaviour
         if (!turnController) return;
 
         StopRoundBreakDelayRoutine();
-        matchFlowState = MatchFlowState.TurnPreparation;
+        TransitionPhase(GamePhase.TurnPreparation);
         hasPreparedTurnState = false;
         turnController.PrepareTurn(PrepareCurrentTurn);
     }
@@ -128,8 +142,10 @@ public sealed class MatchManager : MonoBehaviour
         if (roundController)
             roundController.ReturnRoundItemsToPool();
 
+        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+
         StopRoundBreakDelayRoutine();
-        matchFlowState = MatchFlowState.MatchComplete;
+        TransitionPhase(GamePhase.MatchComplete);
         HasActiveMatch = false;
     }
 
@@ -158,9 +174,11 @@ public sealed class MatchManager : MonoBehaviour
     {
         ResetCurrentMatchProgress();
         SpawnConfiguredMatch(configuration);
+        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
 
         HasActiveMatch = true;
-        matchFlowState = MatchFlowState.Inactive;
+        overlayToRestoreAfterSettings = GameOverlay.None;
 
         if (uiManager)
             uiManager.ShowMatchState(this);
@@ -171,6 +189,8 @@ public sealed class MatchManager : MonoBehaviour
     private void ResetCurrentMatchProgress()
     {
         StopRoundBreakDelayRoutine();
+        SetOverlay(GameOverlay.None);
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
 
         if (goalController)
             goalController.StartGoalLockoutPeriod();
@@ -188,7 +208,6 @@ public sealed class MatchManager : MonoBehaviour
             abilitySelectionCoordinator.ResetProgression();
 
         hasPreparedTurnState = false;
-        matchFlowState = MatchFlowState.Inactive;
     }
 
     private bool SpawnConfiguredMatch(MatchConfiguration configuration)
@@ -201,15 +220,17 @@ public sealed class MatchManager : MonoBehaviour
 
     private void StopCurrentMatch()
     {
-        if (!HasActiveMatch) return;
+        if (!HasActiveMatch && CurrentPhase == GamePhase.NoActiveMatch) return;
         ResetCurrentMatchProgress();
 
         if (roundController)
             roundController.ReturnRoundItemsToPool();
 
+        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+
         HasActiveMatch = false;
         hasPreparedTurnState = false;
-        matchFlowState = MatchFlowState.Inactive;
+        TransitionPhase(GamePhase.NoActiveMatch);
     }
 
     private void SubscribeToGameFlow()
@@ -235,8 +256,10 @@ public sealed class MatchManager : MonoBehaviour
         {
             inGameMenu.RestartClicked += HandleRestartClicked;
             inGameMenu.MainMenuClicked += HandleMainMenuClicked;
-            inGameMenu.PauseStateChanged += HandlePauseStateChanged;
-            HandlePauseStateChanged(inGameMenu.IsPaused);
+            inGameMenu.PauseToggleRequested += HandlePauseToggleRequested;
+            inGameMenu.SettingsOpenRequested += HandleSettingsOpenRequested;
+            inGameMenu.SettingsCloseRequested += HandleSettingsCloseRequested;
+            ApplyOverlayEffects();
         }
     }
 
@@ -259,14 +282,39 @@ public sealed class MatchManager : MonoBehaviour
         {
             inGameMenu.RestartClicked -= HandleRestartClicked;
             inGameMenu.MainMenuClicked -= HandleMainMenuClicked;
-            inGameMenu.PauseStateChanged -= HandlePauseStateChanged;
+            inGameMenu.PauseToggleRequested -= HandlePauseToggleRequested;
+            inGameMenu.SettingsOpenRequested -= HandleSettingsOpenRequested;
+            inGameMenu.SettingsCloseRequested -= HandleSettingsCloseRequested;
         }
     }
 
-    private void HandlePauseStateChanged(bool isPaused)
+    private void HandlePauseToggleRequested()
     {
-        if (roundController)
-            roundController.SetAbilityPauseState(isPaused);
+        if (CurrentOverlay == GameOverlay.Settings) return;
+
+        var nextOverlay = CurrentOverlay == GameOverlay.Pause
+            ? GameOverlay.None
+            : GameOverlay.Pause;
+
+        SetOverlay(nextOverlay);
+    }
+
+    private void HandleSettingsOpenRequested()
+    {
+        if (CurrentOverlay == GameOverlay.Settings) return;
+
+        overlayToRestoreAfterSettings = CurrentOverlay == GameOverlay.Pause
+            ? GameOverlay.Pause
+            : GameOverlay.None;
+
+        SetOverlay(GameOverlay.Settings);
+    }
+
+    private void HandleSettingsCloseRequested()
+    {
+        if (CurrentOverlay != GameOverlay.Settings) return;
+
+        SetOverlay(overlayToRestoreAfterSettings);
     }
 
     private void HandleRespawnItemsRequested()
@@ -275,6 +323,8 @@ public sealed class MatchManager : MonoBehaviour
         if (!hasCurrentConfiguration) return;
 
         var canStartTurn = roundController && roundController.RebuildRoundItemsForTurn(currentConfiguration);
+        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+        ApplyResolvedPlayerInputMode();
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
 
@@ -287,13 +337,13 @@ public sealed class MatchManager : MonoBehaviour
 
     private void HandleTurnStarted()
     {
-        matchFlowState = MatchFlowState.TurnActive;
+        TransitionPhase(GamePhase.TurnActive);
     }
 
     private void EnterRoundBreak()
     {
         StopRoundBreakDelayRoutine();
-        matchFlowState = MatchFlowState.RoundBreak;
+        TransitionPhase(GamePhase.RoundBreak);
         roundBreakDelayRoutine = StartCoroutine(ReleaseRoundBreakAfterDelayRoutine());
     }
 
@@ -307,7 +357,7 @@ public sealed class MatchManager : MonoBehaviour
         roundBreakDelayRoutine = null;
 
         if (!HasActiveMatch) yield break;
-        if (matchFlowState != MatchFlowState.RoundBreak) yield break;
+        if (CurrentPhase != GamePhase.RoundBreak) yield break;
 
         PrepareNextTurn();
     }
@@ -341,11 +391,66 @@ public sealed class MatchManager : MonoBehaviour
             Debug.LogError($"{nameof(MatchManager)} requires an {nameof(AbilitySelectionCoordinator)} reference.", this);
     }
 
-    private bool IsPauseOrSettingsBlocking()
+    private void SetOverlay(GameOverlay nextOverlay)
+    {
+        if (CurrentOverlay == nextOverlay)
+        {
+            ApplyOverlayEffects();
+            ApplyResolvedPlayerInputMode();
+            return;
+        }
+
+        var previousOverlay = CurrentOverlay;
+        CurrentOverlay = nextOverlay;
+        ApplyOverlayEffects();
+        ApplyResolvedPlayerInputMode();
+        OverlayChanged?.Invoke(previousOverlay, CurrentOverlay);
+    }
+
+    private void TransitionPhase(GamePhase nextPhase)
+    {
+        if (CurrentPhase == nextPhase) return;
+
+        var previousPhase = CurrentPhase;
+        CurrentPhase = nextPhase;
+        ApplyResolvedPlayerInputMode();
+        PhaseChanged?.Invoke(previousPhase, CurrentPhase);
+    }
+
+    private void ApplyOverlayEffects()
     {
         var inGameMenu = uiManager ? uiManager.InGameMenu : null;
-        if (!inGameMenu) return false;
+        if (inGameMenu)
+            inGameMenu.ApplyOverlayState(CurrentOverlay);
 
-        return inGameMenu.IsPaused || inGameMenu.IsSettingsOpen;
+        if (roundController)
+            roundController.SetAbilityPauseState(CurrentOverlay != GameOverlay.None);
+    }
+
+    private void ApplyResolvedPlayerInputMode()
+    {
+        ApplyPlayerInputMode(ResolvePlayerInputMode());
+    }
+
+    private void ApplyPlayerInputMode(PlayerInputMode inputMode)
+    {
+        if (!roundController) return;
+        roundController.ApplyPlayerInputMode(inputMode);
+    }
+
+    private PlayerInputMode ResolvePlayerInputMode()
+    {
+        if (CurrentOverlay != GameOverlay.None)
+            return PlayerInputMode.Disabled;
+
+        return CurrentPhase switch
+        {
+            GamePhase.TurnActive => PlayerInputMode.Gameplay,
+            GamePhase.RoundBreak => PlayerInputMode.Intermission,
+            GamePhase.NoActiveMatch => PlayerInputMode.Disabled,
+            GamePhase.TurnPreparation => PlayerInputMode.Disabled,
+            GamePhase.MatchComplete => PlayerInputMode.Disabled,
+            _ => PlayerInputMode.Disabled
+        };
     }
 }

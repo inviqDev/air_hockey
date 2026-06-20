@@ -6,10 +6,10 @@ public sealed class UIManager : MonoBehaviour
     [SerializeField] private MenuViewsContainer menuViewsContainer;
     [SerializeField] private StartGameMenu startGameMenu;
     [SerializeField] private InGameMenuView inGameMenuView;
-    [SerializeField] private InGameMenuController inGameMenu;
+    [SerializeField] private InGameMenu inGameMenu;
     [SerializeField] private MatchUIView matchView;
 
-    public InGameMenuController InGameMenu => inGameMenu;
+    public InGameMenu InGameMenu => inGameMenu;
 
     public event Action<MatchConfiguration> MatchConfigurationSelected;
 
@@ -87,7 +87,8 @@ public sealed class UIManager : MonoBehaviour
         var rightPlayerScore = matchManager.RightScore;
         SetScores(leftPlayerScore, rightPlayerScore);
 
-        ClearGoalPopUpText();
+        if (matchView)
+            matchView.ResetMatchSessionState();
     }
 
     public void ClearGoalPopUpText()
@@ -151,7 +152,7 @@ public sealed class UIManager : MonoBehaviour
             Debug.LogError($"{nameof(UIManager)} requires an InGameMenuView reference.", this);
 
         if (!inGameMenu)
-            Debug.LogError($"{nameof(UIManager)} requires an InGameMenuController reference.", this);
+            Debug.LogError($"{nameof(UIManager)} requires an InGameMenu reference.", this);
 
         if (!matchView)
             Debug.LogError($"{nameof(UIManager)} requires a MatchUIView reference.", this);

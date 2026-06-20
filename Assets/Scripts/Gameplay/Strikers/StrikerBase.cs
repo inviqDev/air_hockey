@@ -16,7 +16,6 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
     private TurnController currentTurnController;
     private IMovable movable;
-
     private void Reset()
     {
         if (!sideOwner)

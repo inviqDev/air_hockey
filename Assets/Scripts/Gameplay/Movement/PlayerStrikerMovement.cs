@@ -4,10 +4,8 @@ using UnityEngine;
 public sealed class PlayerStrikerMovement : StrikerMovement
 {
     [SerializeField] private PlayerInputReader inputReader;
-    [SerializeField] private bool useLegacyDirectDash;
 
     private Vector2 currentMoveDirection;
-    private bool dashRequested;
 
     private void Reset()
     {
@@ -30,11 +28,9 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
         currentMoveDirection = Vector2.zero;
         SetCurrentMoveDirection(currentMoveDirection);
-        dashRequested = false;
 
         inputReader.Initialize(controlScheme);
         inputReader.MoveInputChanged += HandleMoveInputChanged;
-        inputReader.DashPressed += HandleDashPressed;
 
         currentMoveDirection = inputReader.CurrentMoveInput;
         SetCurrentMoveDirection(currentMoveDirection);
@@ -53,9 +49,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
     {
         if (!CanMoveThisFrame()) return;
 
-        var command = new MovementCommand(currentMoveDirection, dashRequested);
-        dashRequested = false;
-
+        var command = new MovementCommand(currentMoveDirection, false);
         ExecuteMovementStep(command);
         UpdateMovementLoopState();
     }
@@ -80,20 +74,18 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         }
 
         var hasMoveInput = currentMoveDirection.sqrMagnitude > 0.0001f;
-        var hasDashActivity = dashRequested || IsDashActive;
+        var hasDashActivity = IsDashActive;
 
         enabled = hasMoveInput || hasDashActivity;
     }
 
     protected override void HandleMovementStopped()
     {
-        dashRequested = false;
     }
 
     protected override void HandleMovementReset()
     {
         base.HandleMovementReset();
-        dashRequested = false;
     }
 
     private void HandleMoveInputChanged(Vector2 moveDirection)
@@ -103,18 +95,9 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
         if (!IsMovementAllowed) return;
 
-        if (moveDirection.sqrMagnitude <= 0.0001f && !dashRequested && !IsDashActive)
+        if (moveDirection.sqrMagnitude <= 0.0001f && !IsDashActive)
             StopMovement();
 
-        UpdateMovementLoopState();
-    }
-
-    private void HandleDashPressed()
-    {
-        if (!useLegacyDirectDash) return;
-        if (!IsMovementAllowed) return;
-
-        dashRequested = true;
         UpdateMovementLoopState();
     }
 
@@ -123,7 +106,6 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         if (!inputReader) return;
 
         inputReader.MoveInputChanged -= HandleMoveInputChanged;
-        inputReader.DashPressed -= HandleDashPressed;
         inputReader.Shutdown();
     }
 

@@ -96,6 +96,7 @@ public sealed class MatchUIView : MenuViewBase
     {
         UnsubscribeFromTurnEvents();
         StopGoalInfoAnimation();
+        StopAndResetTurnTimer();
     }
 
     protected override void HandleAfterInitialize()
@@ -123,6 +124,13 @@ public sealed class MatchUIView : MenuViewBase
         turnTimer.Stop();
         turnTimer.Reset();
         UpdateTurnTimerText();
+    }
+
+    public void ResetMatchSessionState()
+    {
+        StopGoalInfoAnimation();
+        HideGoalInfoElement();
+        StopAndResetTurnTimer();
     }
 
     private void HideGoalInfoImmediately()

@@ -23,6 +23,7 @@ public sealed class PlayerAbilityController : MonoBehaviour
 
     public int AbilitySlotCount => SlotCount;
     public bool IsAbilityUsageAllowed => canUseAbilitiesDuringTurn && !isPaused;
+    public PlayerInputReader InputReader => inputReader;
 
     public void SetPuckScaleController(IPuckScaleController controller)
     {

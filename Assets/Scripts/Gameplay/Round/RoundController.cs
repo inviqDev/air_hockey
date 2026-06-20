@@ -29,6 +29,7 @@ public sealed class RoundController : MonoBehaviour
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
     private bool isAbilityPauseStateActive;
+    private PlayerInputMode currentInputMode = PlayerInputMode.Disabled;
     
     private readonly Pool gameplayItemPool = new();
 
@@ -68,6 +69,8 @@ public sealed class RoundController : MonoBehaviour
         var rightStrikerSpawnPosition = GetPosition(rightStrikerSpawnPoint);
         rightStriker = ActivateStrikerFromPool(configuration, PlayerSide.Right, rightStrikerSpawnPosition);
         BindAbilityHud(PlayerSide.Right, rightStriker);
+
+        ApplyPlayerInputContextToActiveReaders();
     }
 
     public bool ResetRoundItemsForTurn()
@@ -106,6 +109,12 @@ public sealed class RoundController : MonoBehaviour
         isAbilityPauseStateActive = isPaused;
         ApplyAbilityPauseState(leftStriker);
         ApplyAbilityPauseState(rightStriker);
+    }
+
+    public void ApplyPlayerInputMode(PlayerInputMode inputMode)
+    {
+        currentInputMode = inputMode;
+        ApplyPlayerInputContextToActiveReaders();
     }
 
     public void ResetRoundItemsToStartPositions()
@@ -238,6 +247,26 @@ public sealed class RoundController : MonoBehaviour
 
         var abilityController = striker.AbilityController;
         abilityController?.SetPaused(isAbilityPauseStateActive);
+    }
+
+    private void ApplyPlayerInputContextToActiveReaders()
+    {
+        var leftReader = GetPlayerInputReader(leftStriker);
+        var rightReader = GetPlayerInputReader(rightStriker);
+
+        if (leftReader)
+            leftReader.SetInputMode(currentInputMode);
+
+        if (rightReader && rightReader != leftReader)
+            rightReader.SetInputMode(currentInputMode);
+    }
+
+    private static PlayerInputReader GetPlayerInputReader(StrikerBase striker)
+    {
+        if (!striker) return null;
+
+        var abilityController = striker.AbilityController;
+        return abilityController ? abilityController.InputReader : null;
     }
 
     private void ValidateReferences()

@@ -25,6 +25,7 @@ public sealed class InGameSettingsView : MenuViewBase
     [Header("Settings Windows")]
     [SerializeField] private GameObject topInfoPanel;
     [SerializeField] private GameObject centerPanel;
+    [SerializeField] private GameObject playerHudRoot;
 
     public event Action BackClicked;
     public event Action MainMenuClicked;
@@ -32,6 +33,7 @@ public sealed class InGameSettingsView : MenuViewBase
     private bool hasCachedManagedViewState;
     private bool wasTopInfoPanelActive;
     private bool wasCenterPanelActive;
+    private bool wasPlayerHudRootActive;
     private Tween fadeTween;
 
     private void OnEnable()
@@ -148,6 +150,7 @@ public sealed class InGameSettingsView : MenuViewBase
         hasCachedManagedViewState = true;
         wasTopInfoPanelActive = topInfoPanel && topInfoPanel.activeSelf;
         wasCenterPanelActive = centerPanel && centerPanel.activeSelf;
+        wasPlayerHudRootActive = playerHudRoot && playerHudRoot.activeSelf;
     }
 
     private void RestoreManagedViewState()
@@ -161,6 +164,9 @@ public sealed class InGameSettingsView : MenuViewBase
 
         if (centerPanel)
             centerPanel.SetActive(wasCenterPanelActive);
+
+        if (playerHudRoot)
+            playerHudRoot.SetActive(wasPlayerHudRootActive);
     }
 
     private void SetManagedViewUIActive(bool isActive)
@@ -170,6 +176,9 @@ public sealed class InGameSettingsView : MenuViewBase
 
         if (centerPanel)
             centerPanel.SetActive(isActive);
+
+        if (playerHudRoot)
+            playerHudRoot.SetActive(isActive);
     }
 
     private void SetSettingsContentActive(bool isActive)
@@ -246,5 +255,8 @@ public sealed class InGameSettingsView : MenuViewBase
 
         if (!centerPanel)
             Debug.LogError($"{nameof(InGameSettingsView)} requires a center panel reference.", this);
+
+        if (!playerHudRoot)
+            Debug.LogError($"{nameof(InGameSettingsView)} requires a player HUD root reference.", this);
     }
 }

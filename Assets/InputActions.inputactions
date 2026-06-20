@@ -16,15 +16,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "LeftPlayerDash",
-                    "type": "Button",
-                    "id": "980e05e2-fd24-4930-a092-c1d1aaa1b8e4",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "LeftPlayerAbilitySlot1",
                     "type": "Button",
                     "id": "5ce00bb7-2251-49d4-a70d-92d9054cbc9c",
@@ -68,15 +59,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
-                },
-                {
-                    "name": "RightPlayerDash",
-                    "type": "Button",
-                    "id": "7ab9853f-9668-4628-b16a-0eda0d7a9344",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 },
                 {
                     "name": "RightPlayerAbilitySlot1",
@@ -170,17 +152,6 @@
                     "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "d80f4b4f-5ab3-4c61-b013-49ec96ec0a7b",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "LeftPlayerDash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 },
                 {
                     "name": "",
@@ -283,17 +254,6 @@
                 },
                 {
                     "name": "",
-                    "id": "4397b0b5-1767-4e89-a983-784d7a629751",
-                    "path": "<Keyboard>/rightShift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RightPlayerDash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "728ce9c8-d3af-4e5f-9ad4-fb66ad2c2099",
                     "path": "<Keyboard>/numpad4",
                     "interactions": "",
@@ -333,6 +293,54 @@
                     "processors": "",
                     "groups": "",
                     "action": "RightPlayerAbilitySlot4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Intermission",
+            "id": "4fe67938-3798-4b79-b7ca-57a99f465085",
+            "actions": [
+                {
+                    "name": "LeftPlayerAbilityMenu",
+                    "type": "Button",
+                    "id": "d08bc474-eab1-4be9-9b53-3aa2a3a5ecb0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilityMenu",
+                    "type": "Button",
+                    "id": "93f00e86-ac4d-40f6-b0b2-e81987a8d8f5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "ba97f913-9ec2-4f98-82d0-ac4252ec8f6e",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilityMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6dcd3224-3413-4519-9e80-fd34e71de6e5",
+                    "path": "<Keyboard>/numpad0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilityMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

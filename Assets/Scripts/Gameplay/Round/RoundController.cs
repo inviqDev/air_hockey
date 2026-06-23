@@ -117,6 +117,12 @@ public sealed class RoundController : MonoBehaviour
         ApplyPlayerInputContextToActiveReaders();
     }
 
+    public PlayerAbilityController GetAbilityController(PlayerSide side)
+    {
+        var striker = side == PlayerSide.Left ? leftStriker : rightStriker;
+        return striker ? striker.AbilityController : null;
+    }
+
     public void ResetRoundItemsToStartPositions()
     {
         ResetStrikerToStartPosition(leftStriker, GetPosition(leftStrikerSpawnPoint));

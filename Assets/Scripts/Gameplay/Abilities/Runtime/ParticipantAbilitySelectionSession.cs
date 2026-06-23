@@ -39,10 +39,43 @@ public sealed class ParticipantAbilitySelectionSession
         return true;
     }
 
+    public bool TrySelectPreviousOffer()
+    {
+        return TrySelectRelative(-1);
+    }
+
+    public bool TrySelectNextOffer()
+    {
+        return TrySelectRelative(1);
+    }
+
     public void Close()
     {
         State = SessionState.Closed;
         offers = System.Array.Empty<AbilityOffer>();
         selectedOfferIndex = -1;
+    }
+
+    private bool TrySelectRelative(int offset)
+    {
+        if (State != SessionState.SelectingOffer) return false;
+
+        var offerCount = offers.Count;
+        if (offerCount <= 1)
+        {
+            if (offerCount == 1 && selectedOfferIndex < 0)
+                selectedOfferIndex = 0;
+
+            return false;
+        }
+
+        var nextIndex = (selectedOfferIndex + offset) % offerCount;
+        if (nextIndex < 0)
+            nextIndex += offerCount;
+
+        if (nextIndex == selectedOfferIndex) return false;
+
+        selectedOfferIndex = nextIndex;
+        return true;
     }
 }

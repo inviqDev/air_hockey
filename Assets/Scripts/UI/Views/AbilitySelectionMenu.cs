@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public sealed class AbilitySelectionMenu : MonoBehaviour
 {
+    private static readonly Color SelectedOfferColor = new(0.95f, 0.82f, 0.36f, 1f);
+
     [Header("Optional References")]
     [SerializeField] private TMP_Text selectionLabel;
     [SerializeField] private TMP_Text descriptionLabel;
@@ -19,6 +21,7 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
 
     private readonly Dictionary<Button, int> buttonIndexes = new();
     private readonly Dictionary<Button, UnityEngine.Events.UnityAction> buttonClickHandlers = new();
+    private readonly Dictionary<Button, Color> defaultButtonColors = new();
 
     private void Awake()
     {
@@ -64,6 +67,7 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
 
             button.gameObject.SetActive(hasOffer);
             button.interactable = hasOffer;
+            ApplyButtonSelectionVisual(button, hasOffer && i == selectedOfferIndex);
 
             var text = i < offerButtonLabels.Length
                 ? offerButtonLabels[i]
@@ -137,6 +141,7 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
             if (!button) continue;
 
             buttonIndexes[button] = i;
+            CacheDefaultButtonColor(button);
         }
     }
 
@@ -218,5 +223,27 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
     private static bool IsValidOfferIndex(IReadOnlyList<AbilityOffer> offers, int index)
     {
         return offers != null && index >= 0 && index < offers.Count;
+    }
+
+    private void ApplyButtonSelectionVisual(Button button, bool isSelected)
+    {
+        if (!button) return;
+        if (!button.targetGraphic) return;
+
+        CacheDefaultButtonColor(button);
+        if (!defaultButtonColors.TryGetValue(button, out var defaultColor)) return;
+
+        button.targetGraphic.color = isSelected
+            ? SelectedOfferColor
+            : defaultColor;
+    }
+
+    private void CacheDefaultButtonColor(Button button)
+    {
+        if (!button) return;
+        if (!button.targetGraphic) return;
+        if (defaultButtonColors.ContainsKey(button)) return;
+
+        defaultButtonColors[button] = button.targetGraphic.color;
     }
 }

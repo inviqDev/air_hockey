@@ -21,7 +21,6 @@ public sealed class AbilityHudView : MonoBehaviour
     private bool isSubscribed;
 
     public event Action PlusAbilityButtonClicked;
-    public PlayerAbilityController AbilityController => abilityController;
 
     public void SetFreeAbilityTimerText(string value)
     {

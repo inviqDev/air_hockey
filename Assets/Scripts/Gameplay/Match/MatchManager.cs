@@ -55,7 +55,10 @@ public sealed class MatchManager : MonoBehaviour
     {
         ValidateReferences();
         if (abilitySelectionCoordinator)
+        {
             abilitySelectionCoordinator.SetMatchManager(this);
+            RefreshAbilitySelectionBindings();
+        }
 
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
     }
@@ -142,7 +145,7 @@ public sealed class MatchManager : MonoBehaviour
         if (roundController)
             roundController.ReturnRoundItemsToPool();
 
-        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+        RefreshAbilitySelectionBindings();
 
         StopRoundBreakDelayRoutine();
         TransitionPhase(GamePhase.MatchComplete);
@@ -174,7 +177,7 @@ public sealed class MatchManager : MonoBehaviour
     {
         ResetCurrentMatchProgress();
         SpawnConfiguredMatch(configuration);
-        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+        RefreshAbilitySelectionBindings();
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
 
         HasActiveMatch = true;
@@ -226,7 +229,7 @@ public sealed class MatchManager : MonoBehaviour
         if (roundController)
             roundController.ReturnRoundItemsToPool();
 
-        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+        RefreshAbilitySelectionBindings();
 
         HasActiveMatch = false;
         hasPreparedTurnState = false;
@@ -236,7 +239,10 @@ public sealed class MatchManager : MonoBehaviour
     private void SubscribeToGameFlow()
     {
         if (abilitySelectionCoordinator)
+        {
             abilitySelectionCoordinator.SetMatchManager(this);
+            RefreshAbilitySelectionBindings();
+        }
 
         if (goalController)
             goalController.GoalResolved += HandleGoalResult;
@@ -323,7 +329,7 @@ public sealed class MatchManager : MonoBehaviour
         if (!hasCurrentConfiguration) return;
 
         var canStartTurn = roundController && roundController.RebuildRoundItemsForTurn(currentConfiguration);
-        abilitySelectionCoordinator?.RefreshRuntimeBindings();
+        RefreshAbilitySelectionBindings();
         ApplyResolvedPlayerInputMode();
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
@@ -436,6 +442,20 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!roundController) return;
         roundController.ApplyPlayerInputMode(inputMode);
+    }
+
+    private void RefreshAbilitySelectionBindings()
+    {
+        if (!abilitySelectionCoordinator) return;
+
+        if (!roundController)
+        {
+            abilitySelectionCoordinator.ClearParticipantAbilityControllers();
+            return;
+        }
+
+        abilitySelectionCoordinator.BindParticipantAbilityController(PlayerSide.Left, roundController.GetAbilityController(PlayerSide.Left));
+        abilitySelectionCoordinator.BindParticipantAbilityController(PlayerSide.Right, roundController.GetAbilityController(PlayerSide.Right));
     }
 
     private PlayerInputMode ResolvePlayerInputMode()

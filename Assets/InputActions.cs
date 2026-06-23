@@ -398,9 +398,45 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""LeftPlayerPreviousOffer"",
+                    ""type"": ""Button"",
+                    ""id"": ""514f6694-fbe8-4d11-a5f9-5fbb885d35c0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftPlayerNextOffer"",
+                    ""type"": ""Button"",
+                    ""id"": ""920ebc16-8072-4be2-9130-ee9410dfb13e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""RightPlayerAbilityMenu"",
                     ""type"": ""Button"",
                     ""id"": ""93f00e86-ac4d-40f6-b0b2-e81987a8d8f5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerPreviousOffer"",
+                    ""type"": ""Button"",
+                    ""id"": ""8b218531-05f1-4289-a4a9-9330696a0563"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerNextOffer"",
+                    ""type"": ""Button"",
+                    ""id"": ""d8623053-3255-4f6a-a1e4-c5f8d4dfe73b"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -427,6 +463,50 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""RightPlayerAbilityMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""38481e53-bd1d-4596-b513-1d7098a13fec"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerPreviousOffer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4515c7f2-d169-4eb3-b5a8-428f28053596"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerNextOffer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6de4442f-aefb-4fb4-8416-12dcb8577f34"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerPreviousOffer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""359e7985-9f04-4ac9-a97c-4f908dbbfe3e"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerNextOffer"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -511,7 +591,11 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         // Intermission
         m_Intermission = asset.FindActionMap("Intermission", throwIfNotFound: true);
         m_Intermission_LeftPlayerAbilityMenu = m_Intermission.FindAction("LeftPlayerAbilityMenu", throwIfNotFound: true);
+        m_Intermission_LeftPlayerPreviousOffer = m_Intermission.FindAction("LeftPlayerPreviousOffer", throwIfNotFound: true);
+        m_Intermission_LeftPlayerNextOffer = m_Intermission.FindAction("LeftPlayerNextOffer", throwIfNotFound: true);
         m_Intermission_RightPlayerAbilityMenu = m_Intermission.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
+        m_Intermission_RightPlayerPreviousOffer = m_Intermission.FindAction("RightPlayerPreviousOffer", throwIfNotFound: true);
+        m_Intermission_RightPlayerNextOffer = m_Intermission.FindAction("RightPlayerNextOffer", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -789,7 +873,11 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Intermission;
     private List<IIntermissionActions> m_IntermissionActionsCallbackInterfaces = new List<IIntermissionActions>();
     private readonly InputAction m_Intermission_LeftPlayerAbilityMenu;
+    private readonly InputAction m_Intermission_LeftPlayerPreviousOffer;
+    private readonly InputAction m_Intermission_LeftPlayerNextOffer;
     private readonly InputAction m_Intermission_RightPlayerAbilityMenu;
+    private readonly InputAction m_Intermission_RightPlayerPreviousOffer;
+    private readonly InputAction m_Intermission_RightPlayerNextOffer;
     /// <summary>
     /// Provides access to input actions defined in input action map "Intermission".
     /// </summary>
@@ -806,9 +894,25 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @LeftPlayerAbilityMenu => m_Wrapper.m_Intermission_LeftPlayerAbilityMenu;
         /// <summary>
+        /// Provides access to the underlying input action "Intermission/LeftPlayerPreviousOffer".
+        /// </summary>
+        public InputAction @LeftPlayerPreviousOffer => m_Wrapper.m_Intermission_LeftPlayerPreviousOffer;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/LeftPlayerNextOffer".
+        /// </summary>
+        public InputAction @LeftPlayerNextOffer => m_Wrapper.m_Intermission_LeftPlayerNextOffer;
+        /// <summary>
         /// Provides access to the underlying input action "Intermission/RightPlayerAbilityMenu".
         /// </summary>
         public InputAction @RightPlayerAbilityMenu => m_Wrapper.m_Intermission_RightPlayerAbilityMenu;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/RightPlayerPreviousOffer".
+        /// </summary>
+        public InputAction @RightPlayerPreviousOffer => m_Wrapper.m_Intermission_RightPlayerPreviousOffer;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/RightPlayerNextOffer".
+        /// </summary>
+        public InputAction @RightPlayerNextOffer => m_Wrapper.m_Intermission_RightPlayerNextOffer;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -838,9 +942,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerAbilityMenu.started += instance.OnLeftPlayerAbilityMenu;
             @LeftPlayerAbilityMenu.performed += instance.OnLeftPlayerAbilityMenu;
             @LeftPlayerAbilityMenu.canceled += instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerPreviousOffer.started += instance.OnLeftPlayerPreviousOffer;
+            @LeftPlayerPreviousOffer.performed += instance.OnLeftPlayerPreviousOffer;
+            @LeftPlayerPreviousOffer.canceled += instance.OnLeftPlayerPreviousOffer;
+            @LeftPlayerNextOffer.started += instance.OnLeftPlayerNextOffer;
+            @LeftPlayerNextOffer.performed += instance.OnLeftPlayerNextOffer;
+            @LeftPlayerNextOffer.canceled += instance.OnLeftPlayerNextOffer;
             @RightPlayerAbilityMenu.started += instance.OnRightPlayerAbilityMenu;
             @RightPlayerAbilityMenu.performed += instance.OnRightPlayerAbilityMenu;
             @RightPlayerAbilityMenu.canceled += instance.OnRightPlayerAbilityMenu;
+            @RightPlayerPreviousOffer.started += instance.OnRightPlayerPreviousOffer;
+            @RightPlayerPreviousOffer.performed += instance.OnRightPlayerPreviousOffer;
+            @RightPlayerPreviousOffer.canceled += instance.OnRightPlayerPreviousOffer;
+            @RightPlayerNextOffer.started += instance.OnRightPlayerNextOffer;
+            @RightPlayerNextOffer.performed += instance.OnRightPlayerNextOffer;
+            @RightPlayerNextOffer.canceled += instance.OnRightPlayerNextOffer;
         }
 
         /// <summary>
@@ -855,9 +971,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @LeftPlayerAbilityMenu.started -= instance.OnLeftPlayerAbilityMenu;
             @LeftPlayerAbilityMenu.performed -= instance.OnLeftPlayerAbilityMenu;
             @LeftPlayerAbilityMenu.canceled -= instance.OnLeftPlayerAbilityMenu;
+            @LeftPlayerPreviousOffer.started -= instance.OnLeftPlayerPreviousOffer;
+            @LeftPlayerPreviousOffer.performed -= instance.OnLeftPlayerPreviousOffer;
+            @LeftPlayerPreviousOffer.canceled -= instance.OnLeftPlayerPreviousOffer;
+            @LeftPlayerNextOffer.started -= instance.OnLeftPlayerNextOffer;
+            @LeftPlayerNextOffer.performed -= instance.OnLeftPlayerNextOffer;
+            @LeftPlayerNextOffer.canceled -= instance.OnLeftPlayerNextOffer;
             @RightPlayerAbilityMenu.started -= instance.OnRightPlayerAbilityMenu;
             @RightPlayerAbilityMenu.performed -= instance.OnRightPlayerAbilityMenu;
             @RightPlayerAbilityMenu.canceled -= instance.OnRightPlayerAbilityMenu;
+            @RightPlayerPreviousOffer.started -= instance.OnRightPlayerPreviousOffer;
+            @RightPlayerPreviousOffer.performed -= instance.OnRightPlayerPreviousOffer;
+            @RightPlayerPreviousOffer.canceled -= instance.OnRightPlayerPreviousOffer;
+            @RightPlayerNextOffer.started -= instance.OnRightPlayerNextOffer;
+            @RightPlayerNextOffer.performed -= instance.OnRightPlayerNextOffer;
+            @RightPlayerNextOffer.canceled -= instance.OnRightPlayerNextOffer;
         }
 
         /// <summary>
@@ -1049,11 +1177,39 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLeftPlayerAbilityMenu(InputAction.CallbackContext context);
         /// <summary>
+        /// Method invoked when associated input action "LeftPlayerPreviousOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerPreviousOffer(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftPlayerNextOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerNextOffer(InputAction.CallbackContext context);
+        /// <summary>
         /// Method invoked when associated input action "RightPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightPlayerAbilityMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerPreviousOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerPreviousOffer(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerNextOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerNextOffer(InputAction.CallbackContext context);
     }
 }

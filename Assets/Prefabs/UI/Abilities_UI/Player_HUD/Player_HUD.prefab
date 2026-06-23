@@ -172,6 +172,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Abilities_board
       objectReference: {fileID: 0}
+    - target: {fileID: 1324396379296527525, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2245079042778091148, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -631,7 +635,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1987607990945074944, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
       propertyPath: m_Name
-      value: Plus_button
+      value: Open_offers_menu_button
       objectReference: {fileID: 0}
     - target: {fileID: 2008965816432248958, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
       propertyPath: m_Interactable
@@ -723,7 +727,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5626583731924481592, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
       propertyPath: m_Name
-      value: Add_ability_button
+      value: Ability_offer_view
       objectReference: {fileID: 0}
     - target: {fileID: 6292870806995444479, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
       propertyPath: m_Name
@@ -731,7 +735,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6595811306337184355, guid: bfa075cd2d411f94fba0ca94ea5eb793, type: 3}
       propertyPath: m_Name
-      value: Available_points
+      value: Available_points_text
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

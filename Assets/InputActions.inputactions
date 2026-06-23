@@ -312,9 +312,45 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "LeftPlayerPreviousOffer",
+                    "type": "Button",
+                    "id": "514f6694-fbe8-4d11-a5f9-5fbb885d35c0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerNextOffer",
+                    "type": "Button",
+                    "id": "920ebc16-8072-4be2-9130-ee9410dfb13e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "RightPlayerAbilityMenu",
                     "type": "Button",
                     "id": "93f00e86-ac4d-40f6-b0b2-e81987a8d8f5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerPreviousOffer",
+                    "type": "Button",
+                    "id": "8b218531-05f1-4289-a4a9-9330696a0563",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerNextOffer",
+                    "type": "Button",
+                    "id": "d8623053-3255-4f6a-a1e4-c5f8d4dfe73b",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -341,6 +377,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "RightPlayerAbilityMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "38481e53-bd1d-4596-b513-1d7098a13fec",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerPreviousOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4515c7f2-d169-4eb3-b5a8-428f28053596",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerNextOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6de4442f-aefb-4fb4-8416-12dcb8577f34",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerPreviousOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "359e7985-9f04-4ac9-a97c-4f908dbbfe3e",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerNextOffer",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

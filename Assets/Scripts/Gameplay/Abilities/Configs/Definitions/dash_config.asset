@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DashAbilityConfig
   id: Dash_Ability_ID
   displayName: Dash
-  description: DASH DASH DAAAAASH
+  description: 'HERE SHOULD BE A DESCRIPTION OF THE DASH ABILITY
+
+    + upgrade levels
+    changes'
   icon: {fileID: 21300000, guid: 9fb5970e0e24de34eb1ac22352d5a6e6, type: 3}
   dashSpeed: 16
   dashDuration: 0.12

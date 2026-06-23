@@ -7353,15 +7353,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turnController: {fileID: 6400000000000000008}
   abilityCatalog: {fileID: 11400000, guid: 4b61d49f9c1849db9b5f7c7f9f5df090, type: 2}
-  leftProgression:
+  leftParticipantProgression:
     abilityHud: {fileID: 4801122334455667701}
     abilitySelectionMenu: {fileID: 2066541299}
-    initialDurationSeconds: 5
+    initialDurationSeconds: 30
     durationMultiplier: 1.5
-  rightProgression:
+  rightParticipantProgression:
     abilityHud: {fileID: 4801122334455667702}
     abilitySelectionMenu: {fileID: 995199731}
-    initialDurationSeconds: 3
+    initialDurationSeconds: 30
     durationMultiplier: 1.5
 --- !u!1 &1879605501
 GameObject:
@@ -9062,6 +9062,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1316459781167304971, guid: cad5e6a2e7bf27c4f962e29f2add10bb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2229053262869863373, guid: cad5e6a2e7bf27c4f962e29f2add10bb, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -9125,6 +9129,10 @@ PrefabInstance:
     - target: {fileID: 5171755019670333491, guid: cad5e6a2e7bf27c4f962e29f2add10bb, type: 3}
       propertyPath: m_Name
       value: Plus_button
+      objectReference: {fileID: 0}
+    - target: {fileID: 6081157353077533983, guid: cad5e6a2e7bf27c4f962e29f2add10bb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6399300812917943928, guid: cad5e6a2e7bf27c4f962e29f2add10bb, type: 3}
       propertyPath: m_AnchorMax.y

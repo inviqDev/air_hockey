@@ -172,6 +172,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Abilities_board
       objectReference: {fileID: 0}
+    - target: {fileID: 1324396379296527525, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2245079042778091148, guid: 55a9a76fc1d7ebe4ca10fd5e9f1e79f9, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

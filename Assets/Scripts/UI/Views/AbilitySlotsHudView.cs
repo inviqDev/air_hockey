@@ -1,50 +1,33 @@
-using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-public sealed class AbilityHudView : MonoBehaviour
+public sealed class AbilitySlotsHudView : MonoBehaviour
 {
-    private const int SlotCount = 4;
-
-    [Header("Free Ability Timer")]
-    [SerializeField] private TextMeshProUGUI freeTimerText;
-    
-    [Header("Add Ability Button")]
-    [SerializeField] private Button plusButton;
-    [SerializeField] private TextMeshProUGUI availablePointsText;
-
-    [Header("Ability Slots")]
-    [SerializeField] private AbilitySlotHudView[] abilitySlots;
+    [SerializeField] private AbilitySlot[] abilitySlots;
 
     private PlayerAbilityController abilityController;
+    
+    private bool isInitialized;
     private bool isSubscribed;
 
-    public event Action PlusAbilityButtonClicked;
-
-    public void SetFreeAbilityTimerText(string value)
+    public void Initialize()
     {
-        if (!freeTimerText) return;
-        freeTimerText.text = value;
-    }
+        if (isInitialized) return;
 
-    public void SetAvailableAmount(int amount)
-    {
-        if (!availablePointsText) return;
+        ValidateReferences();
+        SetAllSlotsEmpty();
+        isInitialized = true;
 
-        var clampedAmount = Mathf.Max(0, amount);
-        availablePointsText.text = clampedAmount.ToString();
-    }
-
-    public void SetAbilityMenuButtonEnabled(bool isEnabled)
-    {
-        if (!plusButton) return;
-
-        plusButton.interactable = isEnabled;
+        if (isActiveAndEnabled)
+        {
+            SubscribeToController();
+            RefreshAllSlots();
+        }
     }
 
     public void BindAbilityController(PlayerAbilityController controller)
     {
+        Initialize();
+
         if (abilityController == controller) return;
 
         UnsubscribeFromController();
@@ -53,28 +36,13 @@ public sealed class AbilityHudView : MonoBehaviour
         if (isActiveAndEnabled)
             SubscribeToController();
 
-        ValidateSlotCount();
+        ValidateControllerSlotCompatibility();
         RefreshAllSlots();
-    }
-
-    private void OnValidate()
-    {
-        CacheAbilitySlotViews();
-        ValidateReferences();
-    }
-
-    private void Awake()
-    {
-        CacheAbilitySlotViews();
-        ValidateReferences();
-        SetAbilityMenuButtonEnabled(false);
-        SetAllSlotsEmpty();
     }
 
     private void OnEnable()
     {
-        if (plusButton)
-            plusButton.onClick.AddListener(HandleAbilityMenuButtonClicked);
+        if (!isInitialized) return;
 
         SubscribeToController();
         RefreshAllSlots();
@@ -82,29 +50,19 @@ public sealed class AbilityHudView : MonoBehaviour
 
     private void OnDisable()
     {
-        if (plusButton)
-            plusButton.onClick.RemoveListener(HandleAbilityMenuButtonClicked);
-
+        if (!isInitialized) return;
         UnsubscribeFromController();
+    }
+
+    private void OnValidate()
+    {
+        ValidateReferences();
     }
 
     private void Update()
     {
+        if (!isInitialized) return;
         RefreshCooldowns();
-    }
-
-    private void ValidateReferences()
-    {
-        if (!freeTimerText)
-            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires a free ability timer text reference.", this);
-
-        if (!plusButton)
-            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires an add ability button reference.", this);
-
-        if (!availablePointsText)
-            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires an available amount text reference.", this);
-
-        ValidateSlotCount();
     }
 
     private void SubscribeToController()
@@ -129,11 +87,6 @@ public sealed class AbilityHudView : MonoBehaviour
     private void HandleAbilitySlotChanged(int slotIndex)
     {
         RefreshSlot(slotIndex);
-    }
-
-    private void HandleAbilityMenuButtonClicked()
-    {
-        PlusAbilityButtonClicked?.Invoke();
     }
 
     private void RefreshAllSlots()
@@ -172,11 +125,13 @@ public sealed class AbilityHudView : MonoBehaviour
         for (var i = 0; i < slotCount; i++)
         {
             var slotData = abilityController.GetAbilitySlotData(i);
+            if (slotData.IsEmpty) continue;
+
             abilitySlots[i].SetCooldown(slotData.ShouldUseActiveCooldownBackground, slotData.CooldownVisualNormalized);
         }
     }
 
-    private void ApplySlotData(AbilitySlotHudView slotView, AbilitySlotData slotData)
+    private void ApplySlotData(AbilitySlot slotView, AbilitySlotData slotData)
     {
         if (slotData.IsEmpty)
         {
@@ -192,33 +147,55 @@ public sealed class AbilityHudView : MonoBehaviour
     {
         foreach (var slot in abilitySlots)
         {
+            if (!slot) continue;
             slot.SetEmpty();
         }
     }
 
-    private void CacheAbilitySlotViews()
+    private void ValidateReferences()
     {
-        if (abilitySlots != null && abilitySlots.Length == SlotCount) return;
+        ValidateConfiguredSlotViews();
 
-        abilitySlots = GetComponentsInChildren<AbilitySlotHudView>(true);
+        if (abilitySlots == null) return;
+
+        for (var i = 0; i < abilitySlots.Length; i++)
+        {
+            if (abilitySlots[i]) continue;
+
+            Debug.LogError(
+                $"{nameof(AbilitySlotsHudView)} on {name} requires an {nameof(AbilitySlot)} reference for slot index {i}.",
+                this);
+        }
     }
 
-    private void ValidateSlotCount()
+    private void ValidateConfiguredSlotViews()
     {
         if (abilitySlots == null)
         {
-            Debug.LogError($"{nameof(AbilityHudView)} on {name} requires ability slot view references.", this);
+            Debug.LogError($"{nameof(AbilitySlotsHudView)} on {name} requires ability slot view references.", this);
             return;
         }
 
-        var expectedSlotCount = abilityController
-            ? abilityController.AbilitySlotCount
-            : SlotCount;
-
-        if (abilitySlots.Length != expectedSlotCount)
+        if (abilitySlots.Length == 0)
         {
             Debug.LogError(
-                $"{nameof(AbilityHudView)} on {name} has {abilitySlots.Length} ability slot views, but expected {expectedSlotCount}.",
+                $"{nameof(AbilitySlotsHudView)} on {name} requires at least one {nameof(AbilitySlot)} reference.",
+                this);
+        }
+    }
+
+    private void ValidateControllerSlotCompatibility()
+    {
+        if (!abilityController) return;
+        if (abilitySlots == null) return;
+
+        var runtimeSlotCount = abilityController.AbilitySlotCount;
+        var configuredSlotCount = abilitySlots.Length;
+
+        if (configuredSlotCount != runtimeSlotCount)
+        {
+            Debug.LogError(
+                $"{nameof(AbilitySlotsHudView)} on {name} has {configuredSlotCount} configured slot views, but {nameof(PlayerAbilityController)} expects {runtimeSlotCount} slots.",
                 this);
         }
     }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class AbilitySlotHudView : MonoBehaviour
+public sealed class AbilitySlot : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Image abilityIcon;
@@ -11,6 +11,10 @@ public sealed class AbilitySlotHudView : MonoBehaviour
     [SerializeField] private Image sliderBackground;
     [SerializeField] private Color activeBackgroundColor;
     [SerializeField] private Color inactiveBackgroundColor;
+
+    private bool hasCachedCooldownState;
+    private float currentCooldownNormalized = -1f;
+    private bool currentUsesActiveBackground;
 
     public void SetEmpty()
     {
@@ -40,15 +44,27 @@ public sealed class AbilitySlotHudView : MonoBehaviour
         if (!cooldownSlider) return;
 
         var clampedNormalized = Mathf.Clamp01(normalized);
-        cooldownSlider.gameObject.SetActive(true);
-        cooldownSlider.value = clampedNormalized;
+        if (!cooldownSlider.gameObject.activeSelf)
+            cooldownSlider.gameObject.SetActive(true);
+
+        if (!hasCachedCooldownState || !Mathf.Approximately(currentCooldownNormalized, clampedNormalized))
+        {
+            cooldownSlider.value = clampedNormalized;
+            currentCooldownNormalized = clampedNormalized;
+        }
 
         if (sliderBackground)
         {
-            sliderBackground.color = useActiveBackground
-                ? activeBackgroundColor
-                : inactiveBackgroundColor;
+            if (!hasCachedCooldownState || currentUsesActiveBackground != useActiveBackground)
+            {
+                sliderBackground.color = useActiveBackground
+                    ? activeBackgroundColor
+                    : inactiveBackgroundColor;
+            }
         }
+
+        currentUsesActiveBackground = useActiveBackground;
+        hasCachedCooldownState = true;
     }
 
     private void OnValidate()
@@ -73,15 +89,15 @@ public sealed class AbilitySlotHudView : MonoBehaviour
     private void ValidateReferences()
     {
         if (!abilityIcon)
-            Debug.LogError($"{nameof(AbilitySlotHudView)} on {name} requires an ability icon image reference.", this);
+            Debug.LogError($"{nameof(AbilitySlot)} on {name} requires an ability icon image reference.", this);
 
         if (!emptyAbilityIcon)
-            Debug.LogError($"{nameof(AbilitySlotHudView)} on {name} requires an empty ability icon sprite reference.", this);
+            Debug.LogError($"{nameof(AbilitySlot)} on {name} requires an empty ability icon sprite reference.", this);
 
         if (!cooldownSlider)
-            Debug.LogError($"{nameof(AbilitySlotHudView)} on {name} requires a cooldown slider reference.", this);
+            Debug.LogError($"{nameof(AbilitySlot)} on {name} requires a cooldown slider reference.", this);
 
         if (!sliderBackground)
-            Debug.LogError($"{nameof(AbilitySlotHudView)} on {name} requires a cooldown background image reference.", this);
+            Debug.LogError($"{nameof(AbilitySlot)} on {name} requires a cooldown background image reference.", this);
     }
 }

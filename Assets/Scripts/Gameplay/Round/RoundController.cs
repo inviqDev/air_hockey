@@ -22,8 +22,8 @@ public sealed class RoundController : MonoBehaviour
     [SerializeField] private PuckRegistry puckRegistry;
 
     [Header("Ability HUD")]
-    [SerializeField] private AbilityHudView leftAbilityHud;
-    [SerializeField] private AbilityHudView rightAbilityHud;
+    [SerializeField] private ParticipantHudView leftParticipantHud;
+    [SerializeField] private ParticipantHudView rightParticipantHud;
 
     private Puck puck;
     private StrikerBase leftStriker;
@@ -140,6 +140,7 @@ public sealed class RoundController : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
+        InitializeAbilityHuds();
         ReturnRoundItemsToPool();
     }
 
@@ -230,16 +231,25 @@ public sealed class RoundController : MonoBehaviour
 
     private void ClearAbilityHuds()
     {
-        if (leftAbilityHud)
-            leftAbilityHud.BindAbilityController(null);
+        if (leftParticipantHud)
+            leftParticipantHud.BindAbilityController(null);
 
-        if (rightAbilityHud)
-            rightAbilityHud.BindAbilityController(null);
+        if (rightParticipantHud)
+            rightParticipantHud.BindAbilityController(null);
     }
 
-    private AbilityHudView GetAbilityHud(PlayerSide side)
+    private ParticipantHudView GetAbilityHud(PlayerSide side)
     {
-        return side == PlayerSide.Left ? leftAbilityHud : rightAbilityHud;
+        return side == PlayerSide.Left ? leftParticipantHud : rightParticipantHud;
+    }
+
+    private void InitializeAbilityHuds()
+    {
+        if (leftParticipantHud)
+            leftParticipantHud.Initialize();
+
+        if (rightParticipantHud)
+            rightParticipantHud.Initialize();
     }
 
     private IPuckScaleController GetPuckScaleController()
@@ -310,10 +320,10 @@ public sealed class RoundController : MonoBehaviour
         if (!puckRegistry)
             Debug.LogError($"{nameof(RoundController)} requires a PuckRegistry reference.", this);
 
-        if (!leftAbilityHud)
+        if (!leftParticipantHud)
             Debug.LogError($"{nameof(RoundController)} requires a left ability HUD reference.", this);
 
-        if (!rightAbilityHud)
+        if (!rightParticipantHud)
             Debug.LogError($"{nameof(RoundController)} requires a right ability HUD reference.", this);
     }
 }

@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7049296308258092543}
   - component: {fileID: 6472530420696884956}
+  - component: {fileID: 1717111717111717111}
   m_Layer: 5
-  m_Name: Abilities_board
+  m_Name: Ability_slots_view
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24,7 +25,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1324396379296527525}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -64,6 +65,23 @@ MonoBehaviour:
   m_Spacing: {x: 0, y: 15}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!114 &1717111717111717111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324396379296527525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7557860f3d4d7ca0f3412879395a23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilitySlots:
+  - {fileID: 171113597092341305}
+  - {fileID: 1610798820148731288}
+  - {fileID: 9164590973028633243}
+  - {fileID: 5039218494317070331}
 --- !u!1001 &3168616650037301106
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -170,6 +188,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2365640389036227167, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
   m_PrefabInstance: {fileID: 3168616650037301106}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1610798820148731288 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4441539824000291562, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
+  m_PrefabInstance: {fileID: 3168616650037301106}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
 --- !u!1001 &4610681172100674771
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -271,6 +300,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
+--- !u!114 &171113597092341305 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4441539824000291562, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
+  m_PrefabInstance: {fileID: 4610681172100674771}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
 --- !u!224 &2245079042778091148 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2365640389036227167, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
@@ -382,6 +422,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2365640389036227167, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
   m_PrefabInstance: {fileID: 4795399151851821169}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9164590973028633243 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4441539824000291562, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
+  m_PrefabInstance: {fileID: 4795399151851821169}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
 --- !u!1001 &8668693114590909713
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -483,6 +534,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
+--- !u!114 &5039218494317070331 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4441539824000291562, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}
+  m_PrefabInstance: {fileID: 8668693114590909713}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81da67f36c264d21b6ed41fa5a736123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilitySlotHudView
 --- !u!224 &6384154923071893326 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2365640389036227167, guid: a362d53a96f9be64dab5551a3f12d35e, type: 3}

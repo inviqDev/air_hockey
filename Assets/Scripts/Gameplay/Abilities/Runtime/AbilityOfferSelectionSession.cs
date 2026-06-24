@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 
-public sealed class ParticipantAbilitySelectionSession
+public sealed class AbilityOfferSelectionSession
 {
     public enum SessionState
     {
@@ -8,7 +9,7 @@ public sealed class ParticipantAbilitySelectionSession
         SelectingOffer
     }
 
-    private IReadOnlyList<AbilityOffer> offers = System.Array.Empty<AbilityOffer>();
+    private IReadOnlyList<AbilityOffer> offers = Array.Empty<AbilityOffer>();
     private int selectedOfferIndex = -1;
 
     public SessionState State { get; private set; }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 564008661852654636}
   - component: {fileID: 2008965816432248958}
   m_Layer: 5
-  m_Name: Plus_icon
+  m_Name: Open_offers_view_button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -117,7 +117,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 944816416698829021}
+  m_TargetGraphic: {fileID: 564008661852654636}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -268,8 +268,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3434496186387418086}
   - component: {fileID: 6293908490660212937}
+  - component: {fileID: 4364332525515522246}
   m_Layer: 5
-  m_Name: Add_ability_button
+  m_Name: Ability_offers_view
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -282,7 +283,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5626583731924481592}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -304,6 +305,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5626583731924481592}
   m_CullTransparentMesh: 1
+--- !u!114 &4364332525515522246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5626583731924481592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f451812b6eb847e69e2b6492d5845fd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openAbilityOffersButton: {fileID: 2008965816432248958}
+  availablePointsText: {fileID: 8903666568348962235}
 --- !u!1 &6292870806995444479
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,7 +331,7 @@ GameObject:
   - component: {fileID: 6743452391121664815}
   - component: {fileID: 8903666568348962235}
   m_Layer: 5
-  m_Name: Available_amount
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -453,7 +468,7 @@ GameObject:
   - component: {fileID: 5347640133382107593}
   - component: {fileID: 944816416698829021}
   m_Layer: 5
-  m_Name: Open_+ability_selection
+  m_Name: Available_points_text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

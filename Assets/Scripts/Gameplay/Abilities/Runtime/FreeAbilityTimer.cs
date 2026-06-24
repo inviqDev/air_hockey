@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public sealed class FreeAbilityTimerProgression
+public sealed class FreeAbilityTimer
 {
     private readonly Timer freeAbilityTimer = new();
 
@@ -9,6 +9,7 @@ public sealed class FreeAbilityTimerProgression
     private float nextTimerDuration = 1f;
 
     public string TimerCurrentValueText => freeAbilityTimer.GetFormattedMinutesSeconds();
+    public int TimerCurrentDisplaySeconds => GetDisplaySeconds();
 
     public void ConfigureFreeAbilityTimer(float initialDurationSeconds, float multiplier)
     {
@@ -18,18 +19,18 @@ public sealed class FreeAbilityTimerProgression
         ResetFreeAbilityTimer();
     }
 
-    public void ResetProgression()
+    public void ResetTimer()
     {
         nextTimerDuration = initialTimerDuration;
         ResetFreeAbilityTimer();
     }
 
-    public void StartTurnProgression()
+    public void StartTurnTimer()
     {
         freeAbilityTimer.Start();
     }
 
-    public void StopTurnProgression()
+    public void StopTurnTimer()
     {
         freeAbilityTimer.Stop();
     }
@@ -41,7 +42,7 @@ public sealed class FreeAbilityTimerProgression
         var completed = freeAbilityTimer.Tick(deltaTime);
         if (!completed) return false;
 
-        RestartFreeAbilityTimerWithNextDuration();
+        RestartTimerWithIncreasedDuration();
         return true;
     }
 
@@ -52,10 +53,18 @@ public sealed class FreeAbilityTimerProgression
         freeAbilityTimer.Reset();
     }
 
-    private void RestartFreeAbilityTimerWithNextDuration()
+    private void RestartTimerWithIncreasedDuration()
     {
         nextTimerDuration *= durationMultiplier;
         freeAbilityTimer.SetDecremental(nextTimerDuration);
         freeAbilityTimer.Restart();
+    }
+
+    private int GetDisplaySeconds()
+    {
+        var clampedSeconds = Mathf.Max(0f, freeAbilityTimer.CurrentSeconds);
+        return freeAbilityTimer.Mode == Timer.TimerMode.Decremental
+            ? Mathf.CeilToInt(clampedSeconds)
+            : Mathf.FloorToInt(clampedSeconds);
     }
 }

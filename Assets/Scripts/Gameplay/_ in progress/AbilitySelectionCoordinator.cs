@@ -5,8 +5,8 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
 {
     [SerializeField] private TurnController turnController;
     [SerializeField] private AbilityCatalog abilityCatalog;
-    [SerializeField] private ParticipantAbilitySelectionBinding leftParticipantProgression = new();
-    [SerializeField] private ParticipantAbilitySelectionBinding rightParticipantProgression = new();
+    [SerializeField] private ParticipantAbilitySetup leftParticipantProgression = new();
+    [SerializeField] private ParticipantAbilitySetup rightParticipantProgression = new();
 
     private readonly AbilityOfferService offerService = new();
 
@@ -102,18 +102,19 @@ public sealed class AbilitySelectionCoordinator : MonoBehaviour
         rightParticipantProgression.Validate(nameof(rightParticipantProgression), this);
     }
 
-    private ParticipantAbilitySelectionRuntime CreateParticipantRuntime(ParticipantAbilitySelectionBinding binding)
+    private ParticipantAbilitySelectionRuntime CreateParticipantRuntime(ParticipantAbilitySetup binding)
     {
-        var progression = new ParticipantAbilityProgression(binding.InitialDurationSeconds, binding.DurationMultiplier);
-        var offerFlow = new ParticipantAbilityOfferFlow(
-            binding.AbilityHud,
-            binding.AbilitySelectionMenu,
+        var progression = new AbilityPointsProgression(binding.InitialDurationSeconds, binding.DurationMultiplier);
+
+        var offerFlow = new AbilityOfferSelectionFlow(
+            binding.ParticipantHud,
+            binding.AbilitySelectionViewContainer,
             progression,
             abilityCatalog,
             offerService,
             () => matchManager && matchManager.IsAbilityMenuInteractionAllowed);
 
-        return new ParticipantAbilitySelectionRuntime(binding.AbilityHud, progression, offerFlow);
+        return new ParticipantAbilitySelectionRuntime(binding.ParticipantHud, progression, offerFlow);
     }
 
     private ParticipantAbilitySelectionRuntime GetParticipantRuntime(PlayerSide side)

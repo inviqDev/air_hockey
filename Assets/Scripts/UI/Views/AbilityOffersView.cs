@@ -4,18 +4,16 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class AbilitySelectionMenu : MonoBehaviour
+public sealed class AbilityOffersView  : MonoBehaviour
 {
-    private static readonly Color SelectedOfferColor = new(0.95f, 0.82f, 0.36f, 1f);
+    [SerializeField] private Color highlightedColor;
 
-    [Header("Optional References")]
-    [SerializeField] private TMP_Text selectionLabel;
-    [SerializeField] private TMP_Text descriptionLabel;
-    [SerializeField] private Transform selectionButtonsRoot;
+    [SerializeField] private Transform buttonsRoot;
     [SerializeField] private Button[] offerButtons;
-    [SerializeField] private TMP_Text[] offerButtonLabels;
+    
+    [SerializeField] private TMP_Text descriptionLabel;
 
-    public event Action<int> OfferClicked;
+    public event Action<int> SelectedOfferClicked;
 
     public bool IsOpen => gameObject.activeSelf;
 
@@ -25,7 +23,7 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
 
     private void Awake()
     {
-        CacheReferences();
+        ValidateReferences();
         RebuildButtonIndexMap();
     }
 
@@ -41,13 +39,12 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
 
     private void OnValidate()
     {
-        CacheReferences();
+        ValidateReferences();
         RebuildButtonIndexMap();
     }
 
     public void Show(IReadOnlyList<AbilityOffer> offers, int selectedOfferIndex)
     {
-        CacheReferences();
         gameObject.SetActive(true);
         Render(offers, selectedOfferIndex);
     }
@@ -68,22 +65,9 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
             button.gameObject.SetActive(hasOffer);
             button.interactable = hasOffer;
             ApplyButtonSelectionVisual(button, hasOffer && i == selectedOfferIndex);
-
-            var text = i < offerButtonLabels.Length
-                ? offerButtonLabels[i]
-                : null;
-
-            if (!text) continue;
-
-            text.text = hasOffer
-                ? GetOfferButtonText(offers[i])
-                : string.Empty;
         }
 
-        if (selectionLabel)
-            selectionLabel.text = "Ability Offers";
-
-        if (descriptionLabel)
+        if (descriptionLabel && offers != null)
         {
             descriptionLabel.text = IsValidOfferIndex(offers, selectedOfferIndex)
                 ? GetOfferDescriptionText(offers[selectedOfferIndex])
@@ -94,38 +78,29 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
     private void HandleOfferButtonClicked(Button clickedButton)
     {
         if (!buttonIndexes.TryGetValue(clickedButton, out var buttonIndex)) return;
-        OfferClicked?.Invoke(buttonIndex);
+        SelectedOfferClicked?.Invoke(buttonIndex);
     }
 
-    private void CacheReferences()
+    private void ValidateReferences()
     {
-        if (!selectionLabel)
-            selectionLabel = FindTextByName("Selection_label");
-
         if (!descriptionLabel)
-            descriptionLabel = FindTextByName("Ability_desctiption");
+            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires a description label reference.", this);
 
-        if (!selectionButtonsRoot)
-            selectionButtonsRoot = FindChildByName("Selection_buttons");
+        if (!buttonsRoot)
+            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires a buttons root reference.", this);
 
         if (offerButtons == null || offerButtons.Length == 0)
         {
-            offerButtons = selectionButtonsRoot
-                ? selectionButtonsRoot.GetComponentsInChildren<Button>(true)
-                : Array.Empty<Button>();
+            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires offer button references.", this);
+            return;
         }
 
-        if (offerButtonLabels == null || offerButtonLabels.Length != offerButtons.Length)
+        for (var i = 0; i < offerButtons.Length; i++)
         {
-            offerButtonLabels = new TMP_Text[offerButtons.Length];
+            if (offerButtons[i]) continue;
 
-            for (var i = 0; i < offerButtons.Length; i++)
-            {
-                var button = offerButtons[i];
-                offerButtonLabels[i] = button
-                    ? button.GetComponentInChildren<TMP_Text>(true)
-                    : null;
-            }
+            Debug.LogError(
+                $"{nameof(AbilityOffersView)} on {name} requires an offer button reference for index {i}.", this);
         }
     }
 
@@ -175,49 +150,15 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
         buttonClickHandlers.Clear();
     }
 
-    private TMP_Text FindTextByName(string objectName)
-    {
-        var textComponents = GetComponentsInChildren<TMP_Text>(true);
-        for (var i = 0; i < textComponents.Length; i++)
-        {
-            var textComponent = textComponents[i];
-            if (textComponent && textComponent.name == objectName)
-                return textComponent;
-        }
-
-        return null;
-    }
-
-    private Transform FindChildByName(string objectName)
-    {
-        var transforms = GetComponentsInChildren<Transform>(true);
-        for (var i = 0; i < transforms.Length; i++)
-        {
-            var child = transforms[i];
-            if (child != null && child.name == objectName)
-                return child;
-        }
-
-        return null;
-    }
-
-    private static string GetOfferButtonText(AbilityOffer offer)
-    {
-        var kindLabel = offer.Kind == AbilityOfferKind.Upgrade ? "Upgrade" : "New";
-        var name = offer.Config ? offer.Config.DisplayName : "Missing Ability";
-        return $"{kindLabel}: {name}";
-    }
-
     private static string GetOfferDescriptionText(AbilityOffer offer)
     {
         var abilityName = offer.Config ? offer.Config.DisplayName : "Missing Ability";
         var description = offer.Config ? offer.Config.Description : string.Empty;
         var kindLabel = offer.Kind == AbilityOfferKind.Upgrade ? "Upgrade" : "New Ability";
 
-        if (string.IsNullOrWhiteSpace(description))
-            return $"{kindLabel}\n{abilityName}";
-
-        return $"{kindLabel}\n{abilityName}\n\n{description}";
+        return string.IsNullOrWhiteSpace(description) 
+            ? $"{kindLabel}\n{abilityName}" 
+            : $"{kindLabel}\n{abilityName}\n\n{description}";
     }
 
     private static bool IsValidOfferIndex(IReadOnlyList<AbilityOffer> offers, int index)
@@ -227,21 +168,20 @@ public sealed class AbilitySelectionMenu : MonoBehaviour
 
     private void ApplyButtonSelectionVisual(Button button, bool isSelected)
     {
-        if (!button) return;
-        if (!button.targetGraphic) return;
+        if (!button || !button.targetGraphic) return;
 
         CacheDefaultButtonColor(button);
+        
         if (!defaultButtonColors.TryGetValue(button, out var defaultColor)) return;
 
         button.targetGraphic.color = isSelected
-            ? SelectedOfferColor
+            ? highlightedColor
             : defaultColor;
     }
 
     private void CacheDefaultButtonColor(Button button)
     {
-        if (!button) return;
-        if (!button.targetGraphic) return;
+        if (!button || !button.targetGraphic) return;
         if (defaultButtonColors.ContainsKey(button)) return;
 
         defaultButtonColors[button] = button.targetGraphic.color;

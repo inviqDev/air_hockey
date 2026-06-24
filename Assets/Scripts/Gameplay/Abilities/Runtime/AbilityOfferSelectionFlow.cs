@@ -1,31 +1,31 @@
 using System;
 using System.Collections.Generic;
 
-public sealed class ParticipantAbilityOfferFlow
+public sealed class AbilityOfferSelectionFlow
 {
-    private readonly AbilityHudView abilityHud;
-    private readonly AbilitySelectionMenu abilitySelectionMenu;
-    private readonly ParticipantAbilityProgression progression;
+    private readonly ParticipantHudView participantHud;
+    private readonly AbilityPointsProgression pointsProgression;
+    private readonly AbilitySelectionViewContainer selectionViewContainer;
     private readonly AbilityOfferService offerService;
     private readonly AbilityCatalog abilityCatalog;
     private readonly Func<bool> isMenuInteractionAllowed;
-    private readonly ParticipantAbilitySelectionSession selectionSession = new();
+    private readonly AbilityOfferSelectionSession offerSelectionSession = new();
 
     private PlayerAbilityController abilityController;
     private PlayerInputReader inputReader;
     private bool isEnabled;
 
-    public ParticipantAbilityOfferFlow(
-        AbilityHudView abilityHud,
-        AbilitySelectionMenu abilitySelectionMenu,
-        ParticipantAbilityProgression progression,
+    public AbilityOfferSelectionFlow(
+        ParticipantHudView participantHud,
+        AbilitySelectionViewContainer selectionViewContainer,
+        AbilityPointsProgression pointsProgression,
         AbilityCatalog abilityCatalog,
         AbilityOfferService offerService,
         Func<bool> isMenuInteractionAllowed)
     {
-        this.abilityHud = abilityHud;
-        this.abilitySelectionMenu = abilitySelectionMenu;
-        this.progression = progression;
+        this.participantHud = participantHud;
+        this.selectionViewContainer = selectionViewContainer;
+        this.pointsProgression = pointsProgression;
         this.abilityCatalog = abilityCatalog;
         this.offerService = offerService;
         this.isMenuInteractionAllowed = isMenuInteractionAllowed;
@@ -77,15 +77,15 @@ public sealed class ParticipantAbilityOfferFlow
 
     public void CloseMenu()
     {
-        selectionSession.Close();
+        offerSelectionSession.Close();
 
-        if (!abilitySelectionMenu) return;
-        abilitySelectionMenu.Close();
+        if (!selectionViewContainer) return;
+        selectionViewContainer.Close();
     }
 
     public void Tick()
     {
-        if (selectionSession.State != ParticipantAbilitySelectionSession.SessionState.SelectingOffer) return;
+        if (offerSelectionSession.State != AbilityOfferSelectionSession.SessionState.SelectingOffer) return;
         if (CanKeepMenuOpen()) return;
 
         CloseMenu();
@@ -93,26 +93,26 @@ public sealed class ParticipantAbilityOfferFlow
 
     private void SubscribeToHud()
     {
-        if (!abilityHud) return;
-        abilityHud.PlusAbilityButtonClicked += HandleMenuToggleRequested;
+        if (!participantHud) return;
+        participantHud.PlusAbilityButtonClicked += HandleMenuToggleRequested;
     }
 
     private void UnsubscribeFromHud()
     {
-        if (!abilityHud) return;
-        abilityHud.PlusAbilityButtonClicked -= HandleMenuToggleRequested;
+        if (!participantHud) return;
+        participantHud.PlusAbilityButtonClicked -= HandleMenuToggleRequested;
     }
 
     private void SubscribeToMenu()
     {
-        if (!abilitySelectionMenu) return;
-        abilitySelectionMenu.OfferClicked += HandleOfferClicked;
+        if (!selectionViewContainer) return;
+        selectionViewContainer.OfferClicked += HandleSelectedOfferClicked;
     }
 
     private void UnsubscribeFromMenu()
     {
-        if (!abilitySelectionMenu) return;
-        abilitySelectionMenu.OfferClicked -= HandleOfferClicked;
+        if (!selectionViewContainer) return;
+        selectionViewContainer.OfferClicked -= HandleSelectedOfferClicked;
     }
 
     private void SubscribeToInputReader()
@@ -135,7 +135,7 @@ public sealed class ParticipantAbilityOfferFlow
 
     private void HandleMenuToggleRequested()
     {
-        if (selectionSession.State == ParticipantAbilitySelectionSession.SessionState.SelectingOffer)
+        if (offerSelectionSession.State == AbilityOfferSelectionSession.SessionState.SelectingOffer)
         {
             CloseMenu();
             return;
@@ -144,28 +144,28 @@ public sealed class ParticipantAbilityOfferFlow
         if (!CanOpenMenuInternal()) return;
 
         var offers = BuildOffers();
-        if (!selectionSession.TryOpen(offers)) return;
+        if (!offerSelectionSession.TryOpen(offers)) return;
 
         RenderMenu();
     }
 
-    private void HandleOfferClicked(int offerIndex)
+    private void HandleSelectedOfferClicked(int offerIndex)
     {
-        if (!selectionSession.TrySelectOffer(offerIndex)) return;
+        if (!offerSelectionSession.TrySelectOffer(offerIndex)) return;
 
         RenderMenu();
     }
 
     private void HandlePreviousOfferRequested()
     {
-        if (!selectionSession.TrySelectPreviousOffer()) return;
+        if (!offerSelectionSession.TrySelectPreviousOffer()) return;
 
         RenderMenu();
     }
 
     private void HandleNextOfferRequested()
     {
-        if (!selectionSession.TrySelectNextOffer()) return;
+        if (!offerSelectionSession.TrySelectNextOffer()) return;
 
         RenderMenu();
     }
@@ -200,8 +200,8 @@ public sealed class ParticipantAbilityOfferFlow
     private bool CanOpenMenuInternal()
     {
         if (!isEnabled) return false;
-        if (progression.AvailableAbilityPoints <= 0) return false;
-        if (!abilitySelectionMenu) return false;
+        if (pointsProgression.AvailableAbilityPoints <= 0) return false;
+        if (!selectionViewContainer) return false;
         if (!inputReader) return false;
 
         if (!abilityController) return false;
@@ -212,7 +212,7 @@ public sealed class ParticipantAbilityOfferFlow
     private bool CanKeepMenuOpen()
     {
         if (!isEnabled) return false;
-        if (!abilitySelectionMenu) return false;
+        if (!selectionViewContainer) return false;
         if (!inputReader) return false;
 
         if (!abilityController) return false;
@@ -222,14 +222,14 @@ public sealed class ParticipantAbilityOfferFlow
 
     private void RenderMenu()
     {
-        if (!abilitySelectionMenu) return;
+        if (!selectionViewContainer) return;
 
-        if (selectionSession.State != ParticipantAbilitySelectionSession.SessionState.SelectingOffer)
+        if (offerSelectionSession.State != AbilityOfferSelectionSession.SessionState.SelectingOffer)
         {
-            abilitySelectionMenu.Close();
+            selectionViewContainer.Close();
             return;
         }
 
-        abilitySelectionMenu.Show(selectionSession.Offers, selectionSession.SelectedOfferIndex);
+        selectionViewContainer.ShowOffers(offerSelectionSession.Offers, offerSelectionSession.SelectedOfferIndex);
     }
 }

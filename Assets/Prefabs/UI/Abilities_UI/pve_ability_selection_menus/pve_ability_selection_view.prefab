@@ -662,7 +662,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4150411928387466019}
   m_Layer: 5
-  m_Name: New_ability_selection_menu_s
+  m_Name: pve_ability_selection_view
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

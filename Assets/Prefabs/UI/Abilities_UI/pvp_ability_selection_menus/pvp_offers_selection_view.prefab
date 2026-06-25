@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3150377084692925878}
   - component: {fileID: 3968527484935326560}
   - component: {fileID: 4952622554392576101}
+  - component: {fileID: 2222222222222222222}
   m_Layer: 5
   m_Name: Abilit_slot (2)
   m_TagString: Untagged
@@ -91,6 +92,20 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 0, b: 0, a: 0.49019608}
   m_EffectDistance: {x: 12, y: 8}
   m_UseGraphicAlpha: 0
+--- !u!114 &2222222222222222222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1907505594334504635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70a5181bd1ec43afa406b8b34b4303af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconImage: {fileID: 3968527484935326560}
+  selectedOutline: {fileID: 4952622554392576101}
 --- !u!1 &2016229607654375980
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,6 +256,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8104528659803711972}
   - component: {fileID: 8801034900919753343}
+  - component: {fileID: 4444444444444444444}
   m_Layer: 5
   m_Name: Selection_buttons
   m_TagString: Untagged
@@ -294,6 +310,22 @@ MonoBehaviour:
   m_Spacing: {x: 50, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!114 &4444444444444444444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2905288719438668827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fcae2c0b59d4625a2d42309f31b84f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotViews:
+  - {fileID: 1111111111111111111}
+  - {fileID: 2222222222222222222}
+  - {fileID: 3333333333333333333}
 --- !u!1 &3657432738233432129
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,6 +338,7 @@ GameObject:
   - component: {fileID: 7990707662036833381}
   - component: {fileID: 4496247729150648026}
   - component: {fileID: 401879907923488462}
+  - component: {fileID: 3333333333333333333}
   m_Layer: 5
   m_Name: Abilit_slot (3)
   m_TagString: Untagged
@@ -385,6 +418,20 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 0, b: 0, a: 0.49019608}
   m_EffectDistance: {x: 12, y: 8}
   m_UseGraphicAlpha: 0
+--- !u!114 &3333333333333333333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3657432738233432129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70a5181bd1ec43afa406b8b34b4303af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconImage: {fileID: 4496247729150648026}
+  selectedOutline: {fileID: 401879907923488462}
 --- !u!1 &3736322993869964760
 GameObject:
   m_ObjectHideFlags: 0
@@ -788,10 +835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e5d4b4d6c82409cb6c32b865dc09874, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offerIcons:
-  - {fileID: 8725278799749103799}
-  - {fileID: 3968527484935326560}
-  - {fileID: 4496247729150648026}
+  offerSlotsContainer: {fileID: 4444444444444444444}
   descriptionLabel: {fileID: 5649684816844644830}
 --- !u!1 &8461670147151281898
 GameObject:
@@ -805,6 +849,7 @@ GameObject:
   - component: {fileID: 1637164365496914307}
   - component: {fileID: 8725278799749103799}
   - component: {fileID: 6099450794052045360}
+  - component: {fileID: 1111111111111111111}
   m_Layer: 5
   m_Name: Abilit_slot (1)
   m_TagString: Untagged
@@ -884,3 +929,17 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 0, b: 0, a: 0.49019608}
   m_EffectDistance: {x: 12, y: 8}
   m_UseGraphicAlpha: 0
+--- !u!114 &1111111111111111111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8461670147151281898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70a5181bd1ec43afa406b8b34b4303af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconImage: {fileID: 8725278799749103799}
+  selectedOutline: {fileID: 6099450794052045360}

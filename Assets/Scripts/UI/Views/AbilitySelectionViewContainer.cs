@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,20 +5,6 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
 {
     [SerializeField] private AbilityOffersView abilityOffersView;
     [SerializeField] private RectTransform slotSelectionRoot;
-
-    public event Action<int> OfferClicked
-    {
-        add
-        {
-            if (!abilityOffersView) return;
-            abilityOffersView.SelectedOfferClicked += value;
-        }
-        remove
-        {
-            if (!abilityOffersView) return;
-            abilityOffersView.SelectedOfferClicked -= value;
-        }
-    }
 
     private void OnValidate()
     {

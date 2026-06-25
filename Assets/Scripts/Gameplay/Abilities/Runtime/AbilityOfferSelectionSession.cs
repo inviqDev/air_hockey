@@ -34,7 +34,7 @@ public sealed class AbilityOfferSelectionSession
     {
         if (State != SessionState.SelectingOffer) return false;
         if (index < 0 || index >= offers.Count) return false;
-        if (selectedOfferIndex == index) return true;
+        if (selectedOfferIndex == index) return false;
 
         selectedOfferIndex = index;
         return true;

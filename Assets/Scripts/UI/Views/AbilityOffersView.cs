@@ -1,46 +1,27 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class AbilityOffersView  : MonoBehaviour
+public sealed class AbilityOffersView : MonoBehaviour
 {
-    [SerializeField] private Color highlightedColor;
-
-    [SerializeField] private Transform buttonsRoot;
-    [SerializeField] private Button[] offerButtons;
-    
+    [SerializeField] private Image[] offerIcons;
     [SerializeField] private TMP_Text descriptionLabel;
-
-    public event Action<int> SelectedOfferClicked;
 
     public bool IsOpen => gameObject.activeSelf;
 
-    private readonly Dictionary<Button, int> buttonIndexes = new();
-    private readonly Dictionary<Button, UnityEngine.Events.UnityAction> buttonClickHandlers = new();
-    private readonly Dictionary<Button, Color> defaultButtonColors = new();
+    private Outline[] offerSelectionOutlines = System.Array.Empty<Outline>();
 
     private void Awake()
     {
         ValidateReferences();
-        RebuildButtonIndexMap();
-    }
-
-    private void OnEnable()
-    {
-        SubscribeToButtons();
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromButtons();
+        RebuildSelectionVisualCache();
     }
 
     private void OnValidate()
     {
         ValidateReferences();
-        RebuildButtonIndexMap();
+        RebuildSelectionVisualCache();
     }
 
     public void Show(IReadOnlyList<AbilityOffer> offers, int selectedOfferIndex)
@@ -56,15 +37,18 @@ public sealed class AbilityOffersView  : MonoBehaviour
 
     public void Render(IReadOnlyList<AbilityOffer> offers, int selectedOfferIndex)
     {
-        for (var i = 0; i < offerButtons.Length; i++)
+        for (var i = 0; i < offerIcons.Length; i++)
         {
             var hasOffer = offers != null && i < offers.Count;
-            var button = offerButtons[i];
-            if (!button) continue;
+            var offerIcon = offerIcons[i];
+            if (!offerIcon) continue;
 
-            button.gameObject.SetActive(hasOffer);
-            button.interactable = hasOffer;
-            ApplyButtonSelectionVisual(button, hasOffer && i == selectedOfferIndex);
+            offerIcon.gameObject.SetActive(hasOffer);
+
+            if (hasOffer)
+                SetOfferIcon(offerIcon, offers[i]);
+
+            ApplySelectionVisual(i, hasOffer && i == selectedOfferIndex);
         }
 
         if (descriptionLabel && offers != null)
@@ -75,79 +59,57 @@ public sealed class AbilityOffersView  : MonoBehaviour
         }
     }
 
-    private void HandleOfferButtonClicked(Button clickedButton)
-    {
-        if (!buttonIndexes.TryGetValue(clickedButton, out var buttonIndex)) return;
-        SelectedOfferClicked?.Invoke(buttonIndex);
-    }
-
     private void ValidateReferences()
     {
         if (!descriptionLabel)
             Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires a description label reference.", this);
 
-        if (!buttonsRoot)
-            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires a buttons root reference.", this);
-
-        if (offerButtons == null || offerButtons.Length == 0)
+        if (offerIcons == null || offerIcons.Length == 0)
         {
-            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires offer button references.", this);
+            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires offer icon references.", this);
             return;
         }
 
-        for (var i = 0; i < offerButtons.Length; i++)
+        for (var i = 0; i < offerIcons.Length; i++)
         {
-            if (offerButtons[i]) continue;
+            var offerIcon = offerIcons[i];
+            if (!offerIcon)
+            {
+                Debug.LogError(
+                    $"{nameof(AbilityOffersView)} on {name} requires an offer icon reference for index {i}.", this);
+                continue;
+            }
 
-            Debug.LogError(
-                $"{nameof(AbilityOffersView)} on {name} requires an offer button reference for index {i}.", this);
+            if (!offerIcon.GetComponent<Outline>())
+            {
+                Debug.LogError(
+                    $"{nameof(AbilityOffersView)} on {name} requires a preconfigured {nameof(Outline)} on offer icon index {i}.",
+                    this);
+            }
         }
     }
 
-    private void RebuildButtonIndexMap()
+    private void RebuildSelectionVisualCache()
     {
-        buttonIndexes.Clear();
-
-        if (offerButtons == null) return;
-
-        for (var i = 0; i < offerButtons.Length; i++)
+        if (offerIcons == null)
         {
-            var button = offerButtons[i];
-            if (!button) continue;
-
-            buttonIndexes[button] = i;
-            CacheDefaultButtonColor(button);
-        }
-    }
-
-    private void SubscribeToButtons()
-    {
-        if (offerButtons == null) return;
-
-        foreach (var button in offerButtons)
-        {
-            if (!button) continue;
-            if (buttonClickHandlers.ContainsKey(button)) continue;
-
-            UnityEngine.Events.UnityAction handler = () => HandleOfferButtonClicked(button);
-            buttonClickHandlers[button] = handler;
-            button.onClick.AddListener(handler);
-        }
-    }
-
-    private void UnsubscribeFromButtons()
-    {
-        if (offerButtons == null) return;
-
-        foreach (var button in offerButtons)
-        {
-            if (!button) continue;
-            if (!buttonClickHandlers.TryGetValue(button, out var handler)) continue;
-
-            button.onClick.RemoveListener(handler);
+            offerSelectionOutlines = System.Array.Empty<Outline>();
+            return;
         }
 
-        buttonClickHandlers.Clear();
+        offerSelectionOutlines = new Outline[offerIcons.Length];
+
+        for (var i = 0; i < offerIcons.Length; i++)
+        {
+            var offerIcon = offerIcons[i];
+            if (!offerIcon) continue;
+
+            var selectionOutline = offerIcon.GetComponent<Outline>();
+            offerSelectionOutlines[i] = selectionOutline;
+
+            if (selectionOutline)
+                selectionOutline.enabled = false;
+        }
     }
 
     private static string GetOfferDescriptionText(AbilityOffer offer)
@@ -166,24 +128,23 @@ public sealed class AbilityOffersView  : MonoBehaviour
         return offers != null && index >= 0 && index < offers.Count;
     }
 
-    private void ApplyButtonSelectionVisual(Button button, bool isSelected)
+    private void ApplySelectionVisual(int offerIndex, bool isSelected)
     {
-        if (!button || !button.targetGraphic) return;
+        if (offerSelectionOutlines == null) return;
+        if (offerIndex < 0 || offerIndex >= offerSelectionOutlines.Length) return;
 
-        CacheDefaultButtonColor(button);
-        
-        if (!defaultButtonColors.TryGetValue(button, out var defaultColor)) return;
+        var selectionOutline = offerSelectionOutlines[offerIndex];
+        if (!selectionOutline) return;
 
-        button.targetGraphic.color = isSelected
-            ? highlightedColor
-            : defaultColor;
+        selectionOutline.enabled = isSelected;
     }
 
-    private void CacheDefaultButtonColor(Button button)
+    private static void SetOfferIcon(Image offerIcon, AbilityOffer offer)
     {
-        if (!button || !button.targetGraphic) return;
-        if (defaultButtonColors.ContainsKey(button)) return;
+        if (!offerIcon) return;
 
-        defaultButtonColors[button] = button.targetGraphic.color;
+        var icon = offer.Config ? offer.Config.Icon : null;
+        offerIcon.sprite = icon;
+        offerIcon.enabled = icon;
     }
 }

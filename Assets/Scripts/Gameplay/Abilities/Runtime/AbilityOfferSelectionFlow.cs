@@ -39,7 +39,6 @@ public sealed class AbilityOfferSelectionFlow
 
         isEnabled = true;
         SubscribeToHud();
-        SubscribeToMenu();
         SubscribeToInputReader();
     }
 
@@ -49,7 +48,6 @@ public sealed class AbilityOfferSelectionFlow
 
         CloseMenu();
         UnsubscribeFromInputReader();
-        UnsubscribeFromMenu();
         UnsubscribeFromHud();
         isEnabled = false;
     }
@@ -86,7 +84,7 @@ public sealed class AbilityOfferSelectionFlow
     public void Tick()
     {
         if (offerSelectionSession.State != AbilityOfferSelectionSession.SessionState.SelectingOffer) return;
-        if (CanKeepMenuOpen()) return;
+        if (CanInteractWithMenu(requireAvailablePoints: false)) return;
 
         CloseMenu();
     }
@@ -101,18 +99,6 @@ public sealed class AbilityOfferSelectionFlow
     {
         if (!participantHud) return;
         participantHud.PlusAbilityButtonClicked -= HandleMenuToggleRequested;
-    }
-
-    private void SubscribeToMenu()
-    {
-        if (!selectionViewContainer) return;
-        selectionViewContainer.OfferClicked += HandleSelectedOfferClicked;
-    }
-
-    private void UnsubscribeFromMenu()
-    {
-        if (!selectionViewContainer) return;
-        selectionViewContainer.OfferClicked -= HandleSelectedOfferClicked;
     }
 
     private void SubscribeToInputReader()
@@ -141,17 +127,10 @@ public sealed class AbilityOfferSelectionFlow
             return;
         }
 
-        if (!CanOpenMenuInternal()) return;
+        if (!CanInteractWithMenu(requireAvailablePoints: true)) return;
 
         var offers = BuildOffers();
         if (!offerSelectionSession.TryOpen(offers)) return;
-
-        RenderMenu();
-    }
-
-    private void HandleSelectedOfferClicked(int offerIndex)
-    {
-        if (!offerSelectionSession.TrySelectOffer(offerIndex)) return;
 
         RenderMenu();
     }
@@ -199,23 +178,16 @@ public sealed class AbilityOfferSelectionFlow
 
     private bool CanOpenMenuInternal()
     {
-        if (!isEnabled) return false;
-        if (pointsProgression.AvailableAbilityPoints <= 0) return false;
-        if (!selectionViewContainer) return false;
-        if (!inputReader) return false;
-
-        if (!abilityController) return false;
-
-        return isMenuInteractionAllowed();
+        return CanInteractWithMenu(requireAvailablePoints: true);
     }
 
-    private bool CanKeepMenuOpen()
+    private bool CanInteractWithMenu(bool requireAvailablePoints)
     {
         if (!isEnabled) return false;
         if (!selectionViewContainer) return false;
         if (!inputReader) return false;
-
         if (!abilityController) return false;
+        if (requireAvailablePoints && pointsProgression.AvailableAbilityPoints <= 0) return false;
 
         return isMenuInteractionAllowed();
     }

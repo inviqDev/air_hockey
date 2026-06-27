@@ -83,7 +83,7 @@ public sealed class AbilityOfferSelectionFlow
 
     public void Tick()
     {
-        if (offerSelectionSession.State != AbilityOfferSelectionSession.SessionState.SelectingOffer) return;
+        if (offerSelectionSession.State == AbilityOfferSelectionState.Closed) return;
         if (CanInteractWithMenu(requireAvailablePoints: false)) return;
 
         CloseMenu();
@@ -108,6 +108,8 @@ public sealed class AbilityOfferSelectionFlow
         inputReader.AbilitySelectionMenuPressed += HandleMenuToggleRequested;
         inputReader.AbilitySelectionPreviousPressed += HandlePreviousOfferRequested;
         inputReader.AbilitySelectionNextPressed += HandleNextOfferRequested;
+        inputReader.AbilitySelectionConfirmPressed += HandleConfirmRequested;
+        inputReader.AbilitySelectionBackPressed += HandleBackRequested;
     }
 
     private void UnsubscribeFromInputReader()
@@ -117,11 +119,13 @@ public sealed class AbilityOfferSelectionFlow
         inputReader.AbilitySelectionMenuPressed -= HandleMenuToggleRequested;
         inputReader.AbilitySelectionPreviousPressed -= HandlePreviousOfferRequested;
         inputReader.AbilitySelectionNextPressed -= HandleNextOfferRequested;
+        inputReader.AbilitySelectionConfirmPressed -= HandleConfirmRequested;
+        inputReader.AbilitySelectionBackPressed -= HandleBackRequested;
     }
 
     private void HandleMenuToggleRequested()
     {
-        if (offerSelectionSession.State == AbilityOfferSelectionSession.SessionState.SelectingOffer)
+        if (offerSelectionSession.State != AbilityOfferSelectionState.Closed)
         {
             CloseMenu();
             return;
@@ -145,6 +149,26 @@ public sealed class AbilityOfferSelectionFlow
     private void HandleNextOfferRequested()
     {
         if (!offerSelectionSession.TrySelectNextOffer()) return;
+
+        RenderMenu();
+    }
+
+    private void HandleConfirmRequested()
+    {
+        switch (offerSelectionSession.State)
+        {
+            case AbilityOfferSelectionState.SelectingOffer:
+                if (!offerSelectionSession.TryEnterSlotSelection()) return;
+                RenderMenu();
+                break;
+            case AbilityOfferSelectionState.SelectingSlot:
+                break;
+        }
+    }
+
+    private void HandleBackRequested()
+    {
+        if (!offerSelectionSession.TryReturnToOfferSelection()) return;
 
         RenderMenu();
     }
@@ -196,12 +220,17 @@ public sealed class AbilityOfferSelectionFlow
     {
         if (!selectionViewContainer) return;
 
-        if (offerSelectionSession.State != AbilityOfferSelectionSession.SessionState.SelectingOffer)
+        switch (offerSelectionSession.State)
         {
-            selectionViewContainer.Close();
-            return;
+            case AbilityOfferSelectionState.Closed:
+                selectionViewContainer.Close();
+                return;
+            case AbilityOfferSelectionState.SelectingOffer:
+                selectionViewContainer.ShowOffers(offerSelectionSession.Offers, offerSelectionSession.SelectedOfferIndex);
+                return;
+            case AbilityOfferSelectionState.SelectingSlot:
+                selectionViewContainer.ShowSlotSelection();
+                return;
         }
-
-        selectionViewContainer.ShowOffers(offerSelectionSession.Offers, offerSelectionSession.SelectedOfferIndex);
     }
 }

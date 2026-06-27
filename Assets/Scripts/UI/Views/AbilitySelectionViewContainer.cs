@@ -27,6 +27,22 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
         abilityOffersView.Show(offers, selectedOfferIndex);
     }
 
+    public void ShowSlotSelection()
+    {
+        if (!slotSelectionRoot)
+        {
+            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires a slot-selection root reference.", this);
+            return;
+        }
+
+        gameObject.SetActive(true);
+
+        if (abilityOffersView)
+            abilityOffersView.Close();
+
+        slotSelectionRoot.gameObject.SetActive(true);
+    }
+
     public void Close()
     {
         if (abilityOffersView)

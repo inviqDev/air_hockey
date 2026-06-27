@@ -1,20 +1,23 @@
 using System;
 using System.Collections.Generic;
 
+public enum AbilityOfferSelectionState
+{
+    Closed,
+    SelectingOffer,
+    SelectingSlot
+}
+
 public sealed class AbilityOfferSelectionSession
 {
-    public enum SessionState
-    {
-        Closed,
-        SelectingOffer
-    }
-
     private IReadOnlyList<AbilityOffer> offers = Array.Empty<AbilityOffer>();
     private int selectedOfferIndex = -1;
+    private int selectedSlotIndex = -1;
 
-    public SessionState State { get; private set; }
+    public AbilityOfferSelectionState State { get; private set; }
     public IReadOnlyList<AbilityOffer> Offers => offers;
     public int SelectedOfferIndex => selectedOfferIndex;
+    public int SelectedSlotIndex => selectedSlotIndex;
 
     public bool TryOpen(IReadOnlyList<AbilityOffer> nextOffers)
     {
@@ -26,17 +29,40 @@ public sealed class AbilityOfferSelectionSession
 
         offers = nextOffers;
         selectedOfferIndex = 0;
-        State = SessionState.SelectingOffer;
+        selectedSlotIndex = -1;
+        State = AbilityOfferSelectionState.SelectingOffer;
         return true;
     }
 
     public bool TrySelectOffer(int index)
     {
-        if (State != SessionState.SelectingOffer) return false;
+        if (State != AbilityOfferSelectionState.SelectingOffer) return false;
         if (index < 0 || index >= offers.Count) return false;
         if (selectedOfferIndex == index) return false;
 
         selectedOfferIndex = index;
+        return true;
+    }
+
+    public bool TryEnterSlotSelection()
+    {
+        if (State != AbilityOfferSelectionState.SelectingOffer) return false;
+        if (!IsValidOfferIndex(selectedOfferIndex)) return false;
+        if (offers[selectedOfferIndex].Kind != AbilityOfferKind.NewAbility) return false;
+
+        State = AbilityOfferSelectionState.SelectingSlot;
+        if (selectedSlotIndex < 0)
+            selectedSlotIndex = 0;
+
+        return true;
+    }
+
+    public bool TryReturnToOfferSelection()
+    {
+        if (State != AbilityOfferSelectionState.SelectingSlot) return false;
+        if (!IsValidOfferIndex(selectedOfferIndex)) return false;
+
+        State = AbilityOfferSelectionState.SelectingOffer;
         return true;
     }
 
@@ -52,14 +78,15 @@ public sealed class AbilityOfferSelectionSession
 
     public void Close()
     {
-        State = SessionState.Closed;
+        State = AbilityOfferSelectionState.Closed;
         offers = System.Array.Empty<AbilityOffer>();
         selectedOfferIndex = -1;
+        selectedSlotIndex = -1;
     }
 
     private bool TrySelectRelative(int offset)
     {
-        if (State != SessionState.SelectingOffer) return false;
+        if (State != AbilityOfferSelectionState.SelectingOffer) return false;
 
         var offerCount = offers.Count;
         if (offerCount <= 1)
@@ -78,5 +105,10 @@ public sealed class AbilityOfferSelectionSession
 
         selectedOfferIndex = nextIndex;
         return true;
+    }
+
+    private bool IsValidOfferIndex(int index)
+    {
+        return index >= 0 && index < offers.Count;
     }
 }

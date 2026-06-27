@@ -1,31 +1,78 @@
 # Unity project .gitignore
+
 #
-# Commit the source of truth:
-# - Assets/
+# Keep the project source of truth under version control:
+# - Assets/ and all corresponding .meta files
 # - Packages/
 # - ProjectSettings/
+# - .gitignore
+# - README.md
 #
-# Do not commit generated caches, local IDE state, build output, or machine-specific files.
 
-# Unity cache and local machine state
+# Ignore generated caches, local tools, IDE state,
+# build output, diagnostics, and machine-specific files.
+
+# ----------------------------------------------------------------------
+
+# Local project documentation and configuration
+
+# ----------------------------------------------------------------------
+
+/AGENTS.md
+/Docs/AI/
+
+/.editorconfig
+
+# ----------------------------------------------------------------------
+
+# Unity-generated cache and local state
+
+# ----------------------------------------------------------------------
+
+/.utmp/
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+
+# Unity diagnostics and captures
+
 /[Mm]emoryCaptures/
 /[Rr]ecordings/
 /[Cc]rashes/
+
 *.log
 sysinfo.txt
 mono_crash.*
 
-# Unity generated scene/test cache
+# ----------------------------------------------------------------------
+
+# Unity-generated scene, test, and dependency cache
+
+# ----------------------------------------------------------------------
+
 /[Aa]ssets/[Ss]ceneDependencyCache*
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 InitTestScene*.unity*
 
-# Unity generated IDE/project files
+# ----------------------------------------------------------------------
+
+# Rider and Unity-generated IDE files
+
+# ----------------------------------------------------------------------
+
+# Rider / IntelliJ local project state
+
+/.idea/
+
+# Rider solution and personal settings
+
+*.DotSettings
+*.DotSettings.user
+
+# Unity-generated solution and project files
+
 *.csproj
 *.unityproj
 *.sln
@@ -42,15 +89,30 @@ InitTestScene*.unity*
 *.opendb
 *.VC.db
 
-# Unity generated debug symbol metadata
+# Generated debug-symbol metadata
+
 *.pidb.meta
 *.pdb.meta
 *.mdb.meta
 
+# Legacy auto-generated Rider Unity plugin
+
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# Gradle project cache
+
+/.gradle/
+
+# ----------------------------------------------------------------------
+
 # Build output and exported players
+
+# ----------------------------------------------------------------------
+
 /[Bb]uild/
 /[Bb]uilds/
 /ExportedObj/
+
 *.apk
 *.aab
 *.app
@@ -58,53 +120,54 @@ InitTestScene*.unity*
 *.unitypackage
 *.unitypackage.meta
 
-# Addressables generated data
-/ServerData
+# ----------------------------------------------------------------------
+
+# Addressables-generated content
+
+# ----------------------------------------------------------------------
+
+/ServerData/
 /[Aa]ssets/StreamingAssets/aa*
 /[Aa]ssets/AddressableAssetsData/link.xml*
 /[Aa]ssets/Addressables_Temp*
 /[Aa]ssets/AddressableAssetsData/*/*.bin*
 
-# Visual Scripting generated files
+# ----------------------------------------------------------------------
+
+# Visual Scripting-generated files
+
+# ----------------------------------------------------------------------
+
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
 
-# Blender temporary imports
+# ----------------------------------------------------------------------
+
+# External tools and generated files
+
+# ----------------------------------------------------------------------
+
+# Blender temporary backup files
+
 *.blend1
 *.blend1.meta
 
-# Crashlytics
+# Crashlytics-generated configuration
+
 crashlytics-build.properties
 
-# Rider / IntelliJ local state
-.idea/
-*.DotSettings.user
-*.csproj.DotSettings
-*.sln.DotSettings
+# Unity Asset Store tools
 
-# Visual Studio / VS Code / local editor state
-.vs/
-.vscode/
+/[Aa]ssets/AssetStoreTools*
 
-# JetBrains Rider Unity plugin auto-generated folder
-/[Aa]ssets/Plugins/Editor/JetBrains*
+# ----------------------------------------------------------------------
 
-# Consulo / Fleet / Gradle
-.consulo/
-.fleet/
-.gradle/
+# Operating-system files
 
-# OS generated files
+# ----------------------------------------------------------------------
+
 .DS_Store
 Thumbs.db
 Desktop.ini
-
-# Local-only AI workflow, instructions, planning, preferences, and ideas
-/Docs/AI/
-/AGENTS.md
-/cuts.md
-
-# Unity Asset Store tools
-/[Aa]ssets/AssetStoreTools*

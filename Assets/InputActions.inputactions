@@ -355,6 +355,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerConfirmSelection",
+                    "type": "Button",
+                    "id": "f5be1a8d-df90-4fd2-b68a-6f2b2dd81752",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerBackSelection",
+                    "type": "Button",
+                    "id": "8c414c7b-5fb8-4b98-9528-a27474b73c93",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerConfirmSelection",
+                    "type": "Button",
+                    "id": "7c52d71d-c9f4-4696-b868-eebad0196e56",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerBackSelection",
+                    "type": "Button",
+                    "id": "ecb8fbc3-0cdf-46ef-b868-f2ce1dd4c3e1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -421,6 +457,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "RightPlayerNextOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c0567e2-bef3-4379-9ac5-9d8f790671e8",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerConfirmSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2f1bc6a8-f4a6-4f4e-b071-8fb7561811dc",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerBackSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "786c9db9-32cb-456a-b8cc-f3a2e93e0fc2",
+                    "path": "<Keyboard>/numpadPlus",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerConfirmSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d6dd1e10-fbb8-4dd1-89d7-cd7c02d13e31",
+                    "path": "<Keyboard>/numpadMinus",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerBackSelection",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

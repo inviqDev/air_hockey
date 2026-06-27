@@ -171,10 +171,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'USE: A/D keys to navigate. Press E to confirm selection.
+  m_text: 'A / D - Select ability
 
-    PRESS Tab
-    to exit'
+    E - Confirm
+
+    Tab - Close menu'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4e7d5992edec86243bd904b571bac84f, type: 2}
   m_sharedMaterial: {fileID: -5030738784957891819, guid: 4e7d5992edec86243bd904b571bac84f, type: 2}
@@ -201,8 +202,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 29.66
-  m_fontSizeBase: 29.66
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -216,7 +217,7 @@ MonoBehaviour:
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
+  m_paragraphSpacing: -20
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
@@ -444,7 +445,7 @@ GameObject:
   - component: {fileID: 9144477473407938385}
   - component: {fileID: 5649684816844644830}
   m_Layer: 5
-  m_Name: selected_ability_offer_desctiption
+  m_Name: selected_offer_desctiption
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

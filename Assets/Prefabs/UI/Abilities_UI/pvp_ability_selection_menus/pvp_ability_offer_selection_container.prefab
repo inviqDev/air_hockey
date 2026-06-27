@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilityOffersView: {fileID: 1507117089152281136}
-  slotSelectionRoot: {fileID: 8645552983304579395}
+  slotSelectionView: {fileID: 5577991133557799113}
 --- !u!1001 &2927181662831962731
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -330,6 +330,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6873720737007584040, guid: dfb123904b6664e40801d9ace6718071, type: 3}
   m_PrefabInstance: {fileID: 2927181662831962731}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5577991133557799113 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4176677745532211900, guid: dfb123904b6664e40801d9ace6718071, type: 3}
+  m_PrefabInstance: {fileID: 2927181662831962731}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c96e92f1cbfc4a41a3df43c9c29b7f3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &9029197260377088439
 PrefabInstance:
   m_ObjectHideFlags: 0

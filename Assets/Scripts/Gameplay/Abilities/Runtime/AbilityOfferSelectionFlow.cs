@@ -158,7 +158,8 @@ public sealed class AbilityOfferSelectionFlow
         switch (offerSelectionSession.State)
         {
             case AbilityOfferSelectionState.SelectingOffer:
-                if (!offerSelectionSession.TryEnterSlotSelection()) return;
+                var firstEmptySlotIndex = FindFirstEmptySlotIndex();
+                if (!offerSelectionSession.TryEnterSlotSelection(firstEmptySlotIndex)) return;
                 RenderMenu();
                 break;
             case AbilityOfferSelectionState.SelectingSlot:
@@ -229,8 +230,36 @@ public sealed class AbilityOfferSelectionFlow
                 selectionViewContainer.ShowOffers(offerSelectionSession.Offers, offerSelectionSession.SelectedOfferIndex);
                 return;
             case AbilityOfferSelectionState.SelectingSlot:
-                selectionViewContainer.ShowSlotSelection();
+                selectionViewContainer.ShowSlotSelection(BuildSlotDataSnapshot(), offerSelectionSession.SelectedSlotIndex);
                 return;
         }
+    }
+
+    private AbilitySlotData[] BuildSlotDataSnapshot()
+    {
+        if (!abilityController)
+            return Array.Empty<AbilitySlotData>();
+
+        var slotCount = abilityController.AbilitySlotCount;
+        var slots = new AbilitySlotData[slotCount];
+
+        for (var i = 0; i < slotCount; i++)
+            slots[i] = abilityController.GetAbilitySlotData(i);
+
+        return slots;
+    }
+
+    private int FindFirstEmptySlotIndex()
+    {
+        if (!abilityController)
+            return -1;
+
+        for (var i = 0; i < abilityController.AbilitySlotCount; i++)
+        {
+            if (abilityController.GetAbilityInSlot(i) == null)
+                return i;
+        }
+
+        return -1;
     }
 }

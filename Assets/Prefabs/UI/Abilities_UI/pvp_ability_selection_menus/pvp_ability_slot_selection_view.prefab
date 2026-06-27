@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1801430528543028738}
   - component: {fileID: 7565502012063825241}
   - component: {fileID: 8013487108283347475}
+  - component: {fileID: 2422222222222222222}
   m_Layer: 5
   m_Name: abiliy_slot (2)
   m_TagString: Untagged
@@ -75,6 +76,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2422222222222222222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653748840121989257}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 0, b: 0, a: 0.49019608}
+  m_EffectDistance: {x: 12, y: 8}
+  m_UseGraphicAlpha: 0
 --- !u!1 &823760866856241402
 GameObject:
   m_ObjectHideFlags: 0
@@ -84,6 +100,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6873720737007584040}
+  - component: {fileID: 4176677745532211900}
   m_Layer: 5
   m_Name: pvp_ability_slot_selection_view
   m_TagString: Untagged
@@ -114,6 +131,31 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4176677745532211900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 823760866856241402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c96e92f1cbfc4a41a3df43c9c29b7f3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotIconImages:
+  - {fileID: 6113457648077811495}
+  - {fileID: 8013487108283347475}
+  - {fileID: 6862573817252196771}
+  - {fileID: 8933141034136675138}
+  selectedOutlines:
+  - {fileID: 1411111111111111111}
+  - {fileID: 2422222222222222222}
+  - {fileID: 3433333333333333333}
+  - {fileID: 4444444444444444445}
+  emptySlotIcon: {fileID: 6408417505435511293, guid: 0d50416c5ce21b344a39ace737dff378, type: 3}
+  occupiedSlotColor: {r: 1, g: 1, b: 1, a: 1}
+  emptySlotColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
 --- !u!1 &1077008049696444666
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,6 +167,7 @@ GameObject:
   - component: {fileID: 6727781870331976465}
   - component: {fileID: 2843288450094650515}
   - component: {fileID: 6862573817252196771}
+  - component: {fileID: 3433333333333333333}
   m_Layer: 5
   m_Name: abiliy_slot (3)
   m_TagString: Untagged
@@ -189,6 +232,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3433333333333333333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077008049696444666}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 0, b: 0, a: 0.49019608}
+  m_EffectDistance: {x: 12, y: 8}
+  m_UseGraphicAlpha: 0
 --- !u!1 &1839897387178482895
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,6 +600,7 @@ GameObject:
   - component: {fileID: 8474537443338928620}
   - component: {fileID: 4762408718713028726}
   - component: {fileID: 8933141034136675138}
+  - component: {fileID: 4444444444444444445}
   m_Layer: 5
   m_Name: abiliy_slot (4)
   m_TagString: Untagged
@@ -606,6 +665,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4444444444444444445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4662194541959539488}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 0, b: 0, a: 0.49019608}
+  m_EffectDistance: {x: 12, y: 8}
+  m_UseGraphicAlpha: 0
 --- !u!1 &4717145971938195320
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,6 +691,7 @@ GameObject:
   - component: {fileID: 2065889815278349988}
   - component: {fileID: 2025428455971279167}
   - component: {fileID: 6113457648077811495}
+  - component: {fileID: 1411111111111111111}
   m_Layer: 5
   m_Name: abiliy_slot (1)
   m_TagString: Untagged
@@ -681,6 +756,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1411111111111111111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4717145971938195320}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 0, b: 0, a: 0.49019608}
+  m_EffectDistance: {x: 12, y: 8}
+  m_UseGraphicAlpha: 0
 --- !u!1 &5092895866696444088
 GameObject:
   m_ObjectHideFlags: 0

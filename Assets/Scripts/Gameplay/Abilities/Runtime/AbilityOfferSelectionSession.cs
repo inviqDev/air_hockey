@@ -44,15 +44,15 @@ public sealed class AbilityOfferSelectionSession
         return true;
     }
 
-    public bool TryEnterSlotSelection()
+    public bool TryEnterSlotSelection(int initialSelectedSlotIndex)
     {
         if (State != AbilityOfferSelectionState.SelectingOffer) return false;
         if (!IsValidOfferIndex(selectedOfferIndex)) return false;
         if (offers[selectedOfferIndex].Kind != AbilityOfferKind.NewAbility) return false;
+        if (initialSelectedSlotIndex < 0) return false;
 
         State = AbilityOfferSelectionState.SelectingSlot;
-        if (selectedSlotIndex < 0)
-            selectedSlotIndex = 0;
+        selectedSlotIndex = initialSelectedSlotIndex;
 
         return true;
     }

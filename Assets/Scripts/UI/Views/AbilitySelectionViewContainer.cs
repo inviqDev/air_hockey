@@ -4,7 +4,7 @@ using UnityEngine;
 public sealed class AbilitySelectionViewContainer : MonoBehaviour
 {
     [SerializeField] private AbilityOffersView abilityOffersView;
-    [SerializeField] private RectTransform slotSelectionRoot;
+    [SerializeField] private AbilitySlotSelectionView slotSelectionView;
 
     private void OnValidate()
     {
@@ -21,17 +21,17 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
 
         gameObject.SetActive(true);
 
-        if (slotSelectionRoot)
-            slotSelectionRoot.gameObject.SetActive(false);
+        if (slotSelectionView)
+            slotSelectionView.Close();
 
         abilityOffersView.Show(offers, selectedOfferIndex);
     }
 
-    public void ShowSlotSelection()
+    public void ShowSlotSelection(IReadOnlyList<AbilitySlotData> slots, int selectedSlotIndex)
     {
-        if (!slotSelectionRoot)
+        if (!slotSelectionView)
         {
-            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires a slot-selection root reference.", this);
+            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilitySlotSelectionView)} reference.", this);
             return;
         }
 
@@ -40,7 +40,7 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
         if (abilityOffersView)
             abilityOffersView.Close();
 
-        slotSelectionRoot.gameObject.SetActive(true);
+        slotSelectionView.Show(slots, selectedSlotIndex);
     }
 
     public void Close()
@@ -48,8 +48,8 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
         if (abilityOffersView)
             abilityOffersView.Close();
 
-        if (slotSelectionRoot)
-            slotSelectionRoot.gameObject.SetActive(false);
+        if (slotSelectionView)
+            slotSelectionView.Close();
 
         gameObject.SetActive(false);
     }
@@ -59,7 +59,7 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
         if (!abilityOffersView)
             Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilityOffersView)} reference.", this);
 
-        if (!slotSelectionRoot)
-            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires a slot-selection root reference.", this);
+        if (!slotSelectionView)
+            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilitySlotSelectionView)} reference.", this);
     }
 }

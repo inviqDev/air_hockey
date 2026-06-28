@@ -203,6 +203,7 @@ MonoBehaviour:
   abilitySlotsHudView: {fileID: 1590693558848063926}
   abilityOffersHudView: {fileID: 6972025680863176693}
   freeAbilityTimerHudView: {fileID: 8138096559935211260}
+  participantReadyView: {fileID: 8752545986652881406}
 --- !u!1 &3081668679342252442
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,6 +289,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8411661227409269697}
   - component: {fileID: 3703324260175486560}
+  - component: {fileID: 8752545986652881406}
   m_Layer: 5
   m_Name: ready_state
   m_TagString: Untagged
@@ -325,6 +327,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5525652194561598902}
   m_CullTransparentMesh: 1
+--- !u!114 &8752545986652881406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5525652194561598902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d0a1d3f2b24957b6d8f884fbf6a611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stateIcon: {fileID: 6127107425723313430}
+  readyText: {fileID: 7644961545743289314}
+  notReadySprite: {fileID: -945800843, guid: f6b24d0bc96ca5b44ace0745e18a1238, type: 3}
+  readySprite: {fileID: -6781377588550502137, guid: f6b24d0bc96ca5b44ace0745e18a1238, type: 3}
+  notReadyTextColor: {r: 0.8000001, g: 0.10980393, b: 0.10980393, a: 1}
+  readyTextColor: {r: 0.19607843, g: 0.6862745, b: 0.19607843, a: 1}
 --- !u!1 &6137780069062449012
 GameObject:
   m_ObjectHideFlags: 0

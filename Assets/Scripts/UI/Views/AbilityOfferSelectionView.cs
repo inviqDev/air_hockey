@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public sealed class AbilityOffersView : MonoBehaviour
+public sealed class AbilityOfferSelectionView : MonoBehaviour
 {
     [SerializeField] private AbilitySelectionItemsContainer offerItemsContainer;
     [SerializeField] private TMP_Text descriptionLabel;
@@ -61,10 +61,10 @@ public sealed class AbilityOffersView : MonoBehaviour
     private void ValidateReferences()
     {
         if (!descriptionLabel)
-            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires a description label reference.", this);
+            Debug.LogError($"{nameof(AbilityOfferSelectionView)} on {name} requires a description label reference.", this);
 
         if (!offerItemsContainer)
-            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires an {nameof(AbilitySelectionItemsContainer)} reference.", this);
+            Debug.LogError($"{nameof(AbilityOfferSelectionView)} on {name} requires an {nameof(AbilitySelectionItemsContainer)} reference.", this);
     }
 
     private static string GetOfferDescriptionText(AbilityOffer offer)

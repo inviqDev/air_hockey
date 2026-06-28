@@ -3,7 +3,7 @@ using UnityEngine;
 
 public sealed class AbilitySelectionViewContainer : MonoBehaviour
 {
-    [SerializeField] private AbilityOffersView abilityOffersView;
+    [SerializeField] private AbilityOfferSelectionView offerSelectionView;
     [SerializeField] private AbilitySlotSelectionView slotSelectionView;
 
     private void OnValidate()
@@ -13,9 +13,9 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
 
     public void ShowOffers(IReadOnlyList<AbilityOffer> offers, int selectedOfferIndex)
     {
-        if (!abilityOffersView)
+        if (!offerSelectionView)
         {
-            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilityOffersView)} reference.", this);
+            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilityOfferSelectionView)} reference.", this);
             return;
         }
 
@@ -24,7 +24,7 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
         if (slotSelectionView)
             slotSelectionView.Close();
 
-        abilityOffersView.Show(offers, selectedOfferIndex);
+        offerSelectionView.Show(offers, selectedOfferIndex);
     }
 
     public void ShowSlotSelection(IReadOnlyList<AbilitySlotData> slots, int selectedSlotIndex)
@@ -37,16 +37,16 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
 
         gameObject.SetActive(true);
 
-        if (abilityOffersView)
-            abilityOffersView.Close();
+        if (offerSelectionView)
+            offerSelectionView.Close();
 
         slotSelectionView.Show(slots, selectedSlotIndex);
     }
 
     public void Close()
     {
-        if (abilityOffersView)
-            abilityOffersView.Close();
+        if (offerSelectionView)
+            offerSelectionView.Close();
 
         if (slotSelectionView)
             slotSelectionView.Close();
@@ -56,8 +56,8 @@ public sealed class AbilitySelectionViewContainer : MonoBehaviour
 
     private void ValidateReferences()
     {
-        if (!abilityOffersView)
-            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilityOffersView)} reference.", this);
+        if (!offerSelectionView)
+            Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilityOfferSelectionView)} reference.", this);
 
         if (!slotSelectionView)
             Debug.LogError($"{nameof(AbilitySelectionViewContainer)} on {name} requires an {nameof(AbilitySlotSelectionView)} reference.", this);

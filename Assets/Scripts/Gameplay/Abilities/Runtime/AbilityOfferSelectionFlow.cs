@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public sealed class AbilityOfferSelectionFlow
 {
@@ -158,7 +159,7 @@ public sealed class AbilityOfferSelectionFlow
         switch (offerSelectionSession.State)
         {
             case AbilityOfferSelectionState.SelectingOffer:
-                var firstEmptySlotIndex = FindFirstEmptySlotIndex();
+                if (!TryFindFirstEmptySlotIndex(out var firstEmptySlotIndex)) return;
                 if (!offerSelectionSession.TryEnterSlotSelection(firstEmptySlotIndex)) return;
                 RenderMenu();
                 break;
@@ -238,7 +239,10 @@ public sealed class AbilityOfferSelectionFlow
     private AbilitySlotData[] BuildSlotDataSnapshot()
     {
         if (!abilityController)
+        {
+            Debug.LogError($"{nameof(AbilityOfferSelectionFlow)} requires a bound {nameof(PlayerAbilityController)} before building a slot-selection snapshot.");
             return Array.Empty<AbilitySlotData>();
+        }
 
         var slotCount = abilityController.AbilitySlotCount;
         var slots = new AbilitySlotData[slotCount];
@@ -249,17 +253,25 @@ public sealed class AbilityOfferSelectionFlow
         return slots;
     }
 
-    private int FindFirstEmptySlotIndex()
+    private bool TryFindFirstEmptySlotIndex(out int slotIndex)
     {
+        slotIndex = default;
+
         if (!abilityController)
-            return -1;
+        {
+            Debug.LogError($"{nameof(AbilityOfferSelectionFlow)} requires a bound {nameof(PlayerAbilityController)} before entering slot selection.");
+            return false;
+        }
 
         for (var i = 0; i < abilityController.AbilitySlotCount; i++)
         {
             if (abilityController.GetAbilityInSlot(i) == null)
-                return i;
+            {
+                slotIndex = i;
+                return true;
+            }
         }
 
-        return -1;
+        return false;
     }
 }

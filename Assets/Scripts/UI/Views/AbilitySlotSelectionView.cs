@@ -34,15 +34,16 @@ public sealed class AbilitySlotSelectionView : MonoBehaviour
         {
             var hasSlotData = slots != null && i < slots.Count;
             var isOccupied = hasSlotData && slots[i].HasAbility;
+            
             var icon = isOccupied && slots[i].Config
                 ? slots[i].Config.Icon
                 : emptySlotIcon;
 
-            ApplySlotVisual(i, icon, isOccupied, hasSlotData && i == selectedSlotIndex);
+            ApplySlotVisual(i, icon, hasSlotData && i == selectedSlotIndex);
         }
     }
 
-    private void ApplySlotVisual(int slotIndex, Sprite icon, bool isOccupied, bool isSelected)
+    private void ApplySlotVisual(int slotIndex, Sprite icon, bool isSelected)
     {
         if (!slotItemsContainer) return;
 

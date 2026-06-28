@@ -3,10 +3,8 @@ using UnityEngine;
 
 public sealed class AbilitySlotSelectionView : MonoBehaviour
 {
-    [SerializeField] private AbilitySlotSelectionItemsContainer slotItemsContainer;
+    [SerializeField] private AbilitySelectionItemsContainer slotItemsContainer;
     [SerializeField] private Sprite emptySlotIcon;
-    [SerializeField] private Color occupiedSlotColor = Color.white;
-    [SerializeField] private Color emptySlotColor = new Color(0.6f, 0.6f, 0.6f, 1f);
 
     private void Awake()
     {
@@ -31,7 +29,7 @@ public sealed class AbilitySlotSelectionView : MonoBehaviour
 
     public void Render(IReadOnlyList<AbilitySlotData> slots, int selectedSlotIndex)
     {
-        var slotCount = slotItemsContainer ? slotItemsContainer.SlotCount : 0;
+        var slotCount = slotItemsContainer ? slotItemsContainer.ItemCount : 0;
         for (var i = 0; i < slotCount; i++)
         {
             var hasSlotData = slots != null && i < slots.Count;
@@ -48,16 +46,18 @@ public sealed class AbilitySlotSelectionView : MonoBehaviour
     {
         if (!slotItemsContainer) return;
 
-        var slotView = slotItemsContainer.GetSlotView(slotIndex);
-        if (!slotView) return;
+        var itemView = slotItemsContainer.GetItemView(slotIndex);
+        if (!itemView) return;
 
-        slotView.Render(icon, isOccupied, isSelected, occupiedSlotColor, emptySlotColor);
+        itemView.SetVisible(true);
+        itemView.SetIcon(icon);
+        itemView.SetSelected(isSelected);
     }
 
     private void ValidateReferences()
     {
         if (!slotItemsContainer)
-            Debug.LogError($"{nameof(AbilitySlotSelectionView)} on {name} requires an {nameof(AbilitySlotSelectionItemsContainer)} reference.", this);
+            Debug.LogError($"{nameof(AbilitySlotSelectionView)} on {name} requires an {nameof(AbilitySelectionItemsContainer)} reference.", this);
 
         if (!emptySlotIcon)
         {

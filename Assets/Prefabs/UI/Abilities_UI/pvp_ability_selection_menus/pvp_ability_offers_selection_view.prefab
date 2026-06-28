@@ -323,7 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fcae2c0b59d4625a2d42309f31b84f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slotViews:
+  itemViews:
   - {fileID: 1111111111111111111}
   - {fileID: 2222222222222222222}
   - {fileID: 3333333333333333333}
@@ -836,7 +836,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e5d4b4d6c82409cb6c32b865dc09874, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offerSlotsContainer: {fileID: 4444444444444444444}
+  offerItemsContainer: {fileID: 4444444444444444444}
   descriptionLabel: {fileID: 5649684816844644830}
 --- !u!1 &8461670147151281898
 GameObject:

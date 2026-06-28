@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
 [RequireComponent(typeof(Outline))]
-public sealed class AbilitySlotSelectionItemView : MonoBehaviour
+public sealed class AbilitySelectionItemView : MonoBehaviour
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private Outline selectedOutline;
@@ -20,17 +20,24 @@ public sealed class AbilitySlotSelectionItemView : MonoBehaviour
         ValidateReferences();
     }
 
-    public void Render(Sprite icon, bool isOccupied, bool isSelected, Color occupiedColor, Color emptyColor)
+    public void SetVisible(bool isVisible)
     {
-        if (iconImage)
-        {
-            iconImage.sprite = icon;
-            iconImage.enabled = icon;
-            iconImage.color = isOccupied ? occupiedColor : emptyColor;
-        }
+        gameObject.SetActive(isVisible);
+    }
 
-        if (selectedOutline)
-            selectedOutline.enabled = isSelected;
+    public void SetIcon(Sprite icon)
+    {
+        if (!iconImage) return;
+
+        iconImage.sprite = icon;
+        iconImage.enabled = icon;
+    }
+
+    public void SetSelected(bool isSelected)
+    {
+        if (!selectedOutline) return;
+
+        selectedOutline.enabled = isSelected;
     }
 
     private void CacheReferences()
@@ -45,9 +52,9 @@ public sealed class AbilitySlotSelectionItemView : MonoBehaviour
     private void ValidateReferences()
     {
         if (!iconImage)
-            Debug.LogError($"{nameof(AbilitySlotSelectionItemView)} on {name} requires an {nameof(Image)} reference.", this);
+            Debug.LogError($"{nameof(AbilitySelectionItemView)} on {name} requires an {nameof(Image)} reference.", this);
 
         if (!selectedOutline)
-            Debug.LogError($"{nameof(AbilitySlotSelectionItemView)} on {name} requires an {nameof(Outline)} reference.", this);
+            Debug.LogError($"{nameof(AbilitySelectionItemView)} on {name} requires an {nameof(Outline)} reference.", this);
     }
 }

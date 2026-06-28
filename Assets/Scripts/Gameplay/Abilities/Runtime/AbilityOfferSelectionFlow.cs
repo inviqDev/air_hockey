@@ -182,6 +182,18 @@ public sealed class AbilityOfferSelectionFlow
         RenderMenu();
     }
 
+    private void ReopenMenuWithRefreshedOffers()
+    {
+        var refreshedOffers = BuildOffers();
+        if (!offerSelectionSession.TryOpen(refreshedOffers))
+        {
+            CloseMenu();
+            return;
+        }
+
+        RenderMenu();
+    }
+
     private void EnterSlotSelection()
     {
         if (!TryFindFirstEmptySlotIndex(out var firstEmptySlotIndex)) return;
@@ -193,11 +205,33 @@ public sealed class AbilityOfferSelectionFlow
     private void ConfirmSelectedSlotAssignment()
     {
         if (!TryGetSelectedNewAbilityOffer(out var selectedOffer)) return;
+        if (pointsProgression.AvailableAbilityPoints <= 0)
+        {
+            Debug.LogError(
+                $"{nameof(AbilityOfferSelectionFlow)} cannot confirm slot selection " +
+                $"because the participant has no available ability points.");
+
+            return;
+        }
 
         var selectedSlotIndex = offerSelectionSession.SelectedSlotIndex;
         if (!abilityController.TryAddAbilityToEmptySlot(selectedOffer.Config, selectedSlotIndex)) return;
+        if (!pointsProgression.TrySpendAvailableAbilityPoint())
+        {
+            Debug.LogError(
+                $"{nameof(AbilityOfferSelectionFlow)} assigned a new ability to slot {selectedSlotIndex} " +
+                $"but failed to spend an available ability point. This violates the selection transaction invariant.");
 
-        CloseMenu();
+            return;
+        }
+
+        if (pointsProgression.AvailableAbilityPoints <= 0)
+        {
+            CloseMenu();
+            return;
+        }
+
+        ReopenMenuWithRefreshedOffers();
     }
 
     private bool TryGetSelectedNewAbilityOffer(out AbilityOffer selectedOffer)

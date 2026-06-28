@@ -107,8 +107,8 @@ public sealed class AbilityOfferSelectionFlow
         if (!inputReader) return;
 
         inputReader.AbilitySelectionMenuPressed += HandleMenuToggleRequested;
-        inputReader.AbilitySelectionPreviousPressed += HandlePreviousOfferRequested;
-        inputReader.AbilitySelectionNextPressed += HandleNextOfferRequested;
+        inputReader.AbilitySelectionPreviousPressed += HandlePreviousSelectionRequested;
+        inputReader.AbilitySelectionNextPressed += HandleNextSelectionRequested;
         inputReader.AbilitySelectionConfirmPressed += HandleConfirmRequested;
         inputReader.AbilitySelectionBackPressed += HandleBackRequested;
     }
@@ -118,8 +118,8 @@ public sealed class AbilityOfferSelectionFlow
         if (!inputReader) return;
 
         inputReader.AbilitySelectionMenuPressed -= HandleMenuToggleRequested;
-        inputReader.AbilitySelectionPreviousPressed -= HandlePreviousOfferRequested;
-        inputReader.AbilitySelectionNextPressed -= HandleNextOfferRequested;
+        inputReader.AbilitySelectionPreviousPressed -= HandlePreviousSelectionRequested;
+        inputReader.AbilitySelectionNextPressed -= HandleNextSelectionRequested;
         inputReader.AbilitySelectionConfirmPressed -= HandleConfirmRequested;
         inputReader.AbilitySelectionBackPressed -= HandleBackRequested;
     }
@@ -140,16 +140,16 @@ public sealed class AbilityOfferSelectionFlow
         RenderMenu();
     }
 
-    private void HandlePreviousOfferRequested()
+    private void HandlePreviousSelectionRequested()
     {
-        if (!offerSelectionSession.TrySelectPreviousOffer()) return;
+        if (!TrySelectPrevious()) return;
 
         RenderMenu();
     }
 
-    private void HandleNextOfferRequested()
+    private void HandleNextSelectionRequested()
     {
-        if (!offerSelectionSession.TrySelectNextOffer()) return;
+        if (!TrySelectNext()) return;
 
         RenderMenu();
     }
@@ -205,6 +205,32 @@ public sealed class AbilityOfferSelectionFlow
     private bool CanOpenMenuInternal()
     {
         return CanInteractWithMenu(requireAvailablePoints: true);
+    }
+
+    private bool TrySelectPrevious()
+    {
+        switch (offerSelectionSession.State)
+        {
+            case AbilityOfferSelectionState.SelectingOffer:
+                return offerSelectionSession.TrySelectPreviousOffer();
+            case AbilityOfferSelectionState.SelectingSlot:
+                return offerSelectionSession.TrySelectPreviousSlot(BuildSlotDataSnapshot());
+            default:
+                return false;
+        }
+    }
+
+    private bool TrySelectNext()
+    {
+        switch (offerSelectionSession.State)
+        {
+            case AbilityOfferSelectionState.SelectingOffer:
+                return offerSelectionSession.TrySelectNextOffer();
+            case AbilityOfferSelectionState.SelectingSlot:
+                return offerSelectionSession.TrySelectNextSlot(BuildSlotDataSnapshot());
+            default:
+                return false;
+        }
     }
 
     private bool CanInteractWithMenu(bool requireAvailablePoints)

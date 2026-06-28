@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public enum AbilityOfferSelectionState
 {
@@ -63,6 +64,7 @@ public sealed class AbilityOfferSelectionSession
         if (!IsValidOfferIndex(selectedOfferIndex)) return false;
 
         State = AbilityOfferSelectionState.SelectingOffer;
+        selectedSlotIndex = -1;
         return true;
     }
 
@@ -76,10 +78,20 @@ public sealed class AbilityOfferSelectionSession
         return TrySelectRelative(1);
     }
 
+    public bool TrySelectPreviousSlot(IReadOnlyList<AbilitySlotData> slots)
+    {
+        return TrySelectRelativeEmptySlot(slots, -1);
+    }
+
+    public bool TrySelectNextSlot(IReadOnlyList<AbilitySlotData> slots)
+    {
+        return TrySelectRelativeEmptySlot(slots, 1);
+    }
+
     public void Close()
     {
         State = AbilityOfferSelectionState.Closed;
-        offers = System.Array.Empty<AbilityOffer>();
+        offers = Array.Empty<AbilityOffer>();
         selectedOfferIndex = -1;
         selectedSlotIndex = -1;
     }
@@ -110,5 +122,55 @@ public sealed class AbilityOfferSelectionSession
     private bool IsValidOfferIndex(int index)
     {
         return index >= 0 && index < offers.Count;
+    }
+
+    private bool TrySelectRelativeEmptySlot(IReadOnlyList<AbilitySlotData> slots, int offset)
+    {
+        if (State != AbilityOfferSelectionState.SelectingSlot) return false;
+        if (slots == null || slots.Count == 0) return false;
+        if (!HasValidSelectedEmptySlot(slots)) return false;
+
+        for (var i = 1; i < slots.Count; i++)
+        {
+            var directionOffset = i * offset;
+            var nextIndex = selectedSlotIndex + directionOffset;
+            var wrappedIndex = WrapIndex(nextIndex, slots.Count);
+            
+            if (slots[wrappedIndex].HasAbility) continue;
+
+            selectedSlotIndex = wrappedIndex;
+            return true;
+        }
+
+        return false;
+    }
+    
+    private bool HasValidSelectedEmptySlot(IReadOnlyList<AbilitySlotData> slots)
+    {
+        if (selectedSlotIndex < 0 || selectedSlotIndex >= slots.Count)
+        {
+            Debug.LogError(
+                $"{nameof(AbilityOfferSelectionSession)} has invalid selected slot index " +
+                $"{selectedSlotIndex} while selecting a slot.");
+
+            return false;
+        }
+
+        if (slots[selectedSlotIndex].HasAbility)
+        {
+            Debug.LogError(
+                $"{nameof(AbilityOfferSelectionSession)} selected occupied slot " +
+                $"{selectedSlotIndex} while selecting a slot.");
+
+            return false;
+        }
+
+        return true;
+    }
+    
+    private static int WrapIndex(int index, int count)
+    {
+        var wrappedIndex = index % count;
+        return wrappedIndex < 0 ? wrappedIndex + count : wrappedIndex;
     }
 }

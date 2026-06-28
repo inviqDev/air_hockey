@@ -10,6 +10,7 @@ public sealed class AbilityOfferSelectionFlow
     private readonly AbilityOfferService offerService;
     private readonly AbilityCatalog abilityCatalog;
     private readonly Func<bool> isMenuInteractionAllowed;
+
     private readonly AbilityOfferSelectionSession offerSelectionSession = new();
 
     private PlayerAbilityController abilityController;
@@ -32,13 +33,14 @@ public sealed class AbilityOfferSelectionFlow
         this.isMenuInteractionAllowed = isMenuInteractionAllowed;
     }
 
-    public bool CanOpenMenu => CanOpenMenuInternal();
+    public bool CanOpenMenu => CanInteractWithMenu(requireAvailablePoints: true);
 
     public void Enable()
     {
         if (isEnabled) return;
 
         isEnabled = true;
+
         SubscribeToHud();
         SubscribeToInputReader();
     }
@@ -50,7 +52,33 @@ public sealed class AbilityOfferSelectionFlow
         CloseMenu();
         UnsubscribeFromInputReader();
         UnsubscribeFromHud();
+
         isEnabled = false;
+    }
+
+    public void BindAbilityController(PlayerAbilityController controller)
+    {
+        if (abilityController == controller) return;
+        if (offerSelectionSession.State != AbilityOfferSelectionState.Closed)
+            CloseMenu();
+
+        abilityController = controller;
+        
+        var nextInputReader = abilityController ? abilityController.InputReader : null;
+        BindInputReader(nextInputReader);
+    }
+
+    public void CloseMenu()
+    {
+        offerSelectionSession.Close();
+        selectionViewContainer.Close();
+    }
+
+    public void Tick()
+    {
+        if (offerSelectionSession.State == AbilityOfferSelectionState.Closed) return;
+        if (!CanInteractWithMenu(requireAvailablePoints: false))
+            CloseMenu();
     }
 
     private void BindInputReader(PlayerInputReader nextInputReader)
@@ -66,39 +94,13 @@ public sealed class AbilityOfferSelectionFlow
             SubscribeToInputReader();
     }
 
-    public void BindAbilityController(PlayerAbilityController controller)
-    {
-        if (abilityController == controller) return;
-
-        abilityController = controller;
-        BindInputReader(abilityController ? abilityController.InputReader : null);
-    }
-
-    public void CloseMenu()
-    {
-        offerSelectionSession.Close();
-
-        if (!selectionViewContainer) return;
-        selectionViewContainer.Close();
-    }
-
-    public void Tick()
-    {
-        if (offerSelectionSession.State == AbilityOfferSelectionState.Closed) return;
-        if (CanInteractWithMenu(requireAvailablePoints: false)) return;
-
-        CloseMenu();
-    }
-
     private void SubscribeToHud()
     {
-        if (!participantHud) return;
         participantHud.PlusAbilityButtonClicked += HandleMenuToggleRequested;
     }
 
     private void UnsubscribeFromHud()
     {
-        if (!participantHud) return;
         participantHud.PlusAbilityButtonClicked -= HandleMenuToggleRequested;
     }
 
@@ -134,10 +136,7 @@ public sealed class AbilityOfferSelectionFlow
 
         if (!CanInteractWithMenu(requireAvailablePoints: true)) return;
 
-        var offers = BuildOffers();
-        if (!offerSelectionSession.TryOpen(offers)) return;
-
-        RenderMenu();
+        OpenMenu();
     }
 
     private void HandlePreviousSelectionRequested()
@@ -159,12 +158,12 @@ public sealed class AbilityOfferSelectionFlow
         switch (offerSelectionSession.State)
         {
             case AbilityOfferSelectionState.SelectingOffer:
-                if (!TryFindFirstEmptySlotIndex(out var firstEmptySlotIndex)) return;
-                if (!offerSelectionSession.TryEnterSlotSelection(firstEmptySlotIndex)) return;
-                RenderMenu();
-                break;
+                EnterSlotSelection();
+                return;
+
             case AbilityOfferSelectionState.SelectingSlot:
-                break;
+                ConfirmSelectedSlotAssignment();
+                return;
         }
     }
 
@@ -175,36 +174,57 @@ public sealed class AbilityOfferSelectionFlow
         RenderMenu();
     }
 
-    private IReadOnlyList<AbilityOffer> BuildOffers()
+    private void OpenMenu()
     {
-        if (!abilityCatalog)
-            return Array.Empty<AbilityOffer>();
+        var offers = BuildOffers();
+        if (!offerSelectionSession.TryOpen(offers)) return;
 
-        if (!abilityController)
-            return Array.Empty<AbilityOffer>();
-
-        var ownedAbilityIds = new List<string>(abilityController.AbilitySlotCount);
-        var hasEmptyAbilitySlot = false;
-
-        for (var i = 0; i < abilityController.AbilitySlotCount; i++)
-        {
-            var ability = abilityController.GetAbilityInSlot(i);
-            if (ability == null)
-            {
-                hasEmptyAbilitySlot = true;
-                continue;
-            }
-
-            if (!string.IsNullOrEmpty(ability.Id))
-                ownedAbilityIds.Add(ability.Id);
-        }
-
-        return offerService.BuildOffers(new AbilityOfferRequest(abilityCatalog, ownedAbilityIds, hasEmptyAbilitySlot));
+        RenderMenu();
     }
 
-    private bool CanOpenMenuInternal()
+    private void EnterSlotSelection()
     {
-        return CanInteractWithMenu(requireAvailablePoints: true);
+        if (!TryFindFirstEmptySlotIndex(out var firstEmptySlotIndex)) return;
+        if (!offerSelectionSession.TryEnterSlotSelection(firstEmptySlotIndex)) return;
+
+        RenderMenu();
+    }
+
+    private void ConfirmSelectedSlotAssignment()
+    {
+        if (!TryGetSelectedNewAbilityOffer(out var selectedOffer)) return;
+
+        var selectedSlotIndex = offerSelectionSession.SelectedSlotIndex;
+        if (!abilityController.TryAddAbilityToEmptySlot(selectedOffer.Config, selectedSlotIndex)) return;
+
+        CloseMenu();
+    }
+
+    private bool TryGetSelectedNewAbilityOffer(out AbilityOffer selectedOffer)
+    {
+        selectedOffer = default;
+
+        var offers = offerSelectionSession.Offers;
+        var selectedOfferIndex = offerSelectionSession.SelectedOfferIndex;
+
+        if (selectedOfferIndex < 0 || selectedOfferIndex >= offers.Count)
+        {
+            Debug.LogError(
+                $"{nameof(AbilityOfferSelectionFlow)} cannot confirm slot selection " +
+                $"because selected offer index {selectedOfferIndex} is invalid.");
+
+            return false;
+        }
+
+        selectedOffer = offers[selectedOfferIndex];
+        if (selectedOffer.Kind == AbilityOfferKind.NewAbility) return true;
+
+        Debug.LogError(
+            $"{nameof(AbilityOfferSelectionFlow)} cannot confirm slot selection " +
+            $"for offer kind {selectedOffer.Kind}.");
+
+        selectedOffer = default;
+        return false;
     }
 
     private bool TrySelectPrevious()
@@ -213,8 +233,11 @@ public sealed class AbilityOfferSelectionFlow
         {
             case AbilityOfferSelectionState.SelectingOffer:
                 return offerSelectionSession.TrySelectPreviousOffer();
+
             case AbilityOfferSelectionState.SelectingSlot:
-                return offerSelectionSession.TrySelectPreviousSlot(BuildSlotDataSnapshot());
+                var slotSnapshot = BuildSlotDataSnapshot();
+                return offerSelectionSession.TrySelectPreviousSlot(slotSnapshot);
+
             default:
                 return false;
         }
@@ -226,8 +249,11 @@ public sealed class AbilityOfferSelectionFlow
         {
             case AbilityOfferSelectionState.SelectingOffer:
                 return offerSelectionSession.TrySelectNextOffer();
+
             case AbilityOfferSelectionState.SelectingSlot:
-                return offerSelectionSession.TrySelectNextSlot(BuildSlotDataSnapshot());
+                var slotSnapshot = BuildSlotDataSnapshot();
+                return offerSelectionSession.TrySelectNextSlot(slotSnapshot);
+            
             default:
                 return false;
         }
@@ -235,69 +261,95 @@ public sealed class AbilityOfferSelectionFlow
 
     private bool CanInteractWithMenu(bool requireAvailablePoints)
     {
-        if (!isEnabled) return false;
-        if (!selectionViewContainer) return false;
-        if (!inputReader) return false;
-        if (!abilityController) return false;
+        if (!isEnabled || !inputReader || !abilityController) return false;
         if (requireAvailablePoints && pointsProgression.AvailableAbilityPoints <= 0) return false;
 
         return isMenuInteractionAllowed();
     }
 
+    private IReadOnlyList<AbilityOffer> BuildOffers()
+    {
+        var slotCount = abilityController.AbilitySlotCount;
+        var ownedAbilityIds = new List<string>(slotCount);
+        var hasEmptyAbilitySlot = false;
+
+        for (var i = 0; i < slotCount; i++)
+        {
+            var ability = abilityController.GetAbilityInSlot(i);
+
+            if (ability == null)
+            {
+                hasEmptyAbilitySlot = true;
+                continue;
+            }
+
+            if (!string.IsNullOrEmpty(ability.Id))
+            {
+                ownedAbilityIds.Add(ability.Id);
+            }
+        }
+
+        var request = new AbilityOfferRequest(abilityCatalog, ownedAbilityIds, hasEmptyAbilitySlot);
+        return offerService.BuildOffers(request);
+    }
+
+    private AbilitySlotData[] BuildSlotDataSnapshot()
+    {
+        var slotCount = abilityController.AbilitySlotCount;
+        var slotSnapshot = new AbilitySlotData[slotCount];
+
+        for (var i = 0; i < slotCount; i++)
+        {
+            slotSnapshot[i] = abilityController.GetAbilitySlotData(i);
+        }
+
+        return slotSnapshot;
+    }
+
+    private bool TryFindFirstEmptySlotIndex(out int slotIndex)
+    {
+        slotIndex = -1;
+
+        for (var i = 0; i < abilityController.AbilitySlotCount; i++)
+        {
+            if (abilityController.GetAbilityInSlot(i) != null) continue;
+
+            slotIndex = i;
+            return true;
+        }
+
+        return false;
+    }
+
     private void RenderMenu()
     {
-        if (!selectionViewContainer) return;
-
         switch (offerSelectionSession.State)
         {
             case AbilityOfferSelectionState.Closed:
                 selectionViewContainer.Close();
                 return;
+
             case AbilityOfferSelectionState.SelectingOffer:
-                selectionViewContainer.ShowOffers(offerSelectionSession.Offers, offerSelectionSession.SelectedOfferIndex);
+                ShowOfferSelection();
                 return;
+
             case AbilityOfferSelectionState.SelectingSlot:
-                selectionViewContainer.ShowSlotSelection(BuildSlotDataSnapshot(), offerSelectionSession.SelectedSlotIndex);
+                ShowSlotSelection();
                 return;
         }
     }
 
-    private AbilitySlotData[] BuildSlotDataSnapshot()
+    private void ShowSlotSelection()
     {
-        if (!abilityController)
-        {
-            Debug.LogError($"{nameof(AbilityOfferSelectionFlow)} requires a bound {nameof(PlayerAbilityController)} before building a slot-selection snapshot.");
-            return Array.Empty<AbilitySlotData>();
-        }
-
-        var slotCount = abilityController.AbilitySlotCount;
-        var slots = new AbilitySlotData[slotCount];
-
-        for (var i = 0; i < slotCount; i++)
-            slots[i] = abilityController.GetAbilitySlotData(i);
-
-        return slots;
+        var playerSlotsSnapshot = BuildSlotDataSnapshot();
+        var selectedSlotIndex = offerSelectionSession.SelectedSlotIndex;
+        selectionViewContainer.ShowSlotSelection(playerSlotsSnapshot, selectedSlotIndex);
     }
 
-    private bool TryFindFirstEmptySlotIndex(out int slotIndex)
+    private void ShowOfferSelection()
     {
-        slotIndex = default;
-
-        if (!abilityController)
-        {
-            Debug.LogError($"{nameof(AbilityOfferSelectionFlow)} requires a bound {nameof(PlayerAbilityController)} before entering slot selection.");
-            return false;
-        }
-
-        for (var i = 0; i < abilityController.AbilitySlotCount; i++)
-        {
-            if (abilityController.GetAbilityInSlot(i) == null)
-            {
-                slotIndex = i;
-                return true;
-            }
-        }
-
-        return false;
+        var offers = offerSelectionSession.Offers;
+        var selectedOfferIndex = offerSelectionSession.SelectedOfferIndex;
+        selectionViewContainer.ShowOffers(offers, selectedOfferIndex);
     }
 }

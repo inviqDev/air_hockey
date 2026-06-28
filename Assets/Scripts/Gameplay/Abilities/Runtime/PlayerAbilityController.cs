@@ -94,6 +94,41 @@ public sealed class PlayerAbilityController : MonoBehaviour
         SetAbilityToSlot(ability, slotIndex);
     }
 
+    public bool TryAddAbilityToEmptySlot(AbilityConfig config, int slotIndex)
+    {
+        if (!ValidateAbilityToEmptySlotRequest(config, slotIndex)) return false;
+
+        if (abilitySlots[slotIndex] != null) return false;
+        if (!EnsureReadyToCreateAbility()) return false;
+
+        var ability = abilityFactory.CreateAbility(config, movementOverride, puckScaleController);
+        if (ability == null) return false;
+
+        SetAbilityToSlot(ability, slotIndex);
+        return true;
+    }
+
+    private bool ValidateAbilityToEmptySlotRequest(AbilityConfig config, int slotIndex)
+    {
+        if (!IsValidSlotIndex(slotIndex))
+        {
+            Debug.LogError($"{nameof(PlayerAbilityController)} on {name} " +
+                           $"cannot add an ability to invalid slot index {slotIndex}.", this);
+
+            return false;
+        }
+
+        if (!config)
+        {
+            Debug.LogError($"{nameof(PlayerAbilityController)} on {name} " +
+                           $"cannot add an ability to slot {slotIndex} because the config is missing.", this);
+
+            return false;
+        }
+
+        return true;
+    }
+
     public void SetAbilityToSlot(IAbility ability, int slotIndex)
     {
         if (!IsValidSlotIndex(slotIndex)) return;

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
 [RequireComponent(typeof(Outline))]
-public sealed class AbilityOfferSlotView : MonoBehaviour
+public sealed class AbilitySelectionItemView : MonoBehaviour
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private Outline selectedOutline;
@@ -25,7 +25,7 @@ public sealed class AbilityOfferSlotView : MonoBehaviour
         gameObject.SetActive(isVisible);
     }
 
-    public void SetOfferIcon(Sprite icon)
+    public void SetIcon(Sprite icon)
     {
         if (!iconImage) return;
 
@@ -52,9 +52,9 @@ public sealed class AbilityOfferSlotView : MonoBehaviour
     private void ValidateReferences()
     {
         if (!iconImage)
-            Debug.LogError($"{nameof(AbilityOfferSlotView)} on {name} requires an {nameof(Image)} reference.", this);
+            Debug.LogError($"{nameof(AbilitySelectionItemView)} on {name} requires an {nameof(Image)} reference.", this);
 
         if (!selectedOutline)
-            Debug.LogError($"{nameof(AbilityOfferSlotView)} on {name} requires an {nameof(Outline)} reference.", this);
+            Debug.LogError($"{nameof(AbilitySelectionItemView)} on {name} requires an {nameof(Outline)} reference.", this);
     }
 }

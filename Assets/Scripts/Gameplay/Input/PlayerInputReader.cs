@@ -16,6 +16,8 @@ public sealed class PlayerInputReader : MonoBehaviour
     public event Action AbilitySelectionMenuPressed;
     public event Action AbilitySelectionPreviousPressed;
     public event Action AbilitySelectionNextPressed;
+    public event Action AbilitySelectionConfirmPressed;
+    public event Action AbilitySelectionBackPressed;
 
     
     private InputActions inputActions;
@@ -35,6 +37,10 @@ public sealed class PlayerInputReader : MonoBehaviour
     private InputAction leftAbilitySelectionNextAction;
     private InputAction rightAbilitySelectionPreviousAction;
     private InputAction rightAbilitySelectionNextAction;
+    private InputAction leftAbilitySelectionConfirmAction;
+    private InputAction leftAbilitySelectionBackAction;
+    private InputAction rightAbilitySelectionConfirmAction;
+    private InputAction rightAbilitySelectionBackAction;
 
     private Vector2 playerOneMoveInput;
     private Vector2 playerTwoMoveInput;
@@ -62,6 +68,7 @@ public sealed class PlayerInputReader : MonoBehaviour
         UnsubscribeAbilitySlots();
         UnsubscribeAbilitySelectionMenu();
         UnsubscribeAbilitySelectionNavigation();
+        UnsubscribeAbilitySelectionDecision();
         
         if (inputActions != null)
         {
@@ -81,6 +88,10 @@ public sealed class PlayerInputReader : MonoBehaviour
         leftAbilitySelectionNextAction = null;
         rightAbilitySelectionPreviousAction = null;
         rightAbilitySelectionNextAction = null;
+        leftAbilitySelectionConfirmAction = null;
+        leftAbilitySelectionBackAction = null;
+        rightAbilitySelectionConfirmAction = null;
+        rightAbilitySelectionBackAction = null;
         
         playerOneMoveInput = Vector2.zero;
         playerTwoMoveInput = Vector2.zero;
@@ -100,6 +111,7 @@ public sealed class PlayerInputReader : MonoBehaviour
         UnsubscribeAbilitySlots();
         UnsubscribeAbilitySelectionMenu();
         UnsubscribeAbilitySelectionNavigation();
+        UnsubscribeAbilitySelectionDecision();
 
         if (inputActions == null) return;
 
@@ -117,19 +129,34 @@ public sealed class PlayerInputReader : MonoBehaviour
         abilityMenuActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
             ? GetIntermissionAbilityMenuAction(PlayerControlScheme.Arrows)
             : null;
+        
         leftAbilitySelectionPreviousAction = GetIntermissionPreviousAction(controlScheme);
         leftAbilitySelectionNextAction = GetIntermissionNextAction(controlScheme);
+        
         rightAbilitySelectionPreviousAction = controlScheme == PlayerControlScheme.WasdAndArrows
             ? GetIntermissionPreviousAction(PlayerControlScheme.Arrows)
             : null;
+        
         rightAbilitySelectionNextAction = controlScheme == PlayerControlScheme.WasdAndArrows
             ? GetIntermissionNextAction(PlayerControlScheme.Arrows)
+            : null;
+        
+        leftAbilitySelectionConfirmAction = GetIntermissionConfirmAction(controlScheme);
+        leftAbilitySelectionBackAction = GetIntermissionBackAction(controlScheme);
+        
+        rightAbilitySelectionConfirmAction = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? GetIntermissionConfirmAction(PlayerControlScheme.Arrows)
+            : null;
+        
+        rightAbilitySelectionBackAction = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? GetIntermissionBackAction(PlayerControlScheme.Arrows)
             : null;
 
         SubscribeMove();
         SubscribeAbilitySlots();
         SubscribeAbilityMenu();
         SubscribeAbilitySelectionNavigation();
+        SubscribeAbilitySelectionDecision();
     }
 
     private void UnsubscribeMove()
@@ -210,6 +237,36 @@ public sealed class PlayerInputReader : MonoBehaviour
             rightAbilitySelectionNextAction.performed += OnAbilitySelectionNextPerformed;
     }
 
+    private void UnsubscribeAbilitySelectionDecision()
+    {
+        if (leftAbilitySelectionConfirmAction != null)
+            leftAbilitySelectionConfirmAction.performed -= OnAbilitySelectionConfirmPerformed;
+
+        if (leftAbilitySelectionBackAction != null)
+            leftAbilitySelectionBackAction.performed -= OnAbilitySelectionBackPerformed;
+
+        if (rightAbilitySelectionConfirmAction != null)
+            rightAbilitySelectionConfirmAction.performed -= OnAbilitySelectionConfirmPerformed;
+
+        if (rightAbilitySelectionBackAction != null)
+            rightAbilitySelectionBackAction.performed -= OnAbilitySelectionBackPerformed;
+    }
+
+    private void SubscribeAbilitySelectionDecision()
+    {
+        if (leftAbilitySelectionConfirmAction != null)
+            leftAbilitySelectionConfirmAction.performed += OnAbilitySelectionConfirmPerformed;
+
+        if (leftAbilitySelectionBackAction != null)
+            leftAbilitySelectionBackAction.performed += OnAbilitySelectionBackPerformed;
+
+        if (rightAbilitySelectionConfirmAction != null)
+            rightAbilitySelectionConfirmAction.performed += OnAbilitySelectionConfirmPerformed;
+
+        if (rightAbilitySelectionBackAction != null)
+            rightAbilitySelectionBackAction.performed += OnAbilitySelectionBackPerformed;
+    }
+
     private void UnsubscribeAbilitySlots()
     {
         UnsubscribeAbilitySlots(abilitySlotActionsPlayerOne, HandleAbilitySlotPressedPlayerOne);
@@ -272,6 +329,20 @@ public sealed class PlayerInputReader : MonoBehaviour
             : inputActions.Intermission.LeftPlayerNextOffer;
     }
 
+    private InputAction GetIntermissionConfirmAction(PlayerControlScheme scheme)
+    {
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Intermission.RightPlayerConfirmSelection
+            : inputActions.Intermission.LeftPlayerConfirmSelection;
+    }
+
+    private InputAction GetIntermissionBackAction(PlayerControlScheme scheme)
+    {
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Intermission.RightPlayerBackSelection
+            : inputActions.Intermission.LeftPlayerBackSelection;
+    }
+
     private void OnLeftAbilitySelectionMenuPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionMenuPressed?.Invoke();
@@ -285,6 +356,16 @@ public sealed class PlayerInputReader : MonoBehaviour
     private void OnAbilitySelectionNextPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionNextPressed?.Invoke();
+    }
+
+    private void OnAbilitySelectionConfirmPerformed(InputAction.CallbackContext context)
+    {
+        AbilitySelectionConfirmPressed?.Invoke();
+    }
+
+    private void OnAbilitySelectionBackPerformed(InputAction.CallbackContext context)
+    {
+        AbilitySelectionBackPressed?.Invoke();
     }
 
     private void HandleAbilitySlotPressedPlayerOne(InputAction.CallbackContext context)

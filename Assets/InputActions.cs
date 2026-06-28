@@ -441,6 +441,42 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftPlayerConfirmSelection"",
+                    ""type"": ""Button"",
+                    ""id"": ""f5be1a8d-df90-4fd2-b68a-6f2b2dd81752"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftPlayerBackSelection"",
+                    ""type"": ""Button"",
+                    ""id"": ""8c414c7b-5fb8-4b98-9528-a27474b73c93"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerConfirmSelection"",
+                    ""type"": ""Button"",
+                    ""id"": ""7c52d71d-c9f4-4696-b868-eebad0196e56"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerBackSelection"",
+                    ""type"": ""Button"",
+                    ""id"": ""ecb8fbc3-0cdf-46ef-b868-f2ce1dd4c3e1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -507,6 +543,50 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""RightPlayerNextOffer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c0567e2-bef3-4379-9ac5-9d8f790671e8"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerConfirmSelection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2f1bc6a8-f4a6-4f4e-b071-8fb7561811dc"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerBackSelection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""786c9db9-32cb-456a-b8cc-f3a2e93e0fc2"",
+                    ""path"": ""<Keyboard>/numpadPlus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerConfirmSelection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d6dd1e10-fbb8-4dd1-89d7-cd7c02d13e31"",
+                    ""path"": ""<Keyboard>/numpadMinus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerBackSelection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -596,6 +676,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Intermission_RightPlayerAbilityMenu = m_Intermission.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
         m_Intermission_RightPlayerPreviousOffer = m_Intermission.FindAction("RightPlayerPreviousOffer", throwIfNotFound: true);
         m_Intermission_RightPlayerNextOffer = m_Intermission.FindAction("RightPlayerNextOffer", throwIfNotFound: true);
+        m_Intermission_LeftPlayerConfirmSelection = m_Intermission.FindAction("LeftPlayerConfirmSelection", throwIfNotFound: true);
+        m_Intermission_LeftPlayerBackSelection = m_Intermission.FindAction("LeftPlayerBackSelection", throwIfNotFound: true);
+        m_Intermission_RightPlayerConfirmSelection = m_Intermission.FindAction("RightPlayerConfirmSelection", throwIfNotFound: true);
+        m_Intermission_RightPlayerBackSelection = m_Intermission.FindAction("RightPlayerBackSelection", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -878,6 +962,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Intermission_RightPlayerAbilityMenu;
     private readonly InputAction m_Intermission_RightPlayerPreviousOffer;
     private readonly InputAction m_Intermission_RightPlayerNextOffer;
+    private readonly InputAction m_Intermission_LeftPlayerConfirmSelection;
+    private readonly InputAction m_Intermission_LeftPlayerBackSelection;
+    private readonly InputAction m_Intermission_RightPlayerConfirmSelection;
+    private readonly InputAction m_Intermission_RightPlayerBackSelection;
     /// <summary>
     /// Provides access to input actions defined in input action map "Intermission".
     /// </summary>
@@ -913,6 +1001,22 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Intermission/RightPlayerNextOffer".
         /// </summary>
         public InputAction @RightPlayerNextOffer => m_Wrapper.m_Intermission_RightPlayerNextOffer;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/LeftPlayerConfirmSelection".
+        /// </summary>
+        public InputAction @LeftPlayerConfirmSelection => m_Wrapper.m_Intermission_LeftPlayerConfirmSelection;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/LeftPlayerBackSelection".
+        /// </summary>
+        public InputAction @LeftPlayerBackSelection => m_Wrapper.m_Intermission_LeftPlayerBackSelection;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/RightPlayerConfirmSelection".
+        /// </summary>
+        public InputAction @RightPlayerConfirmSelection => m_Wrapper.m_Intermission_RightPlayerConfirmSelection;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/RightPlayerBackSelection".
+        /// </summary>
+        public InputAction @RightPlayerBackSelection => m_Wrapper.m_Intermission_RightPlayerBackSelection;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -957,6 +1061,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerNextOffer.started += instance.OnRightPlayerNextOffer;
             @RightPlayerNextOffer.performed += instance.OnRightPlayerNextOffer;
             @RightPlayerNextOffer.canceled += instance.OnRightPlayerNextOffer;
+            @LeftPlayerConfirmSelection.started += instance.OnLeftPlayerConfirmSelection;
+            @LeftPlayerConfirmSelection.performed += instance.OnLeftPlayerConfirmSelection;
+            @LeftPlayerConfirmSelection.canceled += instance.OnLeftPlayerConfirmSelection;
+            @LeftPlayerBackSelection.started += instance.OnLeftPlayerBackSelection;
+            @LeftPlayerBackSelection.performed += instance.OnLeftPlayerBackSelection;
+            @LeftPlayerBackSelection.canceled += instance.OnLeftPlayerBackSelection;
+            @RightPlayerConfirmSelection.started += instance.OnRightPlayerConfirmSelection;
+            @RightPlayerConfirmSelection.performed += instance.OnRightPlayerConfirmSelection;
+            @RightPlayerConfirmSelection.canceled += instance.OnRightPlayerConfirmSelection;
+            @RightPlayerBackSelection.started += instance.OnRightPlayerBackSelection;
+            @RightPlayerBackSelection.performed += instance.OnRightPlayerBackSelection;
+            @RightPlayerBackSelection.canceled += instance.OnRightPlayerBackSelection;
         }
 
         /// <summary>
@@ -986,6 +1102,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerNextOffer.started -= instance.OnRightPlayerNextOffer;
             @RightPlayerNextOffer.performed -= instance.OnRightPlayerNextOffer;
             @RightPlayerNextOffer.canceled -= instance.OnRightPlayerNextOffer;
+            @LeftPlayerConfirmSelection.started -= instance.OnLeftPlayerConfirmSelection;
+            @LeftPlayerConfirmSelection.performed -= instance.OnLeftPlayerConfirmSelection;
+            @LeftPlayerConfirmSelection.canceled -= instance.OnLeftPlayerConfirmSelection;
+            @LeftPlayerBackSelection.started -= instance.OnLeftPlayerBackSelection;
+            @LeftPlayerBackSelection.performed -= instance.OnLeftPlayerBackSelection;
+            @LeftPlayerBackSelection.canceled -= instance.OnLeftPlayerBackSelection;
+            @RightPlayerConfirmSelection.started -= instance.OnRightPlayerConfirmSelection;
+            @RightPlayerConfirmSelection.performed -= instance.OnRightPlayerConfirmSelection;
+            @RightPlayerConfirmSelection.canceled -= instance.OnRightPlayerConfirmSelection;
+            @RightPlayerBackSelection.started -= instance.OnRightPlayerBackSelection;
+            @RightPlayerBackSelection.performed -= instance.OnRightPlayerBackSelection;
+            @RightPlayerBackSelection.canceled -= instance.OnRightPlayerBackSelection;
         }
 
         /// <summary>
@@ -1211,5 +1339,33 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightPlayerNextOffer(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftPlayerConfirmSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerConfirmSelection(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftPlayerBackSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerBackSelection(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerConfirmSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerConfirmSelection(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerBackSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerBackSelection(InputAction.CallbackContext context);
     }
 }

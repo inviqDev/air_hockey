@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public sealed class AbilityOffersView : MonoBehaviour
+public sealed class AbilityOfferSelectionView : MonoBehaviour
 {
-    [SerializeField] private AbilityOfferSlotsContainer offerSlotsContainer;
+    [SerializeField] private AbilitySelectionItemsContainer offerItemsContainer;
     [SerializeField] private TMP_Text descriptionLabel;
 
     public bool IsOpen => gameObject.activeSelf;
@@ -32,22 +32,22 @@ public sealed class AbilityOffersView : MonoBehaviour
 
     public void Render(IReadOnlyList<AbilityOffer> offers, int selectedOfferIndex)
     {
-        var slotCount = offerSlotsContainer ? offerSlotsContainer.SlotCount : 0;
+        var itemCount = offerItemsContainer ? offerItemsContainer.ItemCount : 0;
 
-        for (var i = 0; i < slotCount; i++)
+        for (var i = 0; i < itemCount; i++)
         {
-            var slotView = offerSlotsContainer.GetSlotView(i);
-            if (!slotView) continue;
+            var itemView = offerItemsContainer.GetItemView(i);
+            if (!itemView) continue;
 
             var hasOffer = offers != null && i < offers.Count;
-            slotView.SetVisible(hasOffer);
+            itemView.SetVisible(hasOffer);
 
             if (hasOffer)
-                slotView.SetOfferIcon(offers[i].Config ? offers[i].Config.Icon : null);
+                itemView.SetIcon(offers[i].Config ? offers[i].Config.Icon : null);
             else
-                slotView.SetOfferIcon(null);
+                itemView.SetIcon(null);
 
-            slotView.SetSelected(hasOffer && i == selectedOfferIndex);
+            itemView.SetSelected(hasOffer && i == selectedOfferIndex);
         }
 
         if (descriptionLabel && offers != null)
@@ -61,10 +61,10 @@ public sealed class AbilityOffersView : MonoBehaviour
     private void ValidateReferences()
     {
         if (!descriptionLabel)
-            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires a description label reference.", this);
+            Debug.LogError($"{nameof(AbilityOfferSelectionView)} on {name} requires a description label reference.", this);
 
-        if (!offerSlotsContainer)
-            Debug.LogError($"{nameof(AbilityOffersView)} on {name} requires an {nameof(AbilityOfferSlotsContainer)} reference.", this);
+        if (!offerItemsContainer)
+            Debug.LogError($"{nameof(AbilityOfferSelectionView)} on {name} requires an {nameof(AbilitySelectionItemsContainer)} reference.", this);
     }
 
     private static string GetOfferDescriptionText(AbilityOffer offer)

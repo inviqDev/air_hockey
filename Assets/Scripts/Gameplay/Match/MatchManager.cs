@@ -112,10 +112,15 @@ public sealed class MatchManager : MonoBehaviour
         SubscribeToGameFlow();
         isInitialized = true;
     }
-
+    
     public bool IsParticipantReady(PlayerSide side)
     {
-        return TryGetParticipantReadyState(side, out var isReady) && isReady;
+        return side switch
+        {
+            PlayerSide.Left => leftParticipantReady,
+            PlayerSide.Right => rightParticipantReady,
+            _ => false
+        };
     }
 
     public bool TrySetParticipantReady(PlayerSide side, bool requestedReadyState)

@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using System.Collections;
 
 public enum GamePhase
 {
@@ -26,7 +25,7 @@ public sealed class MatchManager : MonoBehaviour
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private GoalController goalController;
     [SerializeField] private ScoreKeeper scoreKeeper;
-    [SerializeField] private AbilitySelectionCoordinator abilitySelectionCoordinator;
+    [SerializeField] private ParticipantPreparationCoordinator participantPreparationCoordinator;
 
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
@@ -39,40 +38,44 @@ public sealed class MatchManager : MonoBehaviour
 
     public event Action<GamePhase, GamePhase> PhaseChanged;
     public event Action<GameOverlay, GameOverlay> OverlayChanged;
+    public event Action<PlayerSide, bool> ParticipantReadyStatusChanged;
 
     private UIManager uiManager;
 
     private MatchConfiguration currentConfiguration;
+    private GameOverlay overlayToRestoreAfterSettings = GameOverlay.None;
+    
     private bool hasCurrentConfiguration;
     private bool hasPreparedTurnState;
     private bool lastPreparedTurnCanStart;
-    private Coroutine roundBreakDelayRoutine;
-    private GameOverlay overlayToRestoreAfterSettings = GameOverlay.None;
+    
+    private bool leftParticipantReady;
+    private bool rightParticipantReady;
 
     private bool isInitialized;
 
     private void Awake()
     {
         ValidateReferences();
-        if (abilitySelectionCoordinator)
-        {
-            abilitySelectionCoordinator.SetMatchManager(this);
-            RefreshAbilitySelectionBindings();
-        }
-
-        ApplyPlayerInputMode(PlayerInputMode.Disabled);
     }
 
     private void OnEnable()
     {
         if (!isInitialized) return;
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.Activate();
+
         SubscribeToGameFlow();
+        ApplyResolvedPlayerInputMode();
     }
 
     private void OnDisable()
     {
         if (!isInitialized) return;
         UnsubscribeFromGameFlow();
+
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.Deactivate();
     }
 
     private void Update()
@@ -102,15 +105,43 @@ public sealed class MatchManager : MonoBehaviour
         uiManager = rootUiManager;
         if (!uiManager) return;
 
+        if (participantPreparationCoordinator)
+        {
+            participantPreparationCoordinator.Initialize(this);
+            participantPreparationCoordinator.Activate();
+            RefreshAbilitySelectionBindings();
+        }
+
         SubscribeToGameFlow();
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
         isInitialized = true;
+    }
+    
+    public bool IsParticipantReady(PlayerSide side)
+    {
+        return side switch
+        {
+            PlayerSide.Left => leftParticipantReady,
+            PlayerSide.Right => rightParticipantReady,
+            _ => false
+        };
+    }
+
+    public bool TrySetParticipantReady(PlayerSide side, bool requestedReadyState)
+    {
+        if (!CanChangeParticipantReadyState()) return false;
+        if (!TryGetParticipantReadyState(side, out var currentReadyState)) return false;
+        if (currentReadyState == requestedReadyState) return false;
+
+        SetParticipantReadyState(side, requestedReadyState);
+        TryPrepareNextTurnWhenBothParticipantsReady();
+        return true;
     }
 
     private void PrepareNextTurn()
     {
         if (!turnController) return;
 
-        StopRoundBreakDelayRoutine();
         TransitionPhase(GamePhase.TurnPreparation);
         hasPreparedTurnState = false;
         turnController.PrepareTurn(PrepareCurrentTurn);
@@ -146,8 +177,7 @@ public sealed class MatchManager : MonoBehaviour
             roundController.ReturnRoundItemsToPool();
 
         RefreshAbilitySelectionBindings();
-
-        StopRoundBreakDelayRoutine();
+        ResetParticipantReadyState();
         TransitionPhase(GamePhase.MatchComplete);
         HasActiveMatch = false;
     }
@@ -191,7 +221,7 @@ public sealed class MatchManager : MonoBehaviour
 
     private void ResetCurrentMatchProgress()
     {
-        StopRoundBreakDelayRoutine();
+        ResetParticipantReadyState();
         SetOverlay(GameOverlay.None);
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
 
@@ -207,8 +237,8 @@ public sealed class MatchManager : MonoBehaviour
         if (turnController)
             turnController.EndTurn();
 
-        if (abilitySelectionCoordinator)
-            abilitySelectionCoordinator.ResetProgression();
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.ResetProgression();
 
         hasPreparedTurnState = false;
     }
@@ -238,12 +268,6 @@ public sealed class MatchManager : MonoBehaviour
 
     private void SubscribeToGameFlow()
     {
-        if (abilitySelectionCoordinator)
-        {
-            abilitySelectionCoordinator.SetMatchManager(this);
-            RefreshAbilitySelectionBindings();
-        }
-
         if (goalController)
             goalController.GoalResolved += HandleGoalResult;
 
@@ -348,32 +372,8 @@ public sealed class MatchManager : MonoBehaviour
 
     private void EnterRoundBreak()
     {
-        StopRoundBreakDelayRoutine();
+        ResetParticipantReadyState();
         TransitionPhase(GamePhase.RoundBreak);
-        roundBreakDelayRoutine = StartCoroutine(ReleaseRoundBreakAfterDelayRoutine());
-    }
-
-    private IEnumerator ReleaseRoundBreakAfterDelayRoutine()
-    {
-        var delaySeconds = turnController ? turnController.GoalDelayBeforeNextTurnSeconds : 0f;
-
-        if (delaySeconds > 0f)
-            yield return new WaitForSeconds(delaySeconds);
-
-        roundBreakDelayRoutine = null;
-
-        if (!HasActiveMatch) yield break;
-        if (CurrentPhase != GamePhase.RoundBreak) yield break;
-
-        PrepareNextTurn();
-    }
-
-    private void StopRoundBreakDelayRoutine()
-    {
-        if (roundBreakDelayRoutine == null) return;
-
-        StopCoroutine(roundBreakDelayRoutine);
-        roundBreakDelayRoutine = null;
     }
 
     private void ValidateReferences()
@@ -393,8 +393,8 @@ public sealed class MatchManager : MonoBehaviour
         if (!turnController)
             Debug.LogError($"{nameof(MatchManager)} requires a TurnController reference.", this);
 
-        if (!abilitySelectionCoordinator)
-            Debug.LogError($"{nameof(MatchManager)} requires an {nameof(AbilitySelectionCoordinator)} reference.", this);
+        if (!participantPreparationCoordinator)
+            Debug.LogError($"{nameof(MatchManager)} requires a {nameof(ParticipantPreparationCoordinator)} reference.", this);
     }
 
     private void SetOverlay(GameOverlay nextOverlay)
@@ -418,6 +418,9 @@ public sealed class MatchManager : MonoBehaviour
         if (CurrentPhase == nextPhase) return;
 
         var previousPhase = CurrentPhase;
+        if (previousPhase == GamePhase.RoundBreak && nextPhase != GamePhase.RoundBreak)
+            ResetParticipantReadyState();
+
         CurrentPhase = nextPhase;
         ApplyResolvedPlayerInputMode();
         PhaseChanged?.Invoke(previousPhase, CurrentPhase);
@@ -446,16 +449,16 @@ public sealed class MatchManager : MonoBehaviour
 
     private void RefreshAbilitySelectionBindings()
     {
-        if (!abilitySelectionCoordinator) return;
+        if (!participantPreparationCoordinator) return;
 
         if (!roundController)
         {
-            abilitySelectionCoordinator.ClearParticipantAbilityControllers();
+            participantPreparationCoordinator.ClearParticipantAbilityControllers();
             return;
         }
 
-        abilitySelectionCoordinator.BindParticipantAbilityController(PlayerSide.Left, roundController.GetAbilityController(PlayerSide.Left));
-        abilitySelectionCoordinator.BindParticipantAbilityController(PlayerSide.Right, roundController.GetAbilityController(PlayerSide.Right));
+        participantPreparationCoordinator.BindParticipantAbilityController(PlayerSide.Left, roundController.GetAbilityController(PlayerSide.Left));
+        participantPreparationCoordinator.BindParticipantAbilityController(PlayerSide.Right, roundController.GetAbilityController(PlayerSide.Right));
     }
 
     private PlayerInputMode ResolvePlayerInputMode()
@@ -472,5 +475,72 @@ public sealed class MatchManager : MonoBehaviour
             GamePhase.MatchComplete => PlayerInputMode.Disabled,
             _ => PlayerInputMode.Disabled
         };
+    }
+
+    private bool CanChangeParticipantReadyState()
+    {
+        return HasActiveMatch &&
+               CurrentPhase == GamePhase.RoundBreak &&
+               CurrentOverlay == GameOverlay.None;
+    }
+
+    private void TryPrepareNextTurnWhenBothParticipantsReady()
+    {
+        if (!HasActiveMatch) return;
+        
+        if (CurrentPhase != GamePhase.RoundBreak) return;
+        if (CurrentOverlay != GameOverlay.None) return;
+        
+        var bothParticipantsReady = leftParticipantReady && rightParticipantReady;
+        if (!bothParticipantsReady) return;
+
+        PrepareNextTurn();
+    }
+
+    private bool TryGetParticipantReadyState(PlayerSide side, out bool currentReadyState)
+    {
+        switch (side)
+        {
+            case PlayerSide.Left:
+                currentReadyState = leftParticipantReady;
+                return true;
+
+            case PlayerSide.Right:
+                currentReadyState = rightParticipantReady;
+                return true;
+
+            default:
+                Debug.LogError($"{nameof(MatchManager)} received " +
+                               $"unsupported {nameof(PlayerSide)} value: {side}.", this);
+                currentReadyState = false;
+                return false;
+        }
+    }
+
+    private void ResetParticipantReadyState()
+    {
+        SetParticipantReadyState(PlayerSide.Left, false);
+        SetParticipantReadyState(PlayerSide.Right, false);
+    }
+
+    private void SetParticipantReadyState(PlayerSide side, bool requestedReadyState)
+    {
+        switch (side)
+        {
+            case PlayerSide.Left:
+                if (leftParticipantReady == requestedReadyState) return;
+                leftParticipantReady = requestedReadyState;
+                break;
+
+            case PlayerSide.Right:
+                if (rightParticipantReady == requestedReadyState) return;
+                rightParticipantReady = requestedReadyState;
+                break;
+
+            default:
+                return;
+        }
+
+        ParticipantReadyStatusChanged?.Invoke(side, requestedReadyState);
     }
 }

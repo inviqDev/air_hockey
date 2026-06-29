@@ -391,6 +391,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerReadyToggle",
+                    "type": "Button",
+                    "id": "f1bb430b-3d99-4254-afbe-e74963f93d31",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerReadyToggle",
+                    "type": "Button",
+                    "id": "253c67b8-505d-4175-a7a4-b53e6ac40d3d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -501,6 +519,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "RightPlayerBackSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "383f177f-6a93-4542-bd7f-a7b2899b40a8",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerReadyToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c62a65d6-bbe5-4043-96ec-7f591d50ca53",
+                    "path": "<Keyboard>/numpadPeriod",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerReadyToggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

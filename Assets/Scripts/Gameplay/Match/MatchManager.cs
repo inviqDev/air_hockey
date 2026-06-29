@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using System.Collections;
 
 public enum GamePhase
 {
@@ -33,7 +32,6 @@ public sealed class MatchManager : MonoBehaviour
     public bool IsTurnActive => turnController && turnController.IsTurnActive;
     public bool IsRoundBreakActive => CurrentPhase == GamePhase.RoundBreak;
     public bool IsAbilityMenuInteractionAllowed => HasActiveMatch && CurrentPhase == GamePhase.RoundBreak && CurrentOverlay == GameOverlay.None;
-    public bool AreBothParticipantsReady => leftParticipantReady && rightParticipantReady;
     public bool HasActiveMatch { get; private set; }
     public GamePhase CurrentPhase { get; private set; } = GamePhase.NoActiveMatch;
     public GameOverlay CurrentOverlay { get; private set; } = GameOverlay.None;
@@ -54,8 +52,6 @@ public sealed class MatchManager : MonoBehaviour
     private bool leftParticipantReady;
     private bool rightParticipantReady;
 
-    private Coroutine roundBreakDelayRoutine;
-    
     private bool isInitialized;
 
     private void Awake()
@@ -138,6 +134,7 @@ public sealed class MatchManager : MonoBehaviour
         if (currentReadyState == requestedReadyState) return false;
 
         SetParticipantReadyState(side, requestedReadyState);
+        TryPrepareNextTurnWhenBothParticipantsReady();
         return true;
     }
 
@@ -145,7 +142,6 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!turnController) return;
 
-        StopRoundBreakDelayRoutine();
         TransitionPhase(GamePhase.TurnPreparation);
         hasPreparedTurnState = false;
         turnController.PrepareTurn(PrepareCurrentTurn);
@@ -181,7 +177,6 @@ public sealed class MatchManager : MonoBehaviour
             roundController.ReturnRoundItemsToPool();
 
         RefreshAbilitySelectionBindings();
-        StopRoundBreakDelayRoutine();
         ResetParticipantReadyState();
         TransitionPhase(GamePhase.MatchComplete);
         HasActiveMatch = false;
@@ -226,7 +221,6 @@ public sealed class MatchManager : MonoBehaviour
 
     private void ResetCurrentMatchProgress()
     {
-        StopRoundBreakDelayRoutine();
         ResetParticipantReadyState();
         SetOverlay(GameOverlay.None);
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
@@ -378,33 +372,8 @@ public sealed class MatchManager : MonoBehaviour
 
     private void EnterRoundBreak()
     {
-        StopRoundBreakDelayRoutine();
         ResetParticipantReadyState();
         TransitionPhase(GamePhase.RoundBreak);
-        roundBreakDelayRoutine = StartCoroutine(ReleaseRoundBreakAfterDelayRoutine());
-    }
-
-    private IEnumerator ReleaseRoundBreakAfterDelayRoutine()
-    {
-        var delaySeconds = turnController ? turnController.GoalDelayBeforeNextTurnSeconds : 0f;
-
-        if (delaySeconds > 0f)
-            yield return new WaitForSeconds(delaySeconds);
-
-        roundBreakDelayRoutine = null;
-
-        if (!HasActiveMatch) yield break;
-        if (CurrentPhase != GamePhase.RoundBreak) yield break;
-
-        PrepareNextTurn();
-    }
-
-    private void StopRoundBreakDelayRoutine()
-    {
-        if (roundBreakDelayRoutine == null) return;
-
-        StopCoroutine(roundBreakDelayRoutine);
-        roundBreakDelayRoutine = null;
     }
 
     private void ValidateReferences()
@@ -513,6 +482,19 @@ public sealed class MatchManager : MonoBehaviour
         return HasActiveMatch &&
                CurrentPhase == GamePhase.RoundBreak &&
                CurrentOverlay == GameOverlay.None;
+    }
+
+    private void TryPrepareNextTurnWhenBothParticipantsReady()
+    {
+        if (!HasActiveMatch) return;
+        
+        if (CurrentPhase != GamePhase.RoundBreak) return;
+        if (CurrentOverlay != GameOverlay.None) return;
+        
+        var bothParticipantsReady = leftParticipantReady && rightParticipantReady;
+        if (!bothParticipantsReady) return;
+
+        PrepareNextTurn();
     }
 
     private bool TryGetParticipantReadyState(PlayerSide side, out bool currentReadyState)

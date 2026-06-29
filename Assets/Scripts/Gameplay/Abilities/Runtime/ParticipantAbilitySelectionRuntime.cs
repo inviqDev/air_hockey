@@ -1,3 +1,5 @@
+using System;
+
 public sealed class ParticipantAbilitySelectionRuntime
 {
     private readonly ParticipantHudView participantHud;
@@ -9,6 +11,14 @@ public sealed class ParticipantAbilitySelectionRuntime
     private int lastRenderedTimerDisplaySeconds;
     private int lastRenderedAvailableAbilityPoints;
     private bool lastRenderedCanOpenMenu;
+
+    public bool IsMenuOpen => offerSelectionFlow.IsMenuOpen;
+
+    public event Action<bool> MenuOpenStateChanged
+    {
+        add => offerSelectionFlow.MenuOpenStateChanged += value;
+        remove => offerSelectionFlow.MenuOpenStateChanged -= value;
+    }
 
     public ParticipantAbilitySelectionRuntime(
         ParticipantHudView participantHud,
@@ -46,9 +56,6 @@ public sealed class ParticipantAbilitySelectionRuntime
         var controllerChanged = abilityController != controller;
         abilityController = controller;
         offerSelectionFlow.BindAbilityController(controller);
-
-        if (controllerChanged || !abilityController)
-            offerSelectionFlow.CloseMenu();
 
         if (controllerChanged)
             InvalidateHudRenderCache();

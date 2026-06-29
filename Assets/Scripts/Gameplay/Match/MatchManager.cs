@@ -26,7 +26,7 @@ public sealed class MatchManager : MonoBehaviour
     [SerializeField] private ServeManager serveManager;
     [SerializeField] private GoalController goalController;
     [SerializeField] private ScoreKeeper scoreKeeper;
-    [SerializeField] private AbilitySelectionCoordinator abilitySelectionCoordinator;
+    [SerializeField] private ParticipantPreparationCoordinator participantPreparationCoordinator;
 
     public int LeftScore => goalController ? goalController.LeftScore : 0;
     public int RightScore => goalController ? goalController.RightScore : 0;
@@ -40,7 +40,7 @@ public sealed class MatchManager : MonoBehaviour
 
     public event Action<GamePhase, GamePhase> PhaseChanged;
     public event Action<GameOverlay, GameOverlay> OverlayChanged;
-    public event Action<PlayerSide, bool> ParticipantReadyChanged;
+    public event Action<PlayerSide, bool> ParticipantReadyStatusChanged;
 
     private UIManager uiManager;
 
@@ -61,25 +61,25 @@ public sealed class MatchManager : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
-        if (abilitySelectionCoordinator)
-        {
-            abilitySelectionCoordinator.SetMatchManager(this);
-            RefreshAbilitySelectionBindings();
-        }
-
-        ApplyPlayerInputMode(PlayerInputMode.Disabled);
     }
 
     private void OnEnable()
     {
         if (!isInitialized) return;
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.Activate();
+
         SubscribeToGameFlow();
+        ApplyResolvedPlayerInputMode();
     }
 
     private void OnDisable()
     {
         if (!isInitialized) return;
         UnsubscribeFromGameFlow();
+
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.Deactivate();
     }
 
     private void Update()
@@ -109,7 +109,15 @@ public sealed class MatchManager : MonoBehaviour
         uiManager = rootUiManager;
         if (!uiManager) return;
 
+        if (participantPreparationCoordinator)
+        {
+            participantPreparationCoordinator.Initialize(this);
+            participantPreparationCoordinator.Activate();
+            RefreshAbilitySelectionBindings();
+        }
+
         SubscribeToGameFlow();
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
         isInitialized = true;
     }
     
@@ -235,8 +243,8 @@ public sealed class MatchManager : MonoBehaviour
         if (turnController)
             turnController.EndTurn();
 
-        if (abilitySelectionCoordinator)
-            abilitySelectionCoordinator.ResetProgression();
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.ResetProgression();
 
         hasPreparedTurnState = false;
     }
@@ -266,12 +274,6 @@ public sealed class MatchManager : MonoBehaviour
 
     private void SubscribeToGameFlow()
     {
-        if (abilitySelectionCoordinator)
-        {
-            abilitySelectionCoordinator.SetMatchManager(this);
-            RefreshAbilitySelectionBindings();
-        }
-
         if (goalController)
             goalController.GoalResolved += HandleGoalResult;
 
@@ -422,8 +424,8 @@ public sealed class MatchManager : MonoBehaviour
         if (!turnController)
             Debug.LogError($"{nameof(MatchManager)} requires a TurnController reference.", this);
 
-        if (!abilitySelectionCoordinator)
-            Debug.LogError($"{nameof(MatchManager)} requires an {nameof(AbilitySelectionCoordinator)} reference.", this);
+        if (!participantPreparationCoordinator)
+            Debug.LogError($"{nameof(MatchManager)} requires a {nameof(ParticipantPreparationCoordinator)} reference.", this);
     }
 
     private void SetOverlay(GameOverlay nextOverlay)
@@ -478,16 +480,16 @@ public sealed class MatchManager : MonoBehaviour
 
     private void RefreshAbilitySelectionBindings()
     {
-        if (!abilitySelectionCoordinator) return;
+        if (!participantPreparationCoordinator) return;
 
         if (!roundController)
         {
-            abilitySelectionCoordinator.ClearParticipantAbilityControllers();
+            participantPreparationCoordinator.ClearParticipantAbilityControllers();
             return;
         }
 
-        abilitySelectionCoordinator.BindParticipantAbilityController(PlayerSide.Left, roundController.GetAbilityController(PlayerSide.Left));
-        abilitySelectionCoordinator.BindParticipantAbilityController(PlayerSide.Right, roundController.GetAbilityController(PlayerSide.Right));
+        participantPreparationCoordinator.BindParticipantAbilityController(PlayerSide.Left, roundController.GetAbilityController(PlayerSide.Left));
+        participantPreparationCoordinator.BindParticipantAbilityController(PlayerSide.Right, roundController.GetAbilityController(PlayerSide.Right));
     }
 
     private PlayerInputMode ResolvePlayerInputMode()
@@ -557,6 +559,6 @@ public sealed class MatchManager : MonoBehaviour
                 return;
         }
 
-        ParticipantReadyChanged?.Invoke(side, requestedReadyState);
+        ParticipantReadyStatusChanged?.Invoke(side, requestedReadyState);
     }
 }

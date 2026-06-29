@@ -16,6 +16,9 @@ public sealed class AbilityOfferSelectionFlow
     private PlayerAbilityController abilityController;
     private PlayerInputReader inputReader;
     private bool isEnabled;
+    private Func<bool> canOpenMenuPredicate = AllowMenuOpen;
+
+    public event Action<bool> MenuOpenStateChanged;
 
     public AbilityOfferSelectionFlow(
         ParticipantHudView participantHud,
@@ -33,7 +36,8 @@ public sealed class AbilityOfferSelectionFlow
         this.isMenuInteractionAllowed = isMenuInteractionAllowed;
     }
 
-    public bool CanOpenMenu => CanInteractWithMenu(requireAvailablePoints: true);
+    public bool CanOpenMenu => CanInteractWithMenu(requireAvailablePoints: true) && canOpenMenuPredicate();
+    public bool IsMenuOpen => offerSelectionSession.State != AbilityOfferSelectionState.Closed;
 
     public void Enable()
     {
@@ -68,10 +72,19 @@ public sealed class AbilityOfferSelectionFlow
         BindInputReader(nextInputReader);
     }
 
+    public void SetCanOpenMenuPredicate(Func<bool> predicate)
+    {
+        canOpenMenuPredicate = predicate ?? AllowMenuOpen;
+    }
+
     public void CloseMenu()
     {
+        var wasMenuOpen = IsMenuOpen;
         offerSelectionSession.Close();
         selectionViewContainer.Close();
+
+        if (wasMenuOpen)
+            MenuOpenStateChanged?.Invoke(false);
     }
 
     public void Tick()
@@ -134,7 +147,7 @@ public sealed class AbilityOfferSelectionFlow
             return;
         }
 
-        if (!CanInteractWithMenu(requireAvailablePoints: true)) return;
+        if (!CanOpenMenu) return;
 
         OpenMenu();
     }
@@ -180,6 +193,7 @@ public sealed class AbilityOfferSelectionFlow
         if (!offerSelectionSession.TryOpen(offers)) return;
 
         RenderMenu();
+        MenuOpenStateChanged?.Invoke(true);
     }
 
     private void ReopenMenuWithRefreshedOffers()
@@ -299,6 +313,11 @@ public sealed class AbilityOfferSelectionFlow
         if (requireAvailablePoints && pointsProgression.AvailableAbilityPoints <= 0) return false;
 
         return isMenuInteractionAllowed();
+    }
+
+    private static bool AllowMenuOpen()
+    {
+        return true;
     }
 
     private IReadOnlyList<AbilityOffer> BuildOffers()

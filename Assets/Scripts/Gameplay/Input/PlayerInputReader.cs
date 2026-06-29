@@ -18,6 +18,7 @@ public sealed class PlayerInputReader : MonoBehaviour
     public event Action AbilitySelectionNextPressed;
     public event Action AbilitySelectionConfirmPressed;
     public event Action AbilitySelectionBackPressed;
+    public event Action ReadyToggleRequested;
 
     
     private InputActions inputActions;
@@ -41,6 +42,8 @@ public sealed class PlayerInputReader : MonoBehaviour
     private InputAction leftAbilitySelectionBackAction;
     private InputAction rightAbilitySelectionConfirmAction;
     private InputAction rightAbilitySelectionBackAction;
+    private InputAction leftReadyToggleAction;
+    private InputAction rightReadyToggleAction;
 
     private Vector2 playerOneMoveInput;
     private Vector2 playerTwoMoveInput;
@@ -92,6 +95,8 @@ public sealed class PlayerInputReader : MonoBehaviour
         leftAbilitySelectionBackAction = null;
         rightAbilitySelectionConfirmAction = null;
         rightAbilitySelectionBackAction = null;
+        leftReadyToggleAction = null;
+        rightReadyToggleAction = null;
         
         playerOneMoveInput = Vector2.zero;
         playerTwoMoveInput = Vector2.zero;
@@ -143,6 +148,7 @@ public sealed class PlayerInputReader : MonoBehaviour
         
         leftAbilitySelectionConfirmAction = GetIntermissionConfirmAction(controlScheme);
         leftAbilitySelectionBackAction = GetIntermissionBackAction(controlScheme);
+        leftReadyToggleAction = GetIntermissionReadyToggleAction(controlScheme);
         
         rightAbilitySelectionConfirmAction = controlScheme == PlayerControlScheme.WasdAndArrows
             ? GetIntermissionConfirmAction(PlayerControlScheme.Arrows)
@@ -150,6 +156,10 @@ public sealed class PlayerInputReader : MonoBehaviour
         
         rightAbilitySelectionBackAction = controlScheme == PlayerControlScheme.WasdAndArrows
             ? GetIntermissionBackAction(PlayerControlScheme.Arrows)
+            : null;
+
+        rightReadyToggleAction = controlScheme == PlayerControlScheme.WasdAndArrows
+            ? GetIntermissionReadyToggleAction(PlayerControlScheme.Arrows)
             : null;
 
         SubscribeMove();
@@ -250,6 +260,12 @@ public sealed class PlayerInputReader : MonoBehaviour
 
         if (rightAbilitySelectionBackAction != null)
             rightAbilitySelectionBackAction.performed -= OnAbilitySelectionBackPerformed;
+
+        if (leftReadyToggleAction != null)
+            leftReadyToggleAction.performed -= OnReadyTogglePerformed;
+
+        if (rightReadyToggleAction != null)
+            rightReadyToggleAction.performed -= OnReadyTogglePerformed;
     }
 
     private void SubscribeAbilitySelectionDecision()
@@ -265,6 +281,12 @@ public sealed class PlayerInputReader : MonoBehaviour
 
         if (rightAbilitySelectionBackAction != null)
             rightAbilitySelectionBackAction.performed += OnAbilitySelectionBackPerformed;
+
+        if (leftReadyToggleAction != null)
+            leftReadyToggleAction.performed += OnReadyTogglePerformed;
+
+        if (rightReadyToggleAction != null)
+            rightReadyToggleAction.performed += OnReadyTogglePerformed;
     }
 
     private void UnsubscribeAbilitySlots()
@@ -343,6 +365,13 @@ public sealed class PlayerInputReader : MonoBehaviour
             : inputActions.Intermission.LeftPlayerBackSelection;
     }
 
+    private InputAction GetIntermissionReadyToggleAction(PlayerControlScheme scheme)
+    {
+        return scheme == PlayerControlScheme.Arrows
+            ? inputActions.Intermission.RightPlayerReadyToggle
+            : inputActions.Intermission.LeftPlayerReadyToggle;
+    }
+
     private void OnLeftAbilitySelectionMenuPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionMenuPressed?.Invoke();
@@ -366,6 +395,11 @@ public sealed class PlayerInputReader : MonoBehaviour
     private void OnAbilitySelectionBackPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionBackPressed?.Invoke();
+    }
+
+    private void OnReadyTogglePerformed(InputAction.CallbackContext context)
+    {
+        ReadyToggleRequested?.Invoke();
     }
 
     private void HandleAbilitySlotPressedPlayerOne(InputAction.CallbackContext context)

@@ -7,6 +7,7 @@ public sealed class ParticipantHudView : MonoBehaviour
     [SerializeField] private AbilitySlotsHudView abilitySlotsHudView;
     [SerializeField] private AbilityOffersHudView abilityOffersHudView;
     [SerializeField] private FreeAbilityTimerHudView freeAbilityTimerHudView;
+    [SerializeField] private ParticipantReadyView participantReadyView;
 
     private bool isInitialized;
 
@@ -31,7 +32,7 @@ public sealed class ParticipantHudView : MonoBehaviour
 
         ValidateReferences();
         
-        if (!abilityOffersHudView || !freeAbilityTimerHudView || !abilitySlotsHudView)
+        if (!abilityOffersHudView || !freeAbilityTimerHudView || !abilitySlotsHudView || !participantReadyView)
         {
             isInitialized = false;
             return;
@@ -40,6 +41,8 @@ public sealed class ParticipantHudView : MonoBehaviour
         freeAbilityTimerHudView.Initialize();
         abilityOffersHudView.Initialize();
         abilitySlotsHudView.Initialize();
+        participantReadyView.SetReady(false);
+        participantReadyView.SetVisible(false);
         
         isInitialized = true;
     }
@@ -68,6 +71,18 @@ public sealed class ParticipantHudView : MonoBehaviour
         abilitySlotsHudView.BindAbilityController(controller);
     }
 
+    public void SetReadyVisible(bool isVisible)
+    {
+        if (!isInitialized || !participantReadyView) return;
+        participantReadyView.SetVisible(isVisible);
+    }
+
+    public void SetReady(bool isReady)
+    {
+        if (!isInitialized || !participantReadyView) return;
+        participantReadyView.SetReady(isReady);
+    }
+
     private void OnValidate()
     {
         ValidateReferences();
@@ -83,5 +98,8 @@ public sealed class ParticipantHudView : MonoBehaviour
 
         if (!abilitySlotsHudView)
             Debug.LogError($"{nameof(ParticipantHudView)} on {name} requires a {nameof(AbilitySlotsHudView)} reference.", this);
+
+        if (!participantReadyView)
+            Debug.LogError($"{nameof(ParticipantHudView)} on {name} requires a {nameof(ParticipantReadyView)} reference.", this);
     }
 }

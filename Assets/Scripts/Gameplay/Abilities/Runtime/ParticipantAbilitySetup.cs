@@ -18,9 +18,9 @@ public sealed class ParticipantAbilitySetup
     public void Validate(string fieldName, UnityEngine.Object context)
     {
         if (!participantHud)
-            Debug.LogError($"{nameof(AbilitySelectionCoordinator)} on {context.name} requires a {nameof(ParticipantHudView)} reference for {fieldName}.", context);
+            Debug.LogError($"{nameof(ParticipantPreparationCoordinator)} on {context.name} requires a {nameof(ParticipantHudView)} reference for {fieldName}.", context);
 
         if (!abilitySelectionViewContainer)
-            Debug.LogError($"{nameof(AbilitySelectionCoordinator)} on {context.name} requires a {nameof(AbilitySelectionViewContainer)} reference for {fieldName}.", context);
+            Debug.LogError($"{nameof(ParticipantPreparationCoordinator)} on {context.name} requires a {nameof(AbilitySelectionViewContainer)} reference for {fieldName}.", context);
     }
 }

@@ -477,6 +477,24 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftPlayerReadyToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""f1bb430b-3d99-4254-afbe-e74963f93d31"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPlayerReadyToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""253c67b8-505d-4175-a7a4-b53e6ac40d3d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -589,6 +607,28 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""RightPlayerBackSelection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""383f177f-6a93-4542-bd7f-a7b2899b40a8"",
+                    ""path"": ""<Keyboard>/backquote"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftPlayerReadyToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c62a65d6-bbe5-4043-96ec-7f591d50ca53"",
+                    ""path"": ""<Keyboard>/numpadPeriod"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightPlayerReadyToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -680,6 +720,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Intermission_LeftPlayerBackSelection = m_Intermission.FindAction("LeftPlayerBackSelection", throwIfNotFound: true);
         m_Intermission_RightPlayerConfirmSelection = m_Intermission.FindAction("RightPlayerConfirmSelection", throwIfNotFound: true);
         m_Intermission_RightPlayerBackSelection = m_Intermission.FindAction("RightPlayerBackSelection", throwIfNotFound: true);
+        m_Intermission_LeftPlayerReadyToggle = m_Intermission.FindAction("LeftPlayerReadyToggle", throwIfNotFound: true);
+        m_Intermission_RightPlayerReadyToggle = m_Intermission.FindAction("RightPlayerReadyToggle", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -966,6 +1008,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Intermission_LeftPlayerBackSelection;
     private readonly InputAction m_Intermission_RightPlayerConfirmSelection;
     private readonly InputAction m_Intermission_RightPlayerBackSelection;
+    private readonly InputAction m_Intermission_LeftPlayerReadyToggle;
+    private readonly InputAction m_Intermission_RightPlayerReadyToggle;
     /// <summary>
     /// Provides access to input actions defined in input action map "Intermission".
     /// </summary>
@@ -1017,6 +1061,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Intermission/RightPlayerBackSelection".
         /// </summary>
         public InputAction @RightPlayerBackSelection => m_Wrapper.m_Intermission_RightPlayerBackSelection;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/LeftPlayerReadyToggle".
+        /// </summary>
+        public InputAction @LeftPlayerReadyToggle => m_Wrapper.m_Intermission_LeftPlayerReadyToggle;
+        /// <summary>
+        /// Provides access to the underlying input action "Intermission/RightPlayerReadyToggle".
+        /// </summary>
+        public InputAction @RightPlayerReadyToggle => m_Wrapper.m_Intermission_RightPlayerReadyToggle;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1073,6 +1125,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerBackSelection.started += instance.OnRightPlayerBackSelection;
             @RightPlayerBackSelection.performed += instance.OnRightPlayerBackSelection;
             @RightPlayerBackSelection.canceled += instance.OnRightPlayerBackSelection;
+            @LeftPlayerReadyToggle.started += instance.OnLeftPlayerReadyToggle;
+            @LeftPlayerReadyToggle.performed += instance.OnLeftPlayerReadyToggle;
+            @LeftPlayerReadyToggle.canceled += instance.OnLeftPlayerReadyToggle;
+            @RightPlayerReadyToggle.started += instance.OnRightPlayerReadyToggle;
+            @RightPlayerReadyToggle.performed += instance.OnRightPlayerReadyToggle;
+            @RightPlayerReadyToggle.canceled += instance.OnRightPlayerReadyToggle;
         }
 
         /// <summary>
@@ -1114,6 +1172,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @RightPlayerBackSelection.started -= instance.OnRightPlayerBackSelection;
             @RightPlayerBackSelection.performed -= instance.OnRightPlayerBackSelection;
             @RightPlayerBackSelection.canceled -= instance.OnRightPlayerBackSelection;
+            @LeftPlayerReadyToggle.started -= instance.OnLeftPlayerReadyToggle;
+            @LeftPlayerReadyToggle.performed -= instance.OnLeftPlayerReadyToggle;
+            @LeftPlayerReadyToggle.canceled -= instance.OnLeftPlayerReadyToggle;
+            @RightPlayerReadyToggle.started -= instance.OnRightPlayerReadyToggle;
+            @RightPlayerReadyToggle.performed -= instance.OnRightPlayerReadyToggle;
+            @RightPlayerReadyToggle.canceled -= instance.OnRightPlayerReadyToggle;
         }
 
         /// <summary>
@@ -1367,5 +1431,19 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightPlayerBackSelection(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftPlayerReadyToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftPlayerReadyToggle(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightPlayerReadyToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightPlayerReadyToggle(InputAction.CallbackContext context);
     }
 }

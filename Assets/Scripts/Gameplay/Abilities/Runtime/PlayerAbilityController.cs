@@ -50,6 +50,12 @@ public sealed class PlayerAbilityController : MonoBehaviour
         NotifyAllAbilitySlotsChanged();
     }
 
+    public void ResetForFullMatch()
+    {
+        CancelAbilities();
+        DisposeAbilities();
+    }
+
     private void Reset()
     {
         if (!strikerMovement)

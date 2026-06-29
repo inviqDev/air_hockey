@@ -88,8 +88,18 @@ public sealed class RoundController : MonoBehaviour
     
     public void ReturnRoundItemsToPool()
     {
-        ReturnItemToPool(leftStriker);
-        ReturnItemToPool(rightStriker);
+        ReturnRoundItemsToPool(resetAbilitiesForFullMatch: false);
+    }
+
+    public void ReturnRoundItemsToPoolForFullMatch()
+    {
+        ReturnRoundItemsToPool(resetAbilitiesForFullMatch: true);
+    }
+
+    private void ReturnRoundItemsToPool(bool resetAbilitiesForFullMatch)
+    {
+        ReturnStrikerToPool(leftStriker, resetAbilitiesForFullMatch);
+        ReturnStrikerToPool(rightStriker, resetAbilitiesForFullMatch);
         ReturnItemToPool(puck);
 
         leftStriker = null;
@@ -188,6 +198,20 @@ public sealed class RoundController : MonoBehaviour
     {
         if (!item) return;
         gameplayItemPool.ReturnToPool(item);
+    }
+
+    private void ReturnStrikerToPool(StrikerBase striker, bool resetAbilitiesForFullMatch)
+    {
+        if (!striker) return;
+
+        if (resetAbilitiesForFullMatch)
+        {
+            var abilityController = striker.AbilityController;
+            if (abilityController)
+                abilityController.ResetForFullMatch();
+        }
+
+        gameplayItemPool.ReturnToPool(striker);
     }
 
     private static void ResetStrikerToStartPosition(StrikerBase striker, Vector2 position)

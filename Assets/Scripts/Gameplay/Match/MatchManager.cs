@@ -174,7 +174,7 @@ public sealed class MatchManager : MonoBehaviour
         }
 
         if (roundController)
-            roundController.ReturnRoundItemsToPool();
+            roundController.ReturnRoundItemsToPoolForFullMatch();
 
         RefreshAbilitySelectionBindings();
         ResetParticipantReadyState();
@@ -247,7 +247,7 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!roundController) return false;
 
-        roundController.ReturnRoundItemsToPool();
+        roundController.ReturnRoundItemsToPoolForFullMatch();
         return roundController.ActivateRoundItems(configuration);
     }
 
@@ -257,7 +257,7 @@ public sealed class MatchManager : MonoBehaviour
         ResetCurrentMatchProgress();
 
         if (roundController)
-            roundController.ReturnRoundItemsToPool();
+            roundController.ReturnRoundItemsToPoolForFullMatch();
 
         RefreshAbilitySelectionBindings();
 

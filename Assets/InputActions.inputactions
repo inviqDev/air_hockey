@@ -7,7 +7,7 @@
             "id": "df70fa95-8a34-4494-b137-73ab6b9c7d37",
             "actions": [
                 {
-                    "name": "Move",
+                    "name": "LeftPlayerMove",
                     "type": "Value",
                     "id": "15813dfa-3787-4218-92ea-ec79e4c0e83f",
                     "expectedControlType": "",
@@ -16,9 +16,81 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Dash",
+                    "name": "LeftPlayerAbilitySlot1",
                     "type": "Button",
-                    "id": "980e05e2-fd24-4930-a092-c1d1aaa1b8e4",
+                    "id": "5ce00bb7-2251-49d4-a70d-92d9054cbc9c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerAbilitySlot2",
+                    "type": "Button",
+                    "id": "0bc13d30-fe6b-4c69-b3e7-338a1dbb7b5f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerAbilitySlot3",
+                    "type": "Button",
+                    "id": "e16873cf-86ad-4ce9-b99d-420cf744d6bd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerAbilitySlot4",
+                    "type": "Button",
+                    "id": "8631d3d7-82bd-4ad3-a33b-df3fba25cf68",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerMove",
+                    "type": "Value",
+                    "id": "f74e8e15-8999-4df6-b418-d0da01a6ee3e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RightPlayerAbilitySlot1",
+                    "type": "Button",
+                    "id": "0c4808e5-b9cb-4a86-8596-20e65f29f37b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilitySlot2",
+                    "type": "Button",
+                    "id": "3fc39dfc-1ed2-489f-9a7a-c6f3292fa0c4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilitySlot3",
+                    "type": "Button",
+                    "id": "81723974-1902-427f-bf8f-8363b0886d60",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilitySlot4",
+                    "type": "Button",
+                    "id": "fa76ee90-a464-4382-b9f4-c78f1798a7f5",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -33,7 +105,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -44,7 +116,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -55,7 +127,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -66,7 +138,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -77,18 +149,398 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "LeftPlayerMove",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
                 {
                     "name": "",
-                    "id": "d80f4b4f-5ab3-4c61-b013-49ec96ec0a7b",
-                    "path": "<Keyboard>/space",
+                    "id": "d1cf03e8-52f2-4e0f-a46a-84f31b4b064f",
+                    "path": "<Keyboard>/1",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Dash",
+                    "action": "LeftPlayerAbilitySlot1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0ad476d0-3ec0-4401-8528-c3bfe4158417",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilitySlot2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fd0bcb71-89ca-4fd7-85a0-bfd193bc102e",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilitySlot3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "46157ee0-5de1-4136-84d5-5caad1460464",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilitySlot4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "2D Vector",
+                    "id": "d0843077-c98a-43bb-a4ea-f0c4e4ace888",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "8b758dbc-2a6b-4b14-8f15-81b886cc5326",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "848d0859-49d8-4178-9bf5-7d1b648adf72",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "f353012c-8352-4da7-a962-3e35b44f4911",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "7a7ee7aa-0bba-4d5e-b1b9-048a08f14915",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "728ce9c8-d3af-4e5f-9ad4-fb66ad2c2099",
+                    "path": "<Keyboard>/numpad4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilitySlot1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ad1a2df7-2d75-443f-b614-9ec6f3cd4f41",
+                    "path": "<Keyboard>/numpad5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilitySlot2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8d2f6d45-fd6f-466b-bd57-5e65c8774e32",
+                    "path": "<Keyboard>/numpad6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilitySlot3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0f89df57-4de8-4651-a3e7-b2ee35559905",
+                    "path": "<Keyboard>/numpad8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilitySlot4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Intermission",
+            "id": "4fe67938-3798-4b79-b7ca-57a99f465085",
+            "actions": [
+                {
+                    "name": "LeftPlayerAbilityMenu",
+                    "type": "Button",
+                    "id": "d08bc474-eab1-4be9-9b53-3aa2a3a5ecb0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerPreviousOffer",
+                    "type": "Button",
+                    "id": "514f6694-fbe8-4d11-a5f9-5fbb885d35c0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerNextOffer",
+                    "type": "Button",
+                    "id": "920ebc16-8072-4be2-9130-ee9410dfb13e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerAbilityMenu",
+                    "type": "Button",
+                    "id": "93f00e86-ac4d-40f6-b0b2-e81987a8d8f5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerPreviousOffer",
+                    "type": "Button",
+                    "id": "8b218531-05f1-4289-a4a9-9330696a0563",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerNextOffer",
+                    "type": "Button",
+                    "id": "d8623053-3255-4f6a-a1e4-c5f8d4dfe73b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerConfirmSelection",
+                    "type": "Button",
+                    "id": "f5be1a8d-df90-4fd2-b68a-6f2b2dd81752",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerBackSelection",
+                    "type": "Button",
+                    "id": "8c414c7b-5fb8-4b98-9528-a27474b73c93",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerConfirmSelection",
+                    "type": "Button",
+                    "id": "7c52d71d-c9f4-4696-b868-eebad0196e56",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerBackSelection",
+                    "type": "Button",
+                    "id": "ecb8fbc3-0cdf-46ef-b868-f2ce1dd4c3e1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftPlayerReadyToggle",
+                    "type": "Button",
+                    "id": "f1bb430b-3d99-4254-afbe-e74963f93d31",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightPlayerReadyToggle",
+                    "type": "Button",
+                    "id": "253c67b8-505d-4175-a7a4-b53e6ac40d3d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "ba97f913-9ec2-4f98-82d0-ac4252ec8f6e",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerAbilityMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6dcd3224-3413-4519-9e80-fd34e71de6e5",
+                    "path": "<Keyboard>/numpad0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerAbilityMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "38481e53-bd1d-4596-b513-1d7098a13fec",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerPreviousOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4515c7f2-d169-4eb3-b5a8-428f28053596",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerNextOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6de4442f-aefb-4fb4-8416-12dcb8577f34",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerPreviousOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "359e7985-9f04-4ac9-a97c-4f908dbbfe3e",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerNextOffer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c0567e2-bef3-4379-9ac5-9d8f790671e8",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerConfirmSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2f1bc6a8-f4a6-4f4e-b071-8fb7561811dc",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerBackSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "786c9db9-32cb-456a-b8cc-f3a2e93e0fc2",
+                    "path": "<Keyboard>/numpadPlus",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerConfirmSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d6dd1e10-fbb8-4dd1-89d7-cd7c02d13e31",
+                    "path": "<Keyboard>/numpadMinus",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerBackSelection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "383f177f-6a93-4542-bd7f-a7b2899b40a8",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftPlayerReadyToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c62a65d6-bbe5-4043-96ec-7f591d50ca53",
+                    "path": "<Keyboard>/numpadPeriod",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPlayerReadyToggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

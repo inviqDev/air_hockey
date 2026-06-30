@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b64112436dd80d844ae693ca379a69ae, type: 3}
+  m_Name: puck_scale_config
+  m_EditorClassIdentifier: Assembly-CSharp::PuckScaleAbilityConfig
+  id: Puck_Scale_Ability_ID
+  displayName: Puck Scale
+  description: 'HERE SHOULD BE A DESCRIPTION OF THE PUCK SCALE ABILITY
+
+    + upgrade
+    levels changes'
+  icon: {fileID: 21300000, guid: a45cbeb82a059f6488170248d990a803, type: 3}
+  downscaledScaleMultiplier: 0.5
+  animationDuration: 0.2
+  animationEase: 6

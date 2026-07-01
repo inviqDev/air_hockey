@@ -1,40 +1,54 @@
+using System;
 using UnityEngine;
 
 public sealed class GameBootstrap : MonoBehaviour
 {
-    [SerializeField] private UIManager uiManager;
     [SerializeField] private MatchManager matchManager;
-
-    private void Awake()
-    {
-        ValidateReferences();
-    }
+    [SerializeField] private UIManager uiManager;
 
     private void Start()
     {
+        ValidateReferencesOrThrow();
         InitializeSceneStartup();
     }
 
     private void OnValidate()
     {
-        ValidateReferences();
-    }
-
-    private void ValidateReferences()
-    {
-        if (!uiManager)
-            Debug.LogError($"{nameof(GameBootstrap)} requires a UIManager reference.", this);
-
-        if (!matchManager)
-            Debug.LogError($"{nameof(GameBootstrap)} requires a MatchManager reference.", this);
+        if (TryGetValidationError(out var error))
+        {
+            Debug.LogError(error, this);
+        }
     }
 
     private void InitializeSceneStartup()
     {
-        if (!uiManager) return;
-        if (!matchManager) return;
-
         uiManager.InitializeGameStart();
         matchManager.InitializeGameStart(uiManager);
+    }
+
+    private void ValidateReferencesOrThrow()
+    {
+        if (TryGetValidationError(out var error))
+        {
+            throw new InvalidOperationException(error);
+        }
+    }
+
+    private bool TryGetValidationError(out string error)
+    {
+        if (!matchManager)
+        {
+            error = $"{nameof(GameBootstrap)} requires a {nameof(MatchManager)} reference.";
+            return true;
+        }
+
+        if (!uiManager)
+        {
+            error = $"{nameof(GameBootstrap)} requires a {nameof(UIManager)} reference.";
+            return true;
+        }
+
+        error = string.Empty;
+        return false;
     }
 }

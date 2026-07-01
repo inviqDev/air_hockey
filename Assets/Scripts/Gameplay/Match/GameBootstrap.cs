@@ -1,12 +1,9 @@
 using UnityEngine;
 
-public sealed class GameManager : MonoBehaviour
+public sealed class GameBootstrap : MonoBehaviour
 {
     [SerializeField] private UIManager uiManager;
     [SerializeField] private MatchManager matchManager;
-
-    public UIManager UIManager => uiManager;
-    public MatchManager MatchManager => matchManager;
 
     private void Awake()
     {
@@ -15,7 +12,7 @@ public sealed class GameManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeGameStartFlow();
+        InitializeSceneStartup();
     }
 
     private void OnValidate()
@@ -26,13 +23,13 @@ public sealed class GameManager : MonoBehaviour
     private void ValidateReferences()
     {
         if (!uiManager)
-            Debug.LogError($"{nameof(GameManager)} requires a UIManager reference.", this);
+            Debug.LogError($"{nameof(GameBootstrap)} requires a UIManager reference.", this);
 
         if (!matchManager)
-            Debug.LogError($"{nameof(GameManager)} requires a MatchManager reference.", this);
+            Debug.LogError($"{nameof(GameBootstrap)} requires a MatchManager reference.", this);
     }
 
-    private void InitializeGameStartFlow()
+    private void InitializeSceneStartup()
     {
         if (!uiManager) return;
         if (!matchManager) return;

@@ -126,8 +126,60 @@ public sealed class StartGameMenu : MenuViewBase
     {
         Hide();
 
-        var configuration = new MatchConfiguration(playerTwoControlType, playerOneSide);
+        var configuration = CreateTemporaryTwoSideConfiguration(playerTwoControlType, playerOneSide);
         MatchConfigurationSelected?.Invoke(configuration);
+    }
+
+    private static MatchConfiguration CreateTemporaryTwoSideConfiguration(
+        PlayerTwoControlType playerTwoControlType,
+        PlayerSide participantOneSide)
+    {
+        var participantOneId = new ParticipantId(0);
+        var participantTwoId = new ParticipantId(1);
+
+        var participantOneSlot = GetSlotForSide(participantOneSide);
+
+        var participantOneControlScheme = playerTwoControlType == PlayerTwoControlType.Ai
+            ? PlayerControlScheme.WasdAndArrows
+            : GetSideDerivedHumanControlScheme(participantOneSide);
+
+        var participantOneSetup = MatchParticipantSetup.CreateHumanSetup(participantOneId, participantOneControlScheme);
+
+        var participantTwoSide = SideUtility.Opposite(participantOneSide);
+        var participantTwoSlot = GetSlotForSide(participantTwoSide);
+
+        var participantTwoSetup = playerTwoControlType == PlayerTwoControlType.Ai
+            ? MatchParticipantSetup.CreateAiSetup(participantTwoId)
+            : MatchParticipantSetup.CreateHumanSetup(
+                participantTwoId, GetSideDerivedHumanControlScheme(participantTwoSide));
+
+        var roster = new ParticipantRoster(participantOneSetup, participantTwoSetup);
+
+        var participantOneAssignment = new ParticipantSlotAssignment(participantOneId, participantOneSlot);
+        var participantTwoAssignment = new ParticipantSlotAssignment(participantTwoId, participantTwoSlot);
+        var slotAssignments = new ParticipantSlotAssignments(participantOneAssignment, participantTwoAssignment);
+
+        return new MatchConfiguration(TemporaryTwoSideArena.ArenaId, roster, slotAssignments);
+    }
+
+    private static ArenaSlotId GetSlotForSide(PlayerSide side)
+    {
+        return side switch
+        {
+            PlayerSide.Left => TemporaryTwoSideArena.LeftSlot,
+            PlayerSide.Right => TemporaryTwoSideArena.RightSlot,
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unsupported player side.")
+        };
+    }
+
+    private static PlayerControlScheme GetSideDerivedHumanControlScheme(PlayerSide side)
+    {
+        return side switch
+        {
+            PlayerSide.Left => PlayerControlScheme.Wasd,
+            PlayerSide.Right => PlayerControlScheme.Arrows,
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unsupported player side.")
+        };
     }
 
     private static void ExitGame()

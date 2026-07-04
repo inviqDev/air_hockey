@@ -1,6 +1,6 @@
 public sealed class ParticipantReadyStatusHandler
 {
-    private readonly PlayerSide side;
+    private readonly ParticipantId participantId;
     private readonly ParticipantHudView participantHud;
     private readonly ParticipantAbilitySelectionRuntime abilitySelectionRuntime;
     private readonly MatchManager matchManager;
@@ -9,12 +9,12 @@ public sealed class ParticipantReadyStatusHandler
     private bool isEnabled;
 
     public ParticipantReadyStatusHandler(
-        PlayerSide side,
+        ParticipantId participantId,
         ParticipantHudView participantHud,
         ParticipantAbilitySelectionRuntime abilitySelectionRuntime,
         MatchManager matchManager)
     {
-        this.side = side;
+        this.participantId = participantId;
         this.participantHud = participantHud;
         this.abilitySelectionRuntime = abilitySelectionRuntime;
         this.matchManager = matchManager;
@@ -25,9 +25,11 @@ public sealed class ParticipantReadyStatusHandler
         if (isEnabled) return;
 
         isEnabled = true;
+
         abilitySelectionRuntime.MenuOpenStateChanged += HandleMenuOpenStateChanged;
         SubscribeToInputReader();
         SubscribeToMatchManager();
+
         RefreshPresentation();
     }
 
@@ -38,7 +40,9 @@ public sealed class ParticipantReadyStatusHandler
         UnsubscribeFromMatchManager();
         UnsubscribeFromInputReader();
         abilitySelectionRuntime.MenuOpenStateChanged -= HandleMenuOpenStateChanged;
+
         isEnabled = false;
+
         HidePresentation();
     }
 
@@ -49,6 +53,7 @@ public sealed class ParticipantReadyStatusHandler
         UnsubscribeFromInputReader();
         inputReader = nextInputReader;
         SubscribeToInputReader();
+
         RefreshPresentation();
     }
 
@@ -84,13 +89,13 @@ public sealed class ParticipantReadyStatusHandler
     {
         if (abilitySelectionRuntime.IsMenuOpen) return;
 
-        var isCurrentlyReady = matchManager.IsParticipantReady(side);
-        matchManager.TrySetParticipantReady(side, !isCurrentlyReady);
+        var isCurrentlyReady = matchManager.IsParticipantReady(participantId);
+        matchManager.TrySetParticipantReady(participantId, !isCurrentlyReady);
     }
 
-    private void HandleParticipantReadyStatusChanged(PlayerSide participantSide, bool isReady)
+    private void HandleParticipantReadyStatusChanged(ParticipantId changedParticipantId, bool isReady)
     {
-        if (participantSide != side) return;
+        if (changedParticipantId != participantId) return;
         RefreshPresentation();
     }
 
@@ -119,7 +124,7 @@ public sealed class ParticipantReadyStatusHandler
             return;
         }
 
-        participantHud.SetReady(matchManager.IsParticipantReady(side));
+        participantHud.SetReady(matchManager.IsParticipantReady(participantId));
         participantHud.SetReadyVisible(true);
     }
 
@@ -132,9 +137,7 @@ public sealed class ParticipantReadyStatusHandler
     private bool ShouldShowReadyView()
     {
         return isEnabled &&
-               matchManager.HasActiveMatch &&
-               matchManager.CurrentPhase == GamePhase.RoundBreak &&
-               matchManager.CurrentOverlay != GameOverlay.Settings &&
+               matchManager.ShouldShowParticipantReady(participantId) &&
                !abilitySelectionRuntime.IsMenuOpen;
     }
 }

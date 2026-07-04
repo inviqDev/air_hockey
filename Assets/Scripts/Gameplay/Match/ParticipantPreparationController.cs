@@ -4,16 +4,12 @@ public sealed class ParticipantPreparationController
     private readonly ParticipantReadyStatusHandler readyStatusHandler;
 
     public ParticipantPreparationController(
-        PlayerSide side,
         ParticipantAbilitySelectionRuntime abilitySelectionRuntime,
         ParticipantReadyStatusHandler readyStatusHandler)
     {
-        Side = side;
         this.abilitySelectionRuntime = abilitySelectionRuntime;
         this.readyStatusHandler = readyStatusHandler;
     }
-
-    public PlayerSide Side { get; }
 
     public void Enable()
     {

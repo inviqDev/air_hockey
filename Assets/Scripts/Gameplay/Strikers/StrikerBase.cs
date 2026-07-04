@@ -11,11 +11,11 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     [SerializeField] private PlayerAbilityController abilityController;
 
     protected StrikerMovement Movement => strikerMovement;
-
     public PlayerAbilityController AbilityController => abilityController;
 
-    private TurnController currentTurnController;
+    private TurnController turnController;
     private IMovable movable;
+
     private void Reset()
     {
         if (!sideOwner)
@@ -36,7 +36,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
         TryCacheReferences();
     }
 
-    public void InitializeStriker(StrikerSetupContext setupContext, TurnController controller)
+    public void Initialize(StrikerSetupContext setupContext, TurnController controller)
     {
         if (!TryCacheReferences()) return;
 
@@ -86,7 +86,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
         SetMovementAllowed(false);
         SetAbilityUsageAllowed(false);
         UnsubscribeFromTurnController();
-        currentTurnController = null;
+        turnController = null;
     }
 
     private void OnDestroy()
@@ -126,7 +126,7 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
     private void ConfigureTurnControllerSubscription(TurnController newTurnController)
     {
-        if (currentTurnController == newTurnController)
+        if (turnController == newTurnController)
         {
             ApplyCurrentTurnState();
             return;
@@ -134,30 +134,30 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
         UnsubscribeFromTurnController();
 
-        currentTurnController = newTurnController;
+        turnController = newTurnController;
         SubscribeToTurnController();
         ApplyCurrentTurnState();
     }
 
     private void SubscribeToTurnController()
     {
-        if (!currentTurnController) return;
+        if (!turnController) return;
 
-        currentTurnController.TurnStarted += HandleTurnStarted;
-        currentTurnController.TurnEnded += HandleTurnEnded;
+        turnController.TurnStarted += HandleTurnStarted;
+        turnController.TurnEnded += HandleTurnEnded;
     }
 
     private void UnsubscribeFromTurnController()
     {
-        if (!currentTurnController) return;
+        if (!turnController) return;
 
-        currentTurnController.TurnStarted -= HandleTurnStarted;
-        currentTurnController.TurnEnded -= HandleTurnEnded;
+        turnController.TurnStarted -= HandleTurnStarted;
+        turnController.TurnEnded -= HandleTurnEnded;
     }
 
     private void ApplyCurrentTurnState()
     {
-        var isGameplayAllowed = currentTurnController && currentTurnController.IsTurnActive;
+        var isGameplayAllowed = turnController && turnController.IsTurnActive;
         SetMovementAllowed(isGameplayAllowed);
         SetAbilityUsageAllowed(isGameplayAllowed);
     }

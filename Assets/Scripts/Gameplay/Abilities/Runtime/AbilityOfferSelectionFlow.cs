@@ -16,7 +16,6 @@ public sealed class AbilityOfferSelectionFlow
     private PlayerAbilityController abilityController;
     private PlayerInputReader inputReader;
     private bool isEnabled;
-    private Func<bool> canOpenMenuPredicate = AllowMenuOpen;
 
     public event Action<bool> MenuOpenStateChanged;
 
@@ -36,7 +35,7 @@ public sealed class AbilityOfferSelectionFlow
         this.isMenuInteractionAllowed = isMenuInteractionAllowed;
     }
 
-    public bool CanOpenMenu => CanInteractWithMenu(requireAvailablePoints: true) && canOpenMenuPredicate();
+    public bool CanOpenMenu => CanInteractWithMenu(requireAvailablePoints: true);
     public bool IsMenuOpen => offerSelectionSession.State != AbilityOfferSelectionState.Closed;
 
     public void Enable()
@@ -67,14 +66,9 @@ public sealed class AbilityOfferSelectionFlow
             CloseMenu();
 
         abilityController = controller;
-        
+
         var nextInputReader = abilityController ? abilityController.InputReader : null;
         BindInputReader(nextInputReader);
-    }
-
-    public void SetCanOpenMenuPredicate(Func<bool> predicate)
-    {
-        canOpenMenuPredicate = predicate ?? AllowMenuOpen;
     }
 
     public void CloseMenu()
@@ -221,9 +215,8 @@ public sealed class AbilityOfferSelectionFlow
         if (!TryGetSelectedNewAbilityOffer(out var selectedOffer)) return;
         if (pointsProgression.AvailableAbilityPoints <= 0)
         {
-            Debug.LogError(
-                $"{nameof(AbilityOfferSelectionFlow)} cannot confirm slot selection " +
-                $"because the participant has no available ability points.");
+            Debug.LogError($"{nameof(AbilityOfferSelectionFlow)} cannot confirm slot selection " +
+                           "because the participant has no available ability points.");
 
             return;
         }
@@ -232,9 +225,8 @@ public sealed class AbilityOfferSelectionFlow
         if (!abilityController.TryAddAbilityToEmptySlot(selectedOffer.Config, selectedSlotIndex)) return;
         if (!pointsProgression.TrySpendAvailableAbilityPoint())
         {
-            Debug.LogError(
-                $"{nameof(AbilityOfferSelectionFlow)} assigned a new ability to slot {selectedSlotIndex} " +
-                $"but failed to spend an available ability point. This violates the selection transaction invariant.");
+            Debug.LogError($"{nameof(AbilityOfferSelectionFlow)} assigned a new ability to slot {selectedSlotIndex} " +
+                           "but failed to spend an available ability point. This violates the selection transaction invariant.");
 
             return;
         }
@@ -301,7 +293,7 @@ public sealed class AbilityOfferSelectionFlow
             case AbilityOfferSelectionState.SelectingSlot:
                 var slotSnapshot = BuildSlotDataSnapshot();
                 return offerSelectionSession.TrySelectNextSlot(slotSnapshot);
-            
+
             default:
                 return false;
         }
@@ -313,11 +305,6 @@ public sealed class AbilityOfferSelectionFlow
         if (requireAvailablePoints && pointsProgression.AvailableAbilityPoints <= 0) return false;
 
         return isMenuInteractionAllowed();
-    }
-
-    private static bool AllowMenuOpen()
-    {
-        return true;
     }
 
     private IReadOnlyList<AbilityOffer> BuildOffers()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum GamePhase
@@ -31,26 +32,25 @@ public sealed class MatchManager : MonoBehaviour
     public int RightScore => goalController ? goalController.RightScore : 0;
     public bool IsTurnActive => turnController && turnController.IsTurnActive;
     public bool IsRoundBreakActive => CurrentPhase == GamePhase.RoundBreak;
-    public bool IsAbilityMenuInteractionAllowed => HasActiveMatch && CurrentPhase == GamePhase.RoundBreak && CurrentOverlay == GameOverlay.None;
     public bool HasActiveMatch { get; private set; }
     public GamePhase CurrentPhase { get; private set; } = GamePhase.NoActiveMatch;
     public GameOverlay CurrentOverlay { get; private set; } = GameOverlay.None;
 
     public event Action<GamePhase, GamePhase> PhaseChanged;
     public event Action<GameOverlay, GameOverlay> OverlayChanged;
-    public event Action<PlayerSide, bool> ParticipantReadyStatusChanged;
+    public event Action<ParticipantId, bool> ParticipantReadyStatusChanged;
 
     private UIManager uiManager;
 
     private MatchConfiguration currentConfiguration;
+    private ParticipantRoster currentParticipants;
     private GameOverlay overlayToRestoreAfterSettings = GameOverlay.None;
-    
+
     private bool hasCurrentConfiguration;
     private bool hasPreparedTurnState;
     private bool lastPreparedTurnCanStart;
-    
-    private bool leftParticipantReady;
-    private bool rightParticipantReady;
+
+    private readonly HashSet<ParticipantId> readyParticipants = new();
 
     private bool isInitialized;
 
@@ -116,26 +116,45 @@ public sealed class MatchManager : MonoBehaviour
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
         isInitialized = true;
     }
-    
-    public bool IsParticipantReady(PlayerSide side)
+
+    public bool IsParticipantReady(ParticipantId participantId)
     {
-        return side switch
-        {
-            PlayerSide.Left => leftParticipantReady,
-            PlayerSide.Right => rightParticipantReady,
-            _ => false
-        };
+        return readyParticipants.Contains(participantId);
     }
 
-    public bool TrySetParticipantReady(PlayerSide side, bool requestedReadyState)
+    public bool TrySetParticipantReady(ParticipantId participantId, bool requestedReadyState)
     {
-        if (!CanChangeParticipantReadyState()) return false;
-        if (!TryGetParticipantReadyState(side, out var currentReadyState)) return false;
+        if (!CanParticipantRequestReady(participantId)) return false;
+        if (!TryGetParticipantReadyState(participantId, out var currentReadyState)) return false;
         if (currentReadyState == requestedReadyState) return false;
 
-        SetParticipantReadyState(side, requestedReadyState);
-        TryPrepareNextTurnWhenBothParticipantsReady();
+        SetParticipantReadyState(participantId, requestedReadyState);
+        TryPrepareNextTurnWhenAllParticipantsReady();
         return true;
+    }
+
+    public bool CanParticipantOpenAbilityMenu(ParticipantId participantId)
+    {
+        var canRequestReady = CanParticipantRequestReady(participantId);
+        var hasNotReadyStatus = !IsParticipantReady(participantId);
+
+        return canRequestReady && hasNotReadyStatus;
+    }
+
+    private bool CanParticipantRequestReady(ParticipantId participantId)
+    {
+        return IsValidParticipant(participantId) &&
+               HasActiveMatch &&
+               CurrentPhase == GamePhase.RoundBreak &&
+               CurrentOverlay == GameOverlay.None;
+    }
+
+    public bool ShouldShowParticipantReady(ParticipantId participantId)
+    {
+        return IsValidParticipant(participantId) &&
+               HasActiveMatch &&
+               CurrentPhase == GamePhase.RoundBreak &&
+               CurrentOverlay != GameOverlay.Settings;
     }
 
     private void PrepareNextTurn()
@@ -152,7 +171,7 @@ public sealed class MatchManager : MonoBehaviour
         var canStartTurn = roundController && roundController.ResetRoundItemsForTurn();
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
-        
+
         if (uiManager)
             uiManager.ClearGoalPopUpText();
 
@@ -180,6 +199,7 @@ public sealed class MatchManager : MonoBehaviour
         ResetParticipantReadyState();
         TransitionPhase(GamePhase.MatchComplete);
         HasActiveMatch = false;
+        ClearParticipantCollection();
     }
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
@@ -205,6 +225,7 @@ public sealed class MatchManager : MonoBehaviour
 
     private void StartConfiguredMatch(MatchConfiguration configuration)
     {
+        ConfigureParticipants(configuration);
         ResetCurrentMatchProgress();
         SpawnConfiguredMatch(configuration);
         RefreshAbilitySelectionBindings();
@@ -246,6 +267,7 @@ public sealed class MatchManager : MonoBehaviour
     private bool SpawnConfiguredMatch(MatchConfiguration configuration)
     {
         if (!roundController) return false;
+        if (currentParticipants == null) return false;
 
         roundController.ReturnRoundItemsToPoolForFullMatch();
         return roundController.ActivateRoundItems(configuration);
@@ -260,6 +282,7 @@ public sealed class MatchManager : MonoBehaviour
             roundController.ReturnRoundItemsToPoolForFullMatch();
 
         RefreshAbilitySelectionBindings();
+        ClearParticipantCollection();
 
         HasActiveMatch = false;
         hasPreparedTurnState = false;
@@ -351,6 +374,7 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!HasActiveMatch) return;
         if (!hasCurrentConfiguration) return;
+        if (currentParticipants == null) return;
 
         var canStartTurn = roundController && roundController.RebuildRoundItemsForTurn(currentConfiguration);
         RefreshAbilitySelectionBindings();
@@ -451,14 +475,19 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!participantPreparationCoordinator) return;
 
-        if (!roundController)
+        if (!roundController || currentParticipants == null)
         {
             participantPreparationCoordinator.ClearParticipantAbilityControllers();
             return;
         }
 
-        participantPreparationCoordinator.BindParticipantAbilityController(PlayerSide.Left, roundController.GetAbilityController(PlayerSide.Left));
-        participantPreparationCoordinator.BindParticipantAbilityController(PlayerSide.Right, roundController.GetAbilityController(PlayerSide.Right));
+        foreach (var participant in currentParticipants.Participants)
+        {
+            var participantId = participant.ParticipantId;
+            var participantSlotId = currentConfiguration.SlotAssignments.GetSlotForParticipant(participantId);
+            var abilityController = roundController.GetAbilityController(participantSlotId);
+            participantPreparationCoordinator.BindParticipantAbilityController(participantId, abilityController);
+        }
     }
 
     private PlayerInputMode ResolvePlayerInputMode()
@@ -477,70 +506,75 @@ public sealed class MatchManager : MonoBehaviour
         };
     }
 
-    private bool CanChangeParticipantReadyState()
+    private bool IsValidParticipant(ParticipantId participantId)
     {
-        return HasActiveMatch &&
-               CurrentPhase == GamePhase.RoundBreak &&
-               CurrentOverlay == GameOverlay.None;
+        return currentParticipants != null && currentParticipants.ContainsParticipant(participantId);
     }
 
-    private void TryPrepareNextTurnWhenBothParticipantsReady()
+    private void TryPrepareNextTurnWhenAllParticipantsReady()
     {
         if (!HasActiveMatch) return;
-        
+        if (currentParticipants == null) return;
+
         if (CurrentPhase != GamePhase.RoundBreak) return;
         if (CurrentOverlay != GameOverlay.None) return;
-        
-        var bothParticipantsReady = leftParticipantReady && rightParticipantReady;
-        if (!bothParticipantsReady) return;
+
+        var allParticipantsReady = readyParticipants.Count == currentParticipants.Count;
+        if (!allParticipantsReady) return;
 
         PrepareNextTurn();
     }
 
-    private bool TryGetParticipantReadyState(PlayerSide side, out bool currentReadyState)
+    private bool TryGetParticipantReadyState(ParticipantId participantId, out bool currentReadyState)
     {
-        switch (side)
+        if (!IsValidParticipant(participantId))
         {
-            case PlayerSide.Left:
-                currentReadyState = leftParticipantReady;
-                return true;
-
-            case PlayerSide.Right:
-                currentReadyState = rightParticipantReady;
-                return true;
-
-            default:
-                Debug.LogError($"{nameof(MatchManager)} received " +
-                               $"unsupported {nameof(PlayerSide)} value: {side}.", this);
-                currentReadyState = false;
-                return false;
+            currentReadyState = false;
+            return false;
         }
+
+        currentReadyState = readyParticipants.Contains(participantId);
+        return true;
     }
 
     private void ResetParticipantReadyState()
     {
-        SetParticipantReadyState(PlayerSide.Left, false);
-        SetParticipantReadyState(PlayerSide.Right, false);
+        if (readyParticipants.Count == 0) return;
+
+        var previousReadyParticipants = new ParticipantId[readyParticipants.Count];
+        readyParticipants.CopyTo(previousReadyParticipants);
+        readyParticipants.Clear();
+
+        foreach (var participantId in previousReadyParticipants)
+        {
+            ParticipantReadyStatusChanged?.Invoke(participantId, false);
+        }
     }
 
-    private void SetParticipantReadyState(PlayerSide side, bool requestedReadyState)
+    private void SetParticipantReadyState(ParticipantId participantId, bool requestedReadyState)
     {
-        switch (side)
-        {
-            case PlayerSide.Left:
-                if (leftParticipantReady == requestedReadyState) return;
-                leftParticipantReady = requestedReadyState;
-                break;
+        var didChange = requestedReadyState
+            ? readyParticipants.Add(participantId)
+            : readyParticipants.Remove(participantId);
 
-            case PlayerSide.Right:
-                if (rightParticipantReady == requestedReadyState) return;
-                rightParticipantReady = requestedReadyState;
-                break;
+        if (!didChange) return;
 
-            default:
-                return;
-        }
+        ParticipantReadyStatusChanged?.Invoke(participantId, requestedReadyState);
+    }
 
-        ParticipantReadyStatusChanged?.Invoke(side, requestedReadyState);
+    private void ConfigureParticipants(MatchConfiguration configuration)
+    {
+        currentParticipants = configuration.Roster;
+
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.ConfigureParticipants(configuration);
+    }
+
+    private void ClearParticipantCollection()
+    {
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.ClearParticipants();
+
+        currentParticipants = null;
     }
 }

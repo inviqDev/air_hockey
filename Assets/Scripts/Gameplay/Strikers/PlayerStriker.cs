@@ -8,18 +8,18 @@ public sealed class PlayerStriker : StrikerBase
 
     protected override void ApplySetup(StrikerSetupContext setupContext)
     {
-        controlScheme = setupContext.PlayerControlScheme;
+        controlScheme = setupContext.GetRequiredHumanControlScheme();
     }
 
     protected override bool TryInitializeMovement()
     {
-        var playerMovement = Movement as PlayerStrikerMovement;
-        if (!playerMovement)
+        if (Movement is PlayerStrikerMovement movement)
         {
-            Debug.LogError($"{nameof(PlayerStriker)} on {name} requires a {nameof(PlayerStrikerMovement)} component.", this);
-            return false;
+            var isInitialized = movement.Initialize(controlScheme);
+            return isInitialized;
         }
 
-        return playerMovement.Initialize(controlScheme);
+        Debug.LogError($"{nameof(PlayerStriker)} on {name} requires a {nameof(PlayerStrikerMovement)} component.", this);
+        return false;
     }
 }

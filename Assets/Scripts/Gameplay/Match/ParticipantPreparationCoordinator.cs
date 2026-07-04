@@ -1,20 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public sealed class ParticipantPreparationCoordinator : MonoBehaviour
 {
     [SerializeField] private TurnController turnController;
     [SerializeField] private AbilityCatalog abilityCatalog;
-    
+
     [SerializeField] private ParticipantAbilitySetup leftParticipantProgression = new();
     [SerializeField] private ParticipantAbilitySetup rightParticipantProgression = new();
 
     private readonly AbilityOfferService offerService = new();
-    private readonly Dictionary<PlayerSide, ParticipantPreparationController> participantControllers = new();
-    
+    private readonly Dictionary<ParticipantId, ParticipantPreparationController> participantControllers = new();
+
     private MatchManager matchManager;
-    
+
     private bool isInitialized;
     private bool isActivated;
     private bool isRuntimeActive;
@@ -56,16 +57,9 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         ValidateReferences();
         matchManager = manager;
 
-        if (isInitialized) return;
+        if (!manager)
+            throw new ArgumentNullException(nameof(manager));
 
-        participantControllers.Clear();
-
-        var leftParticipantController = CreateParticipantPreparationController(PlayerSide.Left, leftParticipantProgression);
-        var rightParticipantController = CreateParticipantPreparationController(PlayerSide.Right, rightParticipantProgression);
-
-        participantControllers.Add(PlayerSide.Left, leftParticipantController);
-        participantControllers.Add(PlayerSide.Right, rightParticipantController);
-        
         isInitialized = true;
     }
 
@@ -87,10 +81,44 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         EndRuntimeActivation();
     }
 
-    public void BindParticipantAbilityController(PlayerSide side, PlayerAbilityController abilityController)
+    public void ConfigureParticipants(MatchConfiguration configuration)
+    {
+        if (!isInitialized)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(ParticipantPreparationCoordinator)} must be initialized before configuring participants.");
+        }
+
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
+
+        EndRuntimeActivation();
+        participantControllers.Clear();
+
+        var allParticipants = configuration.Roster.Participants.ToArray();
+        foreach (var participant in allParticipants)
+        {
+            var slotId = configuration.SlotAssignments.GetSlotForParticipant(participant.ParticipantId);
+            var participantController = CreateParticipantPreparationController(participant, slotId);
+            participantControllers.Add(participant.ParticipantId, participantController);
+        }
+
+        BeginRuntimeActivation();
+    }
+
+    public void ClearParticipants()
     {
         if (!isInitialized) return;
-        if (!TryGetParticipantController(side, out var participantController)) return;
+
+        EndRuntimeActivation();
+        participantControllers.Clear();
+    }
+
+    public void BindParticipantAbilityController(ParticipantId participantId, PlayerAbilityController abilityController)
+    {
+        if (!isInitialized) return;
+
+        if (!TryGetParticipantController(participantId, out var participantController)) return;
         participantController.BindAbilityController(abilityController);
     }
 
@@ -146,15 +174,18 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         rightParticipantProgression.Validate(nameof(rightParticipantProgression), this);
     }
 
-    private ParticipantPreparationController CreateParticipantPreparationController(PlayerSide side, ParticipantAbilitySetup binding)
+    private ParticipantPreparationController CreateParticipantPreparationController(
+        MatchParticipantSetup participant,
+        ArenaSlotId slotId)
     {
-        var abilitySelectionRuntime = CreateParticipantAbilitySelectionRuntime(side, binding);
-        var readyStatusHandler = CreateParticipantReadyStatusHandler(side, binding, abilitySelectionRuntime);
+        var binding = GetSetupForSlot(slotId);
+        var abilitySelectionRuntime = CreateParticipantAbilitySelectionRuntime(participant.ParticipantId, binding);
+        var readyStatusHandler = CreateParticipantReadyStatusHandler(participant.ParticipantId, binding, abilitySelectionRuntime);
 
-        return new ParticipantPreparationController(side, abilitySelectionRuntime, readyStatusHandler);
+        return new ParticipantPreparationController(abilitySelectionRuntime, readyStatusHandler);
     }
 
-    private ParticipantAbilitySelectionRuntime CreateParticipantAbilitySelectionRuntime(PlayerSide side, ParticipantAbilitySetup binding)
+    private ParticipantAbilitySelectionRuntime CreateParticipantAbilitySelectionRuntime(ParticipantId participantId, ParticipantAbilitySetup binding)
     {
         var progression = new AbilityPointsProgression(binding.InitialDurationSeconds, binding.DurationMultiplier);
 
@@ -164,19 +195,17 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
             progression,
             abilityCatalog,
             offerService,
-            () => matchManager && matchManager.IsAbilityMenuInteractionAllowed);
-
-        offerFlow.SetCanOpenMenuPredicate(() => !matchManager || !matchManager.IsParticipantReady(side));
+            () => matchManager && matchManager.CanParticipantOpenAbilityMenu(participantId));
 
         return new ParticipantAbilitySelectionRuntime(binding.ParticipantHud, progression, offerFlow);
     }
 
     private ParticipantReadyStatusHandler CreateParticipantReadyStatusHandler(
-        PlayerSide side,
+        ParticipantId participantId,
         ParticipantAbilitySetup binding,
         ParticipantAbilitySelectionRuntime abilitySelectionRuntime)
     {
-        return new ParticipantReadyStatusHandler(side, binding.ParticipantHud, abilitySelectionRuntime, matchManager);
+        return new ParticipantReadyStatusHandler(participantId, binding.ParticipantHud, abilitySelectionRuntime, matchManager);
     }
 
     private void BeginRuntimeActivation()
@@ -200,23 +229,26 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         isRuntimeActive = false;
     }
 
-    private bool TryGetParticipantController(PlayerSide side, out ParticipantPreparationController controller)
+    private bool TryGetParticipantController(ParticipantId participantId, out ParticipantPreparationController controller)
     {
-        if (participantControllers.TryGetValue(side, out controller))
-            return true;
+        if (participantControllers.TryGetValue(participantId, out controller)) return true;
 
-        if (side != PlayerSide.Left && side != PlayerSide.Right)
-        {
-            Debug.LogError(
-                $"{nameof(ParticipantPreparationCoordinator)} on {name} received unsupported {nameof(PlayerSide)} value: {side}.",
-                this);
-            return false;
-        }
+        Debug.LogError($"{nameof(ParticipantPreparationCoordinator)} on {name} " +
+                       $"is missing a registered participant controller for participant {participantId}.", this);
 
-        Debug.LogError(
-            $"{nameof(ParticipantPreparationCoordinator)} on {name} is missing a registered participant controller for valid side {side}.",
-            this);
         return false;
+    }
+
+    private ParticipantAbilitySetup GetSetupForSlot(ArenaSlotId slotId)
+    {
+        if (slotId == TemporaryTwoSideArena.LeftSlot)
+            return leftParticipantProgression;
+
+        if (slotId == TemporaryTwoSideArena.RightSlot)
+            return rightParticipantProgression;
+
+        throw new ArgumentOutOfRangeException(
+            nameof(slotId), slotId, $"{nameof(ParticipantPreparationCoordinator)} only supports the temporary two-side arena slots.");
     }
 
     private void ForEachParticipantController(Action<ParticipantPreparationController> action)

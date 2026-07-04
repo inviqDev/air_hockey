@@ -1,17 +1,35 @@
-public readonly struct MatchConfiguration
+using System;
+
+public sealed class MatchConfiguration
 {
-    public MatchConfiguration(PlayerTwoControlType playerTwoControlType, PlayerSide playerOneSide)
+    public ArenaId ArenaId { get; }
+    public ParticipantRoster Roster { get; }
+    public ParticipantSlotAssignments SlotAssignments { get; }
+    public int ParticipantCount => Roster.Count;
+
+    public MatchConfiguration(ArenaId arenaId, ParticipantRoster roster, ParticipantSlotAssignments slotAssignments)
     {
-        PlayerTwoControlType = playerTwoControlType;
-        PlayerOneSide = playerOneSide;
+        if (string.IsNullOrWhiteSpace(arenaId.Value))
+            throw new ArgumentException("Arena id cannot be empty.", nameof(arenaId));
+
+        ArenaId = arenaId;
+        Roster = roster ?? throw new ArgumentNullException(nameof(roster));
+        SlotAssignments = slotAssignments ?? throw new ArgumentNullException(nameof(slotAssignments));
+
+        ValidateAssignmentCoverage(Roster, SlotAssignments);
     }
 
-    public PlayerTwoControlType PlayerTwoControlType { get; }
-    public PlayerSide PlayerOneSide { get; }
-    public PlayerSide PlayerTwoSide => SideUtility.Opposite(PlayerOneSide);
-
-    public MatchPlayer GetPlayerForSide(PlayerSide side)
+    private static void ValidateAssignmentCoverage(ParticipantRoster roster, ParticipantSlotAssignments slotAssignments)
     {
-        return side == PlayerOneSide ? MatchPlayer.PlayerOne : MatchPlayer.PlayerTwo;
+        if (roster.Count != slotAssignments.Count)
+            throw new ArgumentException($"{nameof(MatchConfiguration)} requires one slot assignment per participant.", nameof(slotAssignments));
+
+        foreach (var participant in roster.Participants)
+        {
+            if (slotAssignments.ContainsParticipant(participant.ParticipantId)) continue;
+
+            throw new ArgumentException(
+                $"{nameof(MatchConfiguration)} is missing slot assignment for participant {participant.ParticipantId}.", nameof(slotAssignments));
+        }
     }
 }

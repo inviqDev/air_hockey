@@ -30,7 +30,7 @@ public sealed class RoundController : MonoBehaviour
     private StrikerBase rightStriker;
     private bool isAbilityPauseStateActive;
     private PlayerInputMode currentInputMode = PlayerInputMode.Disabled;
-    
+
     private readonly Pool gameplayItemPool = new();
 
     public bool HasAllRoundItemsActive =>
@@ -40,37 +40,76 @@ public sealed class RoundController : MonoBehaviour
 
     public bool ActivateRoundItems(MatchConfiguration configuration)
     {
+        ValidateTemporaryTwoSideConfiguration(configuration);
+
         ReturnRoundItemsToPool();
         SetTableVisible(true);
 
         ActivatePuckFromPool();
         ActivateStrikersFromPool(configuration);
-        
+
         ResetRoundItemsForTurn();
-        
+
         return HasAllRoundItemsActive;
     }
-    
+
     private void ActivatePuckFromPool()
     {
         var puckSpawnPosition = GetPosition(leftPuckSpawnPoint);
         puck = gameplayItemPool.TryGetFromPool(puckPrefab, puckSpawnPosition, Quaternion.identity);
-            
+
         if (puckRegistry)
             puckRegistry.RegisterPuck(puck);
     }
 
     private void ActivateStrikersFromPool(MatchConfiguration configuration)
     {
-        var leftStrikerSpawnPosition = GetPosition(leftStrikerSpawnPoint);
-        leftStriker = ActivateStrikerFromPool(configuration, PlayerSide.Left, leftStrikerSpawnPosition);
+        var participantSetup = GetParticipantForSlot(configuration, TemporaryTwoSideArena.LeftSlot);
+        var spawnPosition = GetPosition(leftStrikerSpawnPoint);
+        leftStriker = ActivateStrikerFromPool(participantSetup, PlayerSide.Left, spawnPosition);
         BindAbilityHud(PlayerSide.Left, leftStriker);
-        
-        var rightStrikerSpawnPosition = GetPosition(rightStrikerSpawnPoint);
-        rightStriker = ActivateStrikerFromPool(configuration, PlayerSide.Right, rightStrikerSpawnPosition);
+
+        participantSetup = GetParticipantForSlot(configuration, TemporaryTwoSideArena.RightSlot);
+        spawnPosition = GetPosition(rightStrikerSpawnPoint);
+        rightStriker = ActivateStrikerFromPool(participantSetup, PlayerSide.Right, spawnPosition);
         BindAbilityHud(PlayerSide.Right, rightStriker);
 
         ApplyPlayerInputContextToActiveReaders();
+    }
+
+    private static MatchParticipantSetup GetParticipantForSlot(MatchConfiguration configuration, ArenaSlotId slotId)
+    {
+        var participantId = configuration.SlotAssignments.GetParticipantForSlot(slotId);
+        var participantSetup = configuration.Roster.GetParticipantSetupById(participantId);
+
+        return participantSetup;
+    }
+
+    private StrikerBase ActivateStrikerFromPool(MatchParticipantSetup participantSetup, PlayerSide side, Vector2 position)
+    {
+        StrikerSetupContext setupContext;
+        StrikerBase striker;
+
+        if (participantSetup.IsHuman)
+        {
+            setupContext = new StrikerSetupContext(side, puck, participantSetup.GetRequiredHumanControlScheme());
+            striker = gameplayItemPool.TryGetFromPool(playerStrikerPrefab, position, Quaternion.identity);
+        }
+        else if (participantSetup.IsAi)
+        {
+            setupContext = new StrikerSetupContext(side, puck);
+            striker = gameplayItemPool.TryGetFromPool(aiStrikerPrefab, position, Quaternion.identity);
+        }
+        else
+        {
+            throw new System.InvalidOperationException(
+                $"Unsupported participant control source {participantSetup.ControlSource}.");
+        }
+
+        if (striker)
+            striker.Initialize(setupContext, turnController);
+
+        return striker;
     }
 
     public bool ResetRoundItemsForTurn()
@@ -85,7 +124,7 @@ public sealed class RoundController : MonoBehaviour
     {
         return ActivateRoundItems(configuration);
     }
-    
+
     public void ReturnRoundItemsToPool()
     {
         ReturnRoundItemsToPool(resetAbilitiesForFullMatch: false);
@@ -127,8 +166,9 @@ public sealed class RoundController : MonoBehaviour
         ApplyPlayerInputContextToActiveReaders();
     }
 
-    public PlayerAbilityController GetAbilityController(PlayerSide side)
+    public PlayerAbilityController GetAbilityController(ArenaSlotId slotId)
     {
+        var side = GetSideForSlot(slotId);
         var striker = side == PlayerSide.Left ? leftStriker : rightStriker;
         return striker ? striker.AbilityController : null;
     }
@@ -154,33 +194,28 @@ public sealed class RoundController : MonoBehaviour
         ReturnRoundItemsToPool();
     }
 
-    private StrikerBase ActivateStrikerFromPool(MatchConfiguration configuration, PlayerSide side, Vector2 position)
+    private static void ValidateTemporaryTwoSideConfiguration(MatchConfiguration configuration)
     {
-        var player = configuration.GetPlayerForSide(side);
-        var isAi = player == MatchPlayer.PlayerTwo &&
-                   configuration.PlayerTwoControlType == PlayerTwoControlType.Ai;
+        if (configuration == null)
+            throw new System.ArgumentNullException(nameof(configuration));
 
-        var controlScheme = GetControlScheme(configuration, player, side);
-        var setupContext = new StrikerSetupContext(side, puck, controlScheme);
-        
-        StrikerBase striker = isAi
-            ? gameplayItemPool.TryGetFromPool(aiStrikerPrefab, position, Quaternion.identity)
-            : gameplayItemPool.TryGetFromPool(playerStrikerPrefab, position, Quaternion.identity);
-
-        if (striker)
-            striker.InitializeStriker(setupContext, turnController);
-
-        return striker;
+        if (configuration.ArenaId != TemporaryTwoSideArena.ArenaId)
+        {
+            throw new System.InvalidOperationException(
+                $"{nameof(RoundController)} only supports arena {TemporaryTwoSideArena.ArenaId}, but received {configuration.ArenaId}.");
+        }
     }
 
-    private static PlayerControlScheme GetControlScheme(MatchConfiguration configuration, MatchPlayer player, PlayerSide side)
+    private static PlayerSide GetSideForSlot(ArenaSlotId slotId)
     {
-        if (configuration.PlayerTwoControlType == PlayerTwoControlType.Ai && player == MatchPlayer.PlayerOne)
-            return PlayerControlScheme.WasdAndArrows;
+        if (slotId == TemporaryTwoSideArena.LeftSlot)
+            return PlayerSide.Left;
 
-        return side == PlayerSide.Left
-            ? PlayerControlScheme.Wasd
-            : PlayerControlScheme.Arrows;
+        if (slotId == TemporaryTwoSideArena.RightSlot)
+            return PlayerSide.Right;
+
+        throw new System.ArgumentOutOfRangeException(
+            nameof(slotId), slotId, $"{nameof(RoundController)} only supports the temporary two-side arena slots.");
     }
 
     private void SetTableVisible(bool isVisible)

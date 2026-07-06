@@ -2,15 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GamePhase
-{
-    NoActiveMatch,
-    TurnPreparation,
-    TurnActive,
-    RoundBreak,
-    MatchComplete
-}
-
 public enum GameOverlay
 {
     None,
@@ -33,7 +24,7 @@ public sealed class MatchManager : MonoBehaviour
     public bool IsTurnActive => turnController && turnController.IsTurnActive;
     public bool IsRoundBreakActive => CurrentPhase == GamePhase.RoundBreak;
     public bool HasActiveMatch { get; private set; }
-    public GamePhase CurrentPhase { get; private set; } = GamePhase.NoActiveMatch;
+    public GamePhase CurrentPhase => matchFlow.CurrentPhase;
     public GameOverlay CurrentOverlay { get; private set; } = GameOverlay.None;
 
     public event Action<GamePhase, GamePhase> PhaseChanged;
@@ -51,11 +42,13 @@ public sealed class MatchManager : MonoBehaviour
     private bool lastPreparedTurnCanStart;
 
     private readonly HashSet<ParticipantId> readyParticipants = new();
+    private readonly MatchFlow matchFlow = new();
 
     private bool isInitialized;
 
     private void Awake()
     {
+        matchFlow.PhaseChanged += HandleMatchFlowPhaseChanged;
         ValidateReferences();
     }
 
@@ -445,9 +438,13 @@ public sealed class MatchManager : MonoBehaviour
         if (previousPhase == GamePhase.RoundBreak && nextPhase != GamePhase.RoundBreak)
             ResetParticipantReadyState();
 
-        CurrentPhase = nextPhase;
+        matchFlow.TransitionToPhase(nextPhase);
+    }
+
+    private void HandleMatchFlowPhaseChanged(GamePhase previousPhase, GamePhase currentPhase)
+    {
         ApplyResolvedPlayerInputMode();
-        PhaseChanged?.Invoke(previousPhase, CurrentPhase);
+        PhaseChanged?.Invoke(previousPhase, currentPhase);
     }
 
     private void ApplyOverlayEffects()

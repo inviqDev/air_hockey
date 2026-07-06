@@ -49,6 +49,7 @@ public sealed class MatchManager : MonoBehaviour
     private void Awake()
     {
         matchFlow.PhaseChanged += HandleMatchFlowPhaseChanged;
+        matchFlow.RoundStartRequested += HandleRoundStartRequested;
         ValidateReferences();
     }
 
@@ -122,7 +123,7 @@ public sealed class MatchManager : MonoBehaviour
         if (currentReadyState == requestedReadyState) return false;
 
         SetParticipantReadyState(participantId, requestedReadyState);
-        TryPrepareNextTurnWhenAllParticipantsReady();
+        RequestRoundStartIfAllParticipantsReady();
         return true;
     }
 
@@ -136,18 +137,14 @@ public sealed class MatchManager : MonoBehaviour
 
     private bool CanParticipantRequestReady(ParticipantId participantId)
     {
-        return IsValidParticipant(participantId) &&
-               HasActiveMatch &&
-               CurrentPhase == GamePhase.RoundBreak &&
-               CurrentOverlay == GameOverlay.None;
+        var isValid = IsValidParticipant(participantId);
+        return matchFlow.CanParticipantRequestReady(HasActiveMatch, isValid, CurrentOverlay);
     }
 
     public bool ShouldShowParticipantReady(ParticipantId participantId)
     {
-        return IsValidParticipant(participantId) &&
-               HasActiveMatch &&
-               CurrentPhase == GamePhase.RoundBreak &&
-               CurrentOverlay != GameOverlay.Settings;
+        var isValid = IsValidParticipant(participantId);
+        return matchFlow.ShouldShowParticipantReady(HasActiveMatch, isValid, CurrentOverlay);
     }
 
     private void PrepareNextTurn()
@@ -447,6 +444,11 @@ public sealed class MatchManager : MonoBehaviour
         PhaseChanged?.Invoke(previousPhase, currentPhase);
     }
 
+    private void HandleRoundStartRequested()
+    {
+        PrepareNextTurn();
+    }
+
     private void ApplyOverlayEffects()
     {
         var inGameMenu = uiManager ? uiManager.InGameMenu : null;
@@ -508,18 +510,15 @@ public sealed class MatchManager : MonoBehaviour
         return currentParticipants != null && currentParticipants.ContainsParticipant(participantId);
     }
 
-    private void TryPrepareNextTurnWhenAllParticipantsReady()
+    private void RequestRoundStartIfAllParticipantsReady()
     {
-        if (!HasActiveMatch) return;
         if (currentParticipants == null) return;
 
-        if (CurrentPhase != GamePhase.RoundBreak) return;
-        if (CurrentOverlay != GameOverlay.None) return;
-
-        var allParticipantsReady = readyParticipants.Count == currentParticipants.Count;
-        if (!allParticipantsReady) return;
-
-        PrepareNextTurn();
+        matchFlow.RequestRoundStartIfReady(
+            HasActiveMatch,
+            CurrentOverlay,
+            readyParticipants.Count,
+            currentParticipants.Count);
     }
 
     private bool TryGetParticipantReadyState(ParticipantId participantId, out bool currentReadyState)

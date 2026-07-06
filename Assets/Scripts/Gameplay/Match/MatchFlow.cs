@@ -77,4 +77,25 @@ public sealed class MatchFlow
         TransitionToPhase(GamePhase.TurnActive);
         return true;
     }
+
+    public bool TryEnterGoalPresentation(bool hasActiveMatch)
+    {
+        if (!hasActiveMatch) return false;
+        if (CurrentPhase != GamePhase.TurnActive) return false;
+
+        TransitionToPhase(GamePhase.GoalPresentation);
+        return true;
+    }
+
+    public bool TryCompleteGoalPresentation(bool hasWinner)
+    {
+        if (CurrentPhase != GamePhase.GoalPresentation) return false;
+
+        var nextPhase = !hasWinner
+            ? GamePhase.RoundBreak
+            : GamePhase.MatchComplete;
+
+        TransitionToPhase(nextPhase);
+        return true;
+    }
 }

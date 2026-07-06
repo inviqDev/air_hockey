@@ -41,6 +41,9 @@ public sealed class MatchManager : MonoBehaviour
     private bool hasPreparedTurnState;
     private bool lastPreparedTurnCanStart;
     private bool isMatchFlowRoundStartPending;
+    private bool hasPendingGoalPresentation;
+    private GoalResult pendingGoalResult;
+    private int goalPresentationVersion;
 
     private readonly HashSet<ParticipantId> readyParticipants = new();
     private readonly MatchFlow matchFlow = new();
@@ -181,23 +184,19 @@ public sealed class MatchManager : MonoBehaviour
         if (turnController)
             turnController.EndTurn();
 
-        if (uiManager)
-            uiManager.PlayGoalInfo(result);
+        if (!matchFlow.TryEnterGoalPresentation(HasActiveMatch)) return;
 
-        if (!result.HasWinner)
+        hasPendingGoalPresentation = true;
+        pendingGoalResult = result;
+        var presentationVersion = ++goalPresentationVersion;
+
+        if (uiManager)
         {
-            EnterRoundBreak();
+            uiManager.PlayGoalInfo(result, () => CompletePendingGoalPresentation(presentationVersion));
             return;
         }
 
-        if (roundController)
-            roundController.ReturnRoundItemsToPoolForFullMatch();
-
-        RefreshAbilitySelectionBindings();
-        ResetParticipantReadyState();
-        TransitionPhase(GamePhase.MatchComplete);
-        HasActiveMatch = false;
-        ClearParticipantCollection();
+        CompletePendingGoalPresentation(presentationVersion);
     }
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
@@ -261,6 +260,7 @@ public sealed class MatchManager : MonoBehaviour
 
         hasPreparedTurnState = false;
         isMatchFlowRoundStartPending = false;
+        InvalidatePendingGoalPresentation();
     }
 
     private bool SpawnConfiguredMatch(MatchConfiguration configuration)
@@ -538,9 +538,40 @@ public sealed class MatchManager : MonoBehaviour
             GamePhase.RoundBreak => PlayerInputMode.Intermission,
             GamePhase.NoActiveMatch => PlayerInputMode.Disabled,
             GamePhase.TurnPreparation => PlayerInputMode.Disabled,
+            GamePhase.GoalPresentation => PlayerInputMode.Disabled,
             GamePhase.MatchComplete => PlayerInputMode.Disabled,
             _ => PlayerInputMode.Disabled
         };
+    }
+
+    private void CompletePendingGoalPresentation(int presentationVersion)
+    {
+        if (presentationVersion != goalPresentationVersion) return;
+        if (!hasPendingGoalPresentation) return;
+
+        var result = pendingGoalResult;
+        hasPendingGoalPresentation = false;
+
+        if (!matchFlow.TryCompleteGoalPresentation(result.HasWinner)) return;
+        if (!result.HasWinner)
+        {
+            ResetParticipantReadyState();
+            return;
+        }
+
+        if (roundController)
+            roundController.ReturnRoundItemsToPoolForFullMatch();
+
+        RefreshAbilitySelectionBindings();
+        ResetParticipantReadyState();
+        HasActiveMatch = false;
+        ClearParticipantCollection();
+    }
+
+    private void InvalidatePendingGoalPresentation()
+    {
+        hasPendingGoalPresentation = false;
+        goalPresentationVersion++;
     }
 
     private bool IsValidParticipant(ParticipantId participantId)

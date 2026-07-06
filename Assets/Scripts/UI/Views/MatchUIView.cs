@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -20,6 +21,7 @@ public sealed class MatchUIView : MenuViewBase
     [SerializeField] private Ease goalInfoFadeEase = Ease.InExpo;
 
     private Sequence goalInfoSequence;
+    private Action goalInfoCompleted;
     private readonly Timer turnTimer = new();
 
     private void Awake()
@@ -57,11 +59,16 @@ public sealed class MatchUIView : MenuViewBase
         goalInfoText.rectTransform.anchoredPosition = goalInfoStartAnchoredPosition;
     }
 
-    public void PlayGoalInfo(string message)
+    public void PlayGoalInfo(string message, Action onCompleted = null)
     {
-        if (!goalInfoText) return;
+        if (!goalInfoText)
+        {
+            onCompleted?.Invoke();
+            return;
+        }
 
         StopGoalInfoAnimation();
+        goalInfoCompleted = onCompleted;
 
         var duration = Mathf.Max(0.01f, goalInfoAnimationSeconds);
         var goalInfoRect = goalInfoText.rectTransform;
@@ -143,6 +150,10 @@ public sealed class MatchUIView : MenuViewBase
     {
         goalInfoSequence = null;
         HideGoalInfoElement();
+
+        var completed = goalInfoCompleted;
+        goalInfoCompleted = null;
+        completed?.Invoke();
     }
 
     private void HideGoalInfoElement()
@@ -161,6 +172,7 @@ public sealed class MatchUIView : MenuViewBase
 
         goalInfoSequence.Kill();
         goalInfoSequence = null;
+        goalInfoCompleted = null;
     }
 
     private void SetGoalInfoAlpha(float alpha)

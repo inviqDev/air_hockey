@@ -97,13 +97,16 @@ public sealed class UIManager : MonoBehaviour
             matchView.SetGoalInfoText(string.Empty);
     }
 
-    public void PlayGoalInfo(GoalResult result)
+    public void PlayGoalInfo(GoalResult result, Action onCompleted = null)
     {
         if (matchView)
         {
             matchView.SetScores(result.LeftScore, result.RightScore);
-            matchView.PlayGoalInfo(GetGoalInfoMessage(result));
+            matchView.PlayGoalInfo(GetGoalInfoMessage(result), onCompleted);
+            return;
         }
+
+        onCompleted?.Invoke();
     }
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)

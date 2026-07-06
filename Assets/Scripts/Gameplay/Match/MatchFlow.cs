@@ -22,7 +22,7 @@ public sealed class MatchFlow
         return roundBreakActive && currentOverlay == GameOverlay.None;
     }
 
-    public bool ShouldShowParticipantReady(bool hasActiveMatch, bool isValidParticipant, GameOverlay currentOverlay)
+    public bool ShouldShowParticipantReadyView(bool hasActiveMatch, bool isValidParticipant, GameOverlay currentOverlay)
     {
         var roundBreakActive = IsParticipantInRoundBreak(hasActiveMatch, isValidParticipant);
         return roundBreakActive && currentOverlay != GameOverlay.Settings;
@@ -43,5 +43,38 @@ public sealed class MatchFlow
         if (readyParticipantCount != requiredParticipantCount) return;
 
         RoundStartRequested?.Invoke();
+    }
+
+    public bool ShouldCancelRoundStart(bool hasActiveMatch, int readyParticipantCount, int requiredParticipantCount)
+    {
+        if (!hasActiveMatch) return false;
+        if (CurrentPhase != GamePhase.RoundBreak) return false;
+        if (requiredParticipantCount <= 0) return true;
+
+        return readyParticipantCount != requiredParticipantCount;
+    }
+
+    public bool TryCompleteRoundStartCountdown(
+        bool hasActiveMatch,
+        GameOverlay currentOverlay,
+        int readyParticipantCount,
+        int requiredParticipantCount)
+    {
+        if (!hasActiveMatch) return false;
+        if (CurrentPhase != GamePhase.RoundBreak) return false;
+        if (currentOverlay != GameOverlay.None) return false;
+        if (requiredParticipantCount <= 0) return false;
+        if (readyParticipantCount != requiredParticipantCount) return false;
+
+        return true;
+    }
+
+    public bool TryCompleteRoundPreparation(bool didPrepareRound)
+    {
+        if (CurrentPhase != GamePhase.RoundBreak) return false;
+        if (!didPrepareRound) return false;
+
+        TransitionToPhase(GamePhase.TurnActive);
+        return true;
     }
 }

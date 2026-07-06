@@ -11,6 +11,7 @@ public sealed class TurnController : MonoBehaviour
 
     public bool IsTurnActive { get; private set; }
     public float GoalDelayBeforeNextTurnSeconds => Mathf.Max(0f, goalDelayBeforeNextTurnSeconds);
+    public event Action CountdownCompleted;
     public event Action TurnStarted;
     public event Action TurnEnded;
     public event Action RespawnItemsRequested;
@@ -24,7 +25,7 @@ public sealed class TurnController : MonoBehaviour
     {
         if (turnStartView)
         {
-            turnStartView.CountdownCompleted += StartTurn;
+            turnStartView.CountdownCompleted += HandleCountdownCompleted;
             turnStartView.RespawnItemsRequested += HandleRespawnItemsRequested;
         }
     }
@@ -33,7 +34,7 @@ public sealed class TurnController : MonoBehaviour
     {
         if (turnStartView)
         {
-            turnStartView.CountdownCompleted -= StartTurn;
+            turnStartView.CountdownCompleted -= HandleCountdownCompleted;
             turnStartView.RespawnItemsRequested -= HandleRespawnItemsRequested;
         }
     }
@@ -103,12 +104,17 @@ public sealed class TurnController : MonoBehaviour
             turnStartView.ShowTurnPreparation(canStartTurn);
     }
 
-    private void StartTurn()
+    public void ActivatePreparedTurn()
     {
         if (IsTurnActive) return;
 
         IsTurnActive = true;
         TurnStarted?.Invoke();
+    }
+
+    private void HandleCountdownCompleted()
+    {
+        CountdownCompleted?.Invoke();
     }
 
     private void StopGoalDelayRoutine()

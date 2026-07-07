@@ -74,14 +74,14 @@ public sealed class MatchFlow
         if (CurrentPhase != GamePhase.RoundBreak) return false;
         if (!didPrepareRound) return false;
 
-        TransitionToPhase(GamePhase.TurnActive);
+        TransitionToPhase(GamePhase.RoundActive);
         return true;
     }
 
     public bool TryEnterGoalPresentation(bool hasActiveMatch)
     {
         if (!hasActiveMatch) return false;
-        if (CurrentPhase != GamePhase.TurnActive) return false;
+        if (CurrentPhase != GamePhase.RoundActive) return false;
 
         TransitionToPhase(GamePhase.GoalPresentation);
         return true;

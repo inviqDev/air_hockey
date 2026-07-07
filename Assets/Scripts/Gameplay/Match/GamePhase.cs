@@ -1,8 +1,8 @@
 public enum GamePhase
 {
     NoActiveMatch,
-    TurnPreparation,
-    TurnActive,
+    RoundPreparation,
+    RoundActive,
     GoalPresentation,
     RoundBreak,
     MatchComplete

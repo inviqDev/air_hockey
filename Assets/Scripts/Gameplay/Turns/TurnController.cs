@@ -1,16 +1,11 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 public sealed class TurnController : MonoBehaviour
 {
     [SerializeField] private TurnStartView turnStartView;
-    [SerializeField] private float goalDelayBeforeNextTurnSeconds = 3f;
-    
-    private Coroutine goalDelayRoutine;
 
     public bool IsTurnActive { get; private set; }
-    public float GoalDelayBeforeNextTurnSeconds => Mathf.Max(0f, goalDelayBeforeNextTurnSeconds);
     public event Action CountdownCompleted;
     public event Action TurnStarted;
     public event Action TurnEnded;
@@ -46,19 +41,11 @@ public sealed class TurnController : MonoBehaviour
 
     public void PrepareTurn(Func<bool> beforeShowTurnPreparation)
     {
-        StopGoalDelayRoutine();
         EndTurn();
         var canStartTurn = beforeShowTurnPreparation == null || beforeShowTurnPreparation();
 
         if (turnStartView)
             turnStartView.ShowTurnPreparation(canStartTurn);
-    }
-
-    public void PrepareTurnAfterGoalDelay(Func<bool> beforeShowTurnPreparation)
-    {
-        StopGoalDelayRoutine();
-        EndTurn();
-        goalDelayRoutine = StartCoroutine(PrepareTurnAfterGoalDelayRoutine(beforeShowTurnPreparation));
     }
 
     public void EndTurn()
@@ -75,7 +62,6 @@ public sealed class TurnController : MonoBehaviour
 
     public void ShowTurnPreparation(bool canStartTurn)
     {
-        StopGoalDelayRoutine();
         EndTurn();
 
         if (turnStartView)
@@ -86,18 +72,6 @@ public sealed class TurnController : MonoBehaviour
     {
         if (IsTurnActive) return;
 
-        var canStartTurn = beforeShowTurnPreparation == null || beforeShowTurnPreparation();
-
-        if (turnStartView)
-            turnStartView.ShowTurnPreparation(canStartTurn);
-    }
-
-    private IEnumerator PrepareTurnAfterGoalDelayRoutine(Func<bool> beforeShowTurnPreparation)
-    {
-        var delaySeconds = Mathf.Max(0f, goalDelayBeforeNextTurnSeconds);
-        yield return new WaitForSeconds(delaySeconds);
-
-        goalDelayRoutine = null;
         var canStartTurn = beforeShowTurnPreparation == null || beforeShowTurnPreparation();
 
         if (turnStartView)
@@ -115,14 +89,6 @@ public sealed class TurnController : MonoBehaviour
     private void HandleCountdownCompleted()
     {
         CountdownCompleted?.Invoke();
-    }
-
-    private void StopGoalDelayRoutine()
-    {
-        if (goalDelayRoutine == null) return;
-
-        StopCoroutine(goalDelayRoutine);
-        goalDelayRoutine = null;
     }
 
     private void HandleRespawnItemsRequested()

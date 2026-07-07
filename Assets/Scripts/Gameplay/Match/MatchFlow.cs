@@ -22,7 +22,7 @@ public sealed class MatchFlow
         return roundBreakActive && currentOverlay == GameOverlay.None;
     }
 
-    public bool ShouldShowParticipantReadyView(bool hasActiveMatch, bool isValidParticipant, GameOverlay currentOverlay)
+    public bool ShouldShowParticipantReady(bool hasActiveMatch, bool isValidParticipant, GameOverlay currentOverlay)
     {
         var roundBreakActive = IsParticipantInRoundBreak(hasActiveMatch, isValidParticipant);
         return roundBreakActive && currentOverlay != GameOverlay.Settings;

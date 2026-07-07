@@ -132,7 +132,7 @@ public sealed class MatchManager : MonoBehaviour
         if (requestedReadyState)
             RequestRoundStart();
         else
-            CancelRoundStartIfReadStateChanged();
+            CancelRoundStartIfReadyStateChanged();
 
         return true;
     }
@@ -154,7 +154,7 @@ public sealed class MatchManager : MonoBehaviour
     public bool ShouldShowParticipantReady(ParticipantId participantId)
     {
         var isValid = IsValidParticipant(participantId);
-        return matchFlow.ShouldShowParticipantReadyView(HasActiveMatch, isValid, CurrentOverlay);
+        return matchFlow.ShouldShowParticipantReady(HasActiveMatch, isValid, CurrentOverlay);
     }
 
     private void PrepareNextTurn()
@@ -585,7 +585,7 @@ public sealed class MatchManager : MonoBehaviour
         matchFlow.RequestRoundStartIfReady(HasActiveMatch, CurrentOverlay, readyParticipants.Count, currentParticipantRoster.Count);
     }
 
-    private void CancelRoundStartIfReadStateChanged()
+    private void CancelRoundStartIfReadyStateChanged()
     {
         if (!isMatchFlowRoundStartPending) return;
         if (currentParticipantRoster == null) return;

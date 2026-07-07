@@ -79,7 +79,7 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!HasActiveMatch) return;
         if (!turnController) return;
-        if (CurrentPhase != GamePhase.TurnPreparation) return;
+        if (CurrentPhase != GamePhase.RoundPreparation) return;
         if (isMatchFlowRoundStartPending) return;
         if (turnController.IsTurnActive) return;
 
@@ -161,7 +161,7 @@ public sealed class MatchManager : MonoBehaviour
         if (!turnController) return;
 
         isMatchFlowRoundStartPending = false;
-        TransitionPhase(GamePhase.TurnPreparation);
+        TransitionPhase(GamePhase.RoundPreparation);
         hasPreparedTurnState = false;
         turnController.PrepareTurn(PrepareCurrentTurn);
     }
@@ -481,7 +481,7 @@ public sealed class MatchManager : MonoBehaviour
             return;
         }
 
-        TransitionPhase(GamePhase.TurnActive);
+        TransitionPhase(GamePhase.RoundActive);
         turnController.ActivatePreparedTurn();
     }
 
@@ -532,10 +532,10 @@ public sealed class MatchManager : MonoBehaviour
 
         return CurrentPhase switch
         {
-            GamePhase.TurnActive => PlayerInputMode.Gameplay,
+            GamePhase.RoundActive => PlayerInputMode.Gameplay,
             GamePhase.RoundBreak => PlayerInputMode.Intermission,
             GamePhase.NoActiveMatch => PlayerInputMode.Disabled,
-            GamePhase.TurnPreparation => PlayerInputMode.Disabled,
+            GamePhase.RoundPreparation => PlayerInputMode.Disabled,
             GamePhase.GoalPresentation => PlayerInputMode.Disabled,
             GamePhase.MatchComplete => PlayerInputMode.Disabled,
             _ => PlayerInputMode.Disabled

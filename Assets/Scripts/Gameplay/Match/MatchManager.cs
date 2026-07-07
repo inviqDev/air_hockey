@@ -37,13 +37,12 @@ public sealed class MatchManager : MonoBehaviour
     private ParticipantRoster currentParticipantRoster;
     private GameOverlay overlayToRestoreAfterSettings = GameOverlay.None;
 
+    private Guid currentMatchSessionId = Guid.Empty;
+
     private bool hasCurrentConfiguration;
     private bool hasPreparedTurnState;
     private bool lastPreparedTurnCanStart;
     private bool isMatchFlowRoundStartPending;
-    private bool hasPendingGoalPresentation;
-    private GoalResult pendingGoalResult;
-    private int goalPresentationVersion;
 
     private readonly HashSet<ParticipantId> readyParticipants = new();
     private readonly MatchFlow matchFlow = new();
@@ -186,17 +185,15 @@ public sealed class MatchManager : MonoBehaviour
 
         if (!matchFlow.TryEnterGoalPresentation(HasActiveMatch)) return;
 
-        hasPendingGoalPresentation = true;
-        pendingGoalResult = result;
-        var presentationVersion = ++goalPresentationVersion;
+        var capturedMatchSessionId = currentMatchSessionId;
 
         if (uiManager)
         {
-            uiManager.PlayGoalPresentation(result, () => CompletePendingGoalPresentation(presentationVersion));
+            uiManager.PlayGoalPresentation(result, () => CompleteGoalPresentationForMatchSession(result, capturedMatchSessionId));
             return;
         }
 
-        CompletePendingGoalPresentation(presentationVersion);
+        CompleteGoalPresentationForMatchSession(result, capturedMatchSessionId);
     }
 
     private void HandleMatchConfigurationSelected(MatchConfiguration configuration)
@@ -222,6 +219,7 @@ public sealed class MatchManager : MonoBehaviour
 
     private void StartConfiguredMatch(MatchConfiguration configuration)
     {
+        SetNewMatchSessionId();
         ConfigureParticipants(configuration);
         ResetCurrentMatchProgress();
         SpawnConfiguredMatch(configuration);
@@ -260,7 +258,6 @@ public sealed class MatchManager : MonoBehaviour
 
         hasPreparedTurnState = false;
         isMatchFlowRoundStartPending = false;
-        InvalidatePendingGoalPresentation();
     }
 
     private bool SpawnConfiguredMatch(MatchConfiguration configuration)
@@ -275,6 +272,7 @@ public sealed class MatchManager : MonoBehaviour
     private void StopCurrentMatch()
     {
         if (!HasActiveMatch && CurrentPhase == GamePhase.NoActiveMatch) return;
+        ClearCurrentMatchSessionId();
         ResetCurrentMatchProgress();
 
         if (roundController)
@@ -544,13 +542,11 @@ public sealed class MatchManager : MonoBehaviour
         };
     }
 
-    private void CompletePendingGoalPresentation(int presentationVersion)
+    private void CompleteGoalPresentationForMatchSession(GoalResult result, Guid capturedMatchSessionId)
     {
-        if (presentationVersion != goalPresentationVersion) return;
-        if (!hasPendingGoalPresentation) return;
-
-        var result = pendingGoalResult;
-        hasPendingGoalPresentation = false;
+        if (capturedMatchSessionId != currentMatchSessionId) return;
+        if (!HasActiveMatch) return;
+        if (CurrentPhase != GamePhase.GoalPresentation) return;
 
         if (!matchFlow.TryCompleteGoalPresentation(result.HasWinner)) return;
         if (!result.HasWinner)
@@ -568,10 +564,14 @@ public sealed class MatchManager : MonoBehaviour
         ClearParticipantCollection();
     }
 
-    private void InvalidatePendingGoalPresentation()
+    private void SetNewMatchSessionId()
     {
-        hasPendingGoalPresentation = false;
-        goalPresentationVersion++;
+        currentMatchSessionId = Guid.NewGuid();
+    }
+
+    private void ClearCurrentMatchSessionId()
+    {
+        currentMatchSessionId = Guid.Empty;
     }
 
     private bool IsValidParticipant(ParticipantId participantId)

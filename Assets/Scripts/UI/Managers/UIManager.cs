@@ -91,18 +91,18 @@ public sealed class UIManager : MonoBehaviour
             matchView.ResetMatchSessionState();
     }
 
-    public void ClearGoalPopUpText()
+    public void ClearGoalPresentationText()
     {
         if (matchView)
-            matchView.SetGoalInfoText(string.Empty);
+            matchView.SetGoalPresentationText(string.Empty);
     }
 
-    public void PlayGoalInfo(GoalResult result, Action onCompleted = null)
+    public void PlayGoalPresentation(GoalResult result, Action onCompleted = null)
     {
         if (matchView)
         {
             matchView.SetScores(result.LeftScore, result.RightScore);
-            matchView.PlayGoalInfo(GetGoalInfoMessage(result), onCompleted);
+            matchView.PlayGoalPresentation(GetGoalPresentationMessage(result), onCompleted);
             return;
         }
 
@@ -122,7 +122,7 @@ public sealed class UIManager : MonoBehaviour
     private void ShowStartGameState(int leftScore, int rightScore, bool hideInGameImmediately)
     {
         SetScores(leftScore, rightScore);
-        ClearGoalPopUpText();
+        ClearGoalPresentationText();
 
         if (inGameMenuView)
         {
@@ -136,7 +136,7 @@ public sealed class UIManager : MonoBehaviour
             startGameMenu.Show();
     }
 
-    private static string GetGoalInfoMessage(GoalResult result)
+    private static string GetGoalPresentationMessage(GoalResult result)
     {
         return result.HasWinner
             ? $"{result.ScoringSide} wins"

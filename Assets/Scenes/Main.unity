@@ -3201,7 +3201,7 @@ GameObject:
   - component: {fileID: 724809469}
   - component: {fileID: 724809468}
   m_Layer: 5
-  m_Name: Goal_info
+  m_Name: GoalPresentation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9789,14 +9789,14 @@ MonoBehaviour:
   visibleByDefault: 1
   leftScoreText: {fileID: 180622732}
   rightScoreText: {fileID: 1728668364}
-  goalInfoText: {fileID: 724809468}
+  goalPresentationText: {fileID: 724809468}
   turnController: {fileID: 6400000000000000008}
   turnTimerText: {fileID: 6600000000000000003}
-  goalInfoStartAnchoredPosition: {x: 0, y: 0}
-  goalInfoMoveUpDistance: 200
-  goalInfoAnimationSeconds: 1.75
-  goalInfoMoveEase: 3
-  goalInfoFadeEase: 17
+  startAnchoredPosition: {x: 0, y: 0}
+  moveUpDistance: 200
+  animationSeconds: 1.75
+  moveEase: 3
+  fadeEase: 17
 --- !u!114 &6400000000000000005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9860,7 +9860,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turnStartView: {fileID: 6500000000000000010}
-  goalDelayBeforeNextTurnSeconds: 10
 --- !u!114 &6400000000000000009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9873,8 +9872,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32d76613d7384c8a9f5d2e2467cb245e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiManager: {fileID: 6800000000000000001}
   matchManager: {fileID: 1387558709}
+  uiManager: {fileID: 6800000000000000001}
 --- !u!225 &6400000000000000012
 CanvasGroup:
   m_ObjectHideFlags: 0

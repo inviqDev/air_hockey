@@ -7,21 +7,22 @@ public sealed class MatchUIView : MenuViewBase
 {
     [SerializeField] private TextMeshProUGUI leftScoreText;
     [SerializeField] private TextMeshProUGUI rightScoreText;
-    [SerializeField] private TextMeshProUGUI goalInfoText;
+    [SerializeField] private TextMeshProUGUI goalPresentationText;
 
     [Header("Turn Timer")]
     [SerializeField] private TurnController turnController;
     [SerializeField] private TextMeshProUGUI turnTimerText;
 
-    [Header("Goal Info Animation")]
-    [SerializeField] private Vector2 goalInfoStartAnchoredPosition = Vector2.zero;
-    [SerializeField] private float goalInfoMoveUpDistance = 220f;
-    [SerializeField] private float goalInfoAnimationSeconds = 2.5f;
-    [SerializeField] private Ease goalInfoMoveEase = Ease.OutSine;
-    [SerializeField] private Ease goalInfoFadeEase = Ease.InExpo;
+    [Header("Goal Presentation Animation")]
+    [SerializeField] private Vector2 startAnchoredPosition = Vector2.zero;
+    [SerializeField] private float moveUpDistance = 220f;
+    [SerializeField] private float animationSeconds = 2.5f;
+    [SerializeField] private Ease moveEase = Ease.OutSine;
+    [SerializeField] private Ease fadeEase = Ease.InExpo;
 
-    private Sequence goalInfoSequence;
-    private Action goalInfoCompleted;
+    private Sequence goalPresentationSequence;
+    private Action goalPresentationCompletedCallback;
+
     private readonly Timer turnTimer = new();
 
     private void Awake()
@@ -37,52 +38,48 @@ public sealed class MatchUIView : MenuViewBase
     public void SetScores(int leftScore, int rightScore)
     {
         if (leftScoreText)
-        {
             leftScoreText.text = leftScore.ToString();
-        }
 
         if (rightScoreText)
-        {
             rightScoreText.text = rightScore.ToString();
-        }
     }
 
-    public void SetGoalInfoText(string message)
+    public void SetGoalPresentationText(string message)
     {
-        StopGoalInfoAnimation();
+        StopGoalPresentationAnimation();
 
-        if (!goalInfoText) return;
-        
-        goalInfoText.text = message;
-        goalInfoText.gameObject.SetActive(!string.IsNullOrEmpty(message));
-        SetGoalInfoAlpha(1f);
-        goalInfoText.rectTransform.anchoredPosition = goalInfoStartAnchoredPosition;
+        if (!goalPresentationText) return;
+
+        goalPresentationText.text = message;
+        goalPresentationText.gameObject.SetActive(!string.IsNullOrEmpty(message));
+        SetGoalPresentationAlpha(1f);
+        goalPresentationText.rectTransform.anchoredPosition = startAnchoredPosition;
     }
 
-    public void PlayGoalInfo(string message, Action onCompleted = null)
+    public void PlayGoalPresentation(string message, Action onCompleted = null)
     {
-        if (!goalInfoText)
+        if (!goalPresentationText)
         {
             onCompleted?.Invoke();
             return;
         }
 
-        StopGoalInfoAnimation();
-        goalInfoCompleted = onCompleted;
+        StopGoalPresentationAnimation();
+        goalPresentationCompletedCallback = onCompleted;
 
-        var duration = Mathf.Max(0.01f, goalInfoAnimationSeconds);
-        var goalInfoRect = goalInfoText.rectTransform;
-        var endPosition = goalInfoStartAnchoredPosition + Vector2.up * goalInfoMoveUpDistance;
+        var duration = Mathf.Max(0.01f, animationSeconds);
+        var goalPresentationRect = goalPresentationText.rectTransform;
+        var endPosition = startAnchoredPosition + Vector2.up * moveUpDistance;
 
-        goalInfoText.text = message;
-        goalInfoText.gameObject.SetActive(true);
-        SetGoalInfoAlpha(1f);
-        goalInfoRect.anchoredPosition = goalInfoStartAnchoredPosition;
+        goalPresentationText.text = message;
+        goalPresentationText.gameObject.SetActive(true);
+        SetGoalPresentationAlpha(1f);
+        goalPresentationRect.anchoredPosition = startAnchoredPosition;
 
-        goalInfoSequence = DOTween.Sequence();
-        goalInfoSequence.Join(goalInfoRect.DOAnchorPos(endPosition, duration).SetEase(goalInfoMoveEase));
-        goalInfoSequence.Join(goalInfoText.DOFade(0f, duration).SetEase(goalInfoFadeEase));
-        goalInfoSequence.OnComplete(CompleteGoalInfoAnimation);
+        goalPresentationSequence = DOTween.Sequence();
+        goalPresentationSequence.Join(goalPresentationRect.DOAnchorPos(endPosition, duration).SetEase(moveEase));
+        goalPresentationSequence.Join(goalPresentationText.DOFade(0f, duration).SetEase(fadeEase));
+        goalPresentationSequence.OnComplete(HandleGoalPresentationAnimationCompleted);
     }
 
     private void OnValidate()
@@ -102,7 +99,7 @@ public sealed class MatchUIView : MenuViewBase
     private void OnDisable()
     {
         UnsubscribeFromTurnEvents();
-        StopGoalInfoAnimation();
+        StopGoalPresentationAnimation();
         StopAndResetTurnTimer();
     }
 
@@ -110,7 +107,7 @@ public sealed class MatchUIView : MenuViewBase
     {
         ConfigureTurnTimer();
         ValidateReferences();
-        HideGoalInfoImmediately();
+        HideGoalPresentationImmediately();
         UpdateTurnTimerText();
     }
 
@@ -135,53 +132,53 @@ public sealed class MatchUIView : MenuViewBase
 
     public void ResetMatchSessionState()
     {
-        StopGoalInfoAnimation();
-        HideGoalInfoElement();
+        StopGoalPresentationAnimation();
+        HideGoalPresentationElement();
         StopAndResetTurnTimer();
     }
 
-    private void HideGoalInfoImmediately()
+    private void HideGoalPresentationImmediately()
     {
-        StopGoalInfoAnimation();
-        HideGoalInfoElement();
+        StopGoalPresentationAnimation();
+        HideGoalPresentationElement();
     }
 
-    private void CompleteGoalInfoAnimation()
+    private void HandleGoalPresentationAnimationCompleted()
     {
-        goalInfoSequence = null;
-        HideGoalInfoElement();
+        goalPresentationSequence = null;
+        HideGoalPresentationElement();
 
-        var completed = goalInfoCompleted;
-        goalInfoCompleted = null;
+        var completed = goalPresentationCompletedCallback;
+        goalPresentationCompletedCallback = null;
         completed?.Invoke();
     }
 
-    private void HideGoalInfoElement()
+    private void HideGoalPresentationElement()
     {
-        if (!goalInfoText) return;
+        if (!goalPresentationText) return;
 
-        goalInfoText.text = string.Empty;
-        goalInfoText.rectTransform.anchoredPosition = goalInfoStartAnchoredPosition;
-        SetGoalInfoAlpha(0f);
-        goalInfoText.gameObject.SetActive(false);
+        goalPresentationText.text = string.Empty;
+        goalPresentationText.rectTransform.anchoredPosition = startAnchoredPosition;
+        SetGoalPresentationAlpha(0f);
+        goalPresentationText.gameObject.SetActive(false);
     }
 
-    private void StopGoalInfoAnimation()
+    private void StopGoalPresentationAnimation()
     {
-        if (goalInfoSequence == null) return;
+        if (goalPresentationSequence == null) return;
 
-        goalInfoSequence.Kill();
-        goalInfoSequence = null;
-        goalInfoCompleted = null;
+        goalPresentationSequence.Kill();
+        goalPresentationSequence = null;
+        goalPresentationCompletedCallback = null;
     }
 
-    private void SetGoalInfoAlpha(float alpha)
+    private void SetGoalPresentationAlpha(float alpha)
     {
-        if (!goalInfoText) return;
+        if (!goalPresentationText) return;
 
-        var color = goalInfoText.color;
+        var color = goalPresentationText.color;
         color.a = alpha;
-        goalInfoText.color = color;
+        goalPresentationText.color = color;
     }
 
     private void ConfigureTurnTimer()
@@ -225,18 +222,12 @@ public sealed class MatchUIView : MenuViewBase
     private void ValidateReferences()
     {
         if (!leftScoreText)
-        {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a LeftScoreText reference.", this);
-        }
 
         if (!rightScoreText)
-        {
             Debug.LogError($"{nameof(MatchUIView)} on {name} requires a RightScoreText reference.", this);
-        }
 
-        if (!goalInfoText)
-        {
-            Debug.LogError($"{nameof(MatchUIView)} on {name} requires a GoalInfoText reference.", this);
-        }
+        if (!goalPresentationText)
+            Debug.LogError($"{nameof(MatchUIView)} on {name} requires a GoalPresentationText reference.", this);
     }
 }

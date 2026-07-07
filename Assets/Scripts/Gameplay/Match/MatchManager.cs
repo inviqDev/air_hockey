@@ -174,7 +174,7 @@ public sealed class MatchManager : MonoBehaviour
         hasPreparedTurnState = true;
 
         if (uiManager)
-            uiManager.ClearGoalPopUpText();
+            uiManager.ClearGoalPresentationText();
 
         return canStartTurn;
     }
@@ -192,7 +192,7 @@ public sealed class MatchManager : MonoBehaviour
 
         if (uiManager)
         {
-            uiManager.PlayGoalInfo(result, () => CompletePendingGoalPresentation(presentationVersion));
+            uiManager.PlayGoalPresentation(result, () => CompletePendingGoalPresentation(presentationVersion));
             return;
         }
 
@@ -382,7 +382,7 @@ public sealed class MatchManager : MonoBehaviour
         hasPreparedTurnState = true;
 
         if (uiManager)
-            uiManager.ClearGoalPopUpText();
+            uiManager.ClearGoalPresentationText();
 
         if (turnController)
             turnController.ShowTurnPreparation(canStartTurn);
@@ -453,7 +453,7 @@ public sealed class MatchManager : MonoBehaviour
         hasPreparedTurnState = false;
 
         if (uiManager)
-            uiManager.ClearGoalPopUpText();
+            uiManager.ClearGoalPresentationText();
 
         turnController.ShowTurnPreparation(true);
     }

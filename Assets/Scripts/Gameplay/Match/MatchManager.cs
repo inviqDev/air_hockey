@@ -245,7 +245,13 @@ public sealed class MatchManager : MonoBehaviour
             goalController.StartGoalLockoutPeriod();
 
         if (scoreKeeper)
+        {
+            if (!hasCurrentConfiguration)
+                throw new InvalidOperationException($"{nameof(MatchManager)} cannot reset score without a current match configuration.");
+
+            scoreKeeper.ConfigureForMatch(currentConfiguration);
             scoreKeeper.ResetScores();
+        }
 
         if (serveManager)
             serveManager.ResetMatch();

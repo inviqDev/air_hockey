@@ -208,14 +208,7 @@ public sealed class RoundController : MonoBehaviour
 
     private static PlayerSide GetSideForSlot(ArenaSlotId slotId)
     {
-        if (slotId == TemporaryTwoSideArena.LeftSlot)
-            return PlayerSide.Left;
-
-        if (slotId == TemporaryTwoSideArena.RightSlot)
-            return PlayerSide.Right;
-
-        throw new System.ArgumentOutOfRangeException(
-            nameof(slotId), slotId, $"{nameof(RoundController)} only supports the temporary two-side arena slots.");
+        return TemporaryTwoSideArena.GetSideForSlot(slotId);
     }
 
     private void SetTableVisible(bool isVisible)

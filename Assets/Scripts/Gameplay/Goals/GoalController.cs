@@ -29,7 +29,7 @@ public sealed class GoalController : MonoBehaviour
         StartGoalLockoutPeriod();
 
         var result = scoreKeeper.RegisterGoal(goalSide);
-        serveManager?.SetNextAttacker(goalSide);
+        serveManager.SetNextAttacker(goalSide);
         GoalResolved?.Invoke(result);
 
         return true;

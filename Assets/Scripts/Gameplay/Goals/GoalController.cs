@@ -11,9 +11,6 @@ public sealed class GoalController : MonoBehaviour
 
     public event Action<GoalResult> GoalResolved;
 
-    public int LeftScore => scoreKeeper ? scoreKeeper.LeftScore : 0;
-    public int RightScore => scoreKeeper ? scoreKeeper.RightScore : 0;
-
     private void Awake()
     {
         ValidateReferences();

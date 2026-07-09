@@ -19,8 +19,8 @@ public sealed class MatchManager : MonoBehaviour
     [SerializeField] private ScoreKeeper scoreKeeper;
     [SerializeField] private ParticipantPreparationCoordinator participantPreparationCoordinator;
 
-    public int LeftScore => goalController ? goalController.LeftScore : 0;
-    public int RightScore => goalController ? goalController.RightScore : 0;
+    public int LeftScore => scoreKeeper ? scoreKeeper.LeftScore : 0;
+    public int RightScore => scoreKeeper ? scoreKeeper.RightScore : 0;
     public bool IsTurnActive => turnController && turnController.IsTurnActive;
     public bool IsRoundBreakActive => CurrentPhase == GamePhase.RoundBreak;
     public bool HasActiveMatch { get; private set; }

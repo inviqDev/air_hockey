@@ -26,6 +26,7 @@ public sealed class MatchManager : MonoBehaviour
     public bool HasActiveMatch { get; private set; }
     public GamePhase CurrentPhase => matchFlow.CurrentPhase;
     public GameOverlay CurrentOverlay { get; private set; } = GameOverlay.None;
+    public MatchResult CompletedMatchResult => completedMatchResult;
 
     public event Action<GamePhase, GamePhase> PhaseChanged;
     public event Action<GameOverlay, GameOverlay> OverlayChanged;
@@ -35,6 +36,7 @@ public sealed class MatchManager : MonoBehaviour
 
     private MatchConfiguration currentConfiguration;
     private ParticipantRoster currentParticipantRoster;
+    private MatchResult completedMatchResult;
     private GameOverlay overlayToRestoreAfterSettings = GameOverlay.None;
 
     private Guid currentMatchSessionId = Guid.Empty;
@@ -219,6 +221,7 @@ public sealed class MatchManager : MonoBehaviour
 
     private void StartConfiguredMatch(MatchConfiguration configuration)
     {
+        ClearCompletedMatchResult();
         SetNewMatchSessionId();
         ConfigureParticipants(configuration);
         ResetCurrentMatchProgress();
@@ -561,6 +564,8 @@ public sealed class MatchManager : MonoBehaviour
             return;
         }
 
+        CaptureCompletedMatchResult(result);
+
         if (roundController)
             roundController.ReturnRoundItemsToPoolForFullMatch();
 
@@ -578,6 +583,19 @@ public sealed class MatchManager : MonoBehaviour
     private void ClearCurrentMatchSessionId()
     {
         currentMatchSessionId = Guid.Empty;
+    }
+
+    private void CaptureCompletedMatchResult(GoalResult result)
+    {
+        if (!scoreKeeper)
+            throw new InvalidOperationException($"{nameof(MatchManager)} cannot create match result without a ScoreKeeper reference.");
+
+        completedMatchResult = scoreKeeper.CreateMatchResult(result.ScoringParticipantId);
+    }
+
+    private void ClearCompletedMatchResult()
+    {
+        completedMatchResult = null;
     }
 
     private bool IsValidParticipant(ParticipantId participantId)

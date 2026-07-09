@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 public sealed class MatchScores
 {
@@ -28,6 +29,11 @@ public sealed class MatchScores
     {
         EnsureParticipantExists(participantId);
         return scoresByParticipant[participantId];
+    }
+
+    public IReadOnlyDictionary<ParticipantId, int> CreateSnapshot()
+    {
+        return new ReadOnlyDictionary<ParticipantId, int>(new Dictionary<ParticipantId, int>(scoresByParticipant));
     }
 
     public void ResetScores()

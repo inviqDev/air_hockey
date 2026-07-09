@@ -45,6 +45,12 @@ public sealed class ScoreKeeper : MonoBehaviour
         matchScores.ResetScores();
     }
 
+    public MatchResult CreateMatchResult(ParticipantId winnerParticipantId)
+    {
+        EnsureConfigured();
+        return new MatchResult(winnerParticipantId, matchScores.CreateSnapshot());
+    }
+
     private int GetProjectedScore(PlayerSide scoreDisplaySide)
     {
         if (matchScores == null || currentConfiguration == null)

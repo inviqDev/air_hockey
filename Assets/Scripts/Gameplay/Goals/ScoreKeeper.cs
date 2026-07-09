@@ -5,6 +5,7 @@ public sealed class ScoreKeeper : MonoBehaviour
     [SerializeField] private int winningScore = 7;
 
     private MatchConfiguration currentConfiguration;
+    private MatchRules matchRules;
     private MatchScores matchScores;
 
     public int LeftScore => GetProjectedScore(PlayerSide.Left);
@@ -21,6 +22,7 @@ public sealed class ScoreKeeper : MonoBehaviour
         }
 
         matchScores = new MatchScores(currentConfiguration.Roster);
+        matchRules = new MatchRules(winningScore);
     }
 
     public GoalResult RegisterGoal(PlayerSide goalSide)
@@ -30,8 +32,9 @@ public sealed class ScoreKeeper : MonoBehaviour
         var scoringSlotId = TemporaryTwoSideArena.GetScoringSlotForGoalZoneSide(goalSide);
         var scoringDisplaySide = TemporaryTwoSideArena.GetSideForSlot(scoringSlotId);
         var scoringParticipantId = GetParticipantIdForSlot(scoringSlotId);
+
         var updatedScore = matchScores.ChangeScore(scoringParticipantId, 1);
-        var hasWinner = HasWinner(updatedScore);
+        var hasWinner = matchRules.IsWinningScoreReached(updatedScore);
 
         return new GoalResult(scoringParticipantId, scoringDisplaySide, LeftScore, RightScore, hasWinner);
     }
@@ -40,11 +43,6 @@ public sealed class ScoreKeeper : MonoBehaviour
     {
         EnsureConfigured();
         matchScores.ResetScores();
-    }
-
-    private bool HasWinner(int updatedParticipantScore)
-    {
-        return winningScore > 0 && updatedParticipantScore >= winningScore;
     }
 
     private int GetProjectedScore(PlayerSide scoreDisplaySide)
@@ -78,5 +76,8 @@ public sealed class ScoreKeeper : MonoBehaviour
 
         if (matchScores == null)
             throw new System.InvalidOperationException($"{nameof(ScoreKeeper)} requires an active score state.");
+
+        if (matchRules == null)
+            throw new System.InvalidOperationException($"{nameof(ScoreKeeper)} requires active match rules.");
     }
 }

@@ -1,4 +1,4 @@
-public struct GoalResult
+public readonly struct GoalResult
 {
     public GoalResult(ParticipantId scoringParticipantId, PlayerSide scoringSide, int leftScore, int rightScore, bool hasWinner)
     {

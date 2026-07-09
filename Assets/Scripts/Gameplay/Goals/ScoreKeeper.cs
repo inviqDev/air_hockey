@@ -13,14 +13,14 @@ public sealed class ScoreKeeper : MonoBehaviour
 
     public void ConfigureForMatch(MatchConfiguration configuration)
     {
-        currentConfiguration = configuration ?? throw new System.ArgumentNullException(nameof(configuration));
-
-        if (currentConfiguration.ArenaId != TemporaryTwoSideArena.ArenaId)
+        var nextConfiguration = configuration ?? throw new System.ArgumentNullException(nameof(configuration));
+        if (nextConfiguration.ArenaId != TemporaryTwoSideArena.ArenaId)
         {
             throw new System.InvalidOperationException(
-                $"{nameof(ScoreKeeper)} only supports arena {TemporaryTwoSideArena.ArenaId}, but received {currentConfiguration.ArenaId}.");
+                $"{nameof(ScoreKeeper)} only supports arena {TemporaryTwoSideArena.ArenaId}, but received {nextConfiguration.ArenaId}.");
         }
 
+        currentConfiguration = nextConfiguration;
         matchScores = new MatchScores(currentConfiguration.Roster);
         matchRules = new MatchRules(winningScore);
     }
@@ -48,7 +48,11 @@ public sealed class ScoreKeeper : MonoBehaviour
     public MatchResult CreateMatchResult(ParticipantId winnerParticipantId)
     {
         EnsureConfigured();
-        return new MatchResult(winnerParticipantId, matchScores.CreateSnapshot());
+
+        var snapshot = matchScores.CreateSnapshot();
+        var matchResult = new MatchResult(winnerParticipantId, snapshot);
+
+        return matchResult;
     }
 
     private int GetProjectedScore(PlayerSide scoreDisplaySide)

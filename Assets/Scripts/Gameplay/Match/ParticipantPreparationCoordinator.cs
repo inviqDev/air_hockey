@@ -93,7 +93,7 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
             throw new ArgumentNullException(nameof(configuration));
 
         EndRuntimeActivation();
-        participantControllers.Clear();
+        DisposeParticipantControllers();
 
         var allParticipants = configuration.Roster.Participants.ToArray();
         foreach (var participant in allParticipants)
@@ -111,7 +111,7 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         if (!isInitialized) return;
 
         EndRuntimeActivation();
-        participantControllers.Clear();
+        DisposeParticipantControllers();
     }
 
     public void BindParticipantAbilityController(ParticipantId participantId, PlayerAbilityController abilityController)
@@ -126,6 +126,12 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
     {
         if (!isInitialized) return;
         ForEachParticipantController(controller => controller.BindAbilityController(null));
+    }
+
+    public void ApplyInputMode(PlayerInputMode inputMode)
+    {
+        if (!isInitialized) return;
+        ForEachParticipantController(controller => controller.ApplyInputMode(inputMode));
     }
 
     public void ResetProgression()
@@ -181,8 +187,11 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         var binding = GetSetupForSlot(slotId);
         var abilitySelectionRuntime = CreateParticipantAbilitySelectionRuntime(participant.ParticipantId, binding);
         var readyStatusHandler = CreateParticipantReadyStatusHandler(participant.ParticipantId, binding, abilitySelectionRuntime);
+        var preparationCommandSource = participant.IsHuman
+            ? new HumanPreparationCommandSource(participant.GetRequiredHumanInputLayout())
+            : null;
 
-        return new ParticipantPreparationController(abilitySelectionRuntime, readyStatusHandler);
+        return new ParticipantPreparationController(abilitySelectionRuntime, readyStatusHandler, preparationCommandSource);
     }
 
     private ParticipantAbilitySelectionRuntime CreateParticipantAbilitySelectionRuntime(ParticipantId participantId, ParticipantAbilitySetup binding)
@@ -227,6 +236,16 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         ForEachParticipantController(controller => controller.Disable());
         UnsubscribeFromTurnEvents();
         isRuntimeActive = false;
+    }
+
+    private void DisposeParticipantControllers()
+    {
+        foreach (var participantController in participantControllers.Values)
+        {
+            participantController?.Dispose();
+        }
+
+        participantControllers.Clear();
     }
 
     private bool TryGetParticipantController(ParticipantId participantId, out ParticipantPreparationController controller)

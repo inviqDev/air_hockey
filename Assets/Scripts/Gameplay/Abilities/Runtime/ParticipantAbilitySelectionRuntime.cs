@@ -63,6 +63,13 @@ public sealed class ParticipantAbilitySelectionRuntime
         RefreshHud();
     }
 
+    public void BindPreparationCommandSource(HumanPreparationCommandSource commandSource)
+    {
+        offerSelectionFlow.BindPreparationCommandSource(commandSource);
+        InvalidateHudRenderCache();
+        RefreshHud();
+    }
+
     public void StartTurnProgression()
     {
         pointsProgression.StartAbilityPointsTurnProgression();

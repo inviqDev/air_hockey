@@ -511,8 +511,11 @@ public sealed class MatchManager : MonoBehaviour
 
     private void ApplyPlayerInputMode(PlayerInputMode inputMode)
     {
-        if (!roundController) return;
-        roundController.ApplyPlayerInputMode(inputMode);
+        if (roundController)
+            roundController.ApplyPlayerInputMode(inputMode);
+
+        if (participantPreparationCoordinator)
+            participantPreparationCoordinator.ApplyInputMode(inputMode);
     }
 
     private void RefreshAbilitySelectionBindings()

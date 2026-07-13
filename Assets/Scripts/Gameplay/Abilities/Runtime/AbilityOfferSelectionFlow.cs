@@ -14,7 +14,7 @@ public sealed class AbilityOfferSelectionFlow
     private readonly AbilityOfferSelectionSession offerSelectionSession = new();
 
     private PlayerAbilityController abilityController;
-    private PlayerInputReader inputReader;
+    private HumanPreparationCommandSource preparationCommandSource;
     private bool isEnabled;
 
     public event Action<bool> MenuOpenStateChanged;
@@ -45,7 +45,7 @@ public sealed class AbilityOfferSelectionFlow
         isEnabled = true;
 
         SubscribeToHud();
-        SubscribeToInputReader();
+        SubscribeToPreparationCommandSource();
     }
 
     public void Disable()
@@ -53,7 +53,7 @@ public sealed class AbilityOfferSelectionFlow
         if (!isEnabled) return;
 
         CloseMenu();
-        UnsubscribeFromInputReader();
+        UnsubscribeFromPreparationCommandSource();
         UnsubscribeFromHud();
 
         isEnabled = false;
@@ -66,9 +66,19 @@ public sealed class AbilityOfferSelectionFlow
             CloseMenu();
 
         abilityController = controller;
+    }
 
-        var nextInputReader = abilityController ? abilityController.InputReader : null;
-        BindInputReader(nextInputReader);
+    public void BindPreparationCommandSource(HumanPreparationCommandSource nextCommandSource)
+    {
+        if (preparationCommandSource == nextCommandSource) return;
+
+        if (isEnabled)
+            UnsubscribeFromPreparationCommandSource();
+
+        preparationCommandSource = nextCommandSource;
+
+        if (isEnabled)
+            SubscribeToPreparationCommandSource();
     }
 
     public void CloseMenu()
@@ -88,19 +98,6 @@ public sealed class AbilityOfferSelectionFlow
             CloseMenu();
     }
 
-    private void BindInputReader(PlayerInputReader nextInputReader)
-    {
-        if (inputReader == nextInputReader) return;
-
-        if (isEnabled)
-            UnsubscribeFromInputReader();
-
-        inputReader = nextInputReader;
-
-        if (isEnabled)
-            SubscribeToInputReader();
-    }
-
     private void SubscribeToHud()
     {
         participantHud.PlusAbilityButtonClicked += HandleMenuToggleRequested;
@@ -111,26 +108,26 @@ public sealed class AbilityOfferSelectionFlow
         participantHud.PlusAbilityButtonClicked -= HandleMenuToggleRequested;
     }
 
-    private void SubscribeToInputReader()
+    private void SubscribeToPreparationCommandSource()
     {
-        if (!inputReader) return;
+        if (preparationCommandSource == null) return;
 
-        inputReader.AbilitySelectionMenuPressed += HandleMenuToggleRequested;
-        inputReader.AbilitySelectionPreviousPressed += HandlePreviousSelectionRequested;
-        inputReader.AbilitySelectionNextPressed += HandleNextSelectionRequested;
-        inputReader.AbilitySelectionConfirmPressed += HandleConfirmRequested;
-        inputReader.AbilitySelectionBackPressed += HandleBackRequested;
+        preparationCommandSource.AbilityMenuPressed += HandleMenuToggleRequested;
+        preparationCommandSource.PreviousOfferPressed += HandlePreviousSelectionRequested;
+        preparationCommandSource.NextOfferPressed += HandleNextSelectionRequested;
+        preparationCommandSource.ConfirmSelectionPressed += HandleConfirmRequested;
+        preparationCommandSource.BackSelectionPressed += HandleBackRequested;
     }
 
-    private void UnsubscribeFromInputReader()
+    private void UnsubscribeFromPreparationCommandSource()
     {
-        if (!inputReader) return;
+        if (preparationCommandSource == null) return;
 
-        inputReader.AbilitySelectionMenuPressed -= HandleMenuToggleRequested;
-        inputReader.AbilitySelectionPreviousPressed -= HandlePreviousSelectionRequested;
-        inputReader.AbilitySelectionNextPressed -= HandleNextSelectionRequested;
-        inputReader.AbilitySelectionConfirmPressed -= HandleConfirmRequested;
-        inputReader.AbilitySelectionBackPressed -= HandleBackRequested;
+        preparationCommandSource.AbilityMenuPressed -= HandleMenuToggleRequested;
+        preparationCommandSource.PreviousOfferPressed -= HandlePreviousSelectionRequested;
+        preparationCommandSource.NextOfferPressed -= HandleNextSelectionRequested;
+        preparationCommandSource.ConfirmSelectionPressed -= HandleConfirmRequested;
+        preparationCommandSource.BackSelectionPressed -= HandleBackRequested;
     }
 
     private void HandleMenuToggleRequested()
@@ -301,7 +298,7 @@ public sealed class AbilityOfferSelectionFlow
 
     private bool CanInteractWithMenu(bool requireAvailablePoints)
     {
-        if (!isEnabled || !inputReader || !abilityController) return false;
+        if (!isEnabled || preparationCommandSource == null || !abilityController) return false;
         if (requireAvailablePoints && pointsProgression.AvailableAbilityPoints <= 0) return false;
 
         return isMenuInteractionAllowed();

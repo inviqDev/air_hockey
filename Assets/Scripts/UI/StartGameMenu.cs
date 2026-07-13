@@ -139,11 +139,11 @@ public sealed class StartGameMenu : MenuViewBase
 
         var participantOneSlot = GetSlotForSide(participantOneSide);
 
-        var participantOneControlScheme = playerTwoControlType == PlayerTwoControlType.Ai
-            ? PlayerControlScheme.WasdAndArrows
-            : GetSideDerivedHumanControlScheme(participantOneSide);
+        var participantOneInputLayout = playerTwoControlType == PlayerTwoControlType.Ai
+            ? InputLayout.Wasd
+            : GetSideDerivedHumanInputLayout(participantOneSide);
 
-        var participantOneSetup = MatchParticipantSetup.CreateHumanSetup(participantOneId, participantOneControlScheme);
+        var participantOneSetup = MatchParticipantSetup.CreateHumanSetup(participantOneId, participantOneInputLayout);
 
         var participantTwoSide = SideUtility.Opposite(participantOneSide);
         var participantTwoSlot = GetSlotForSide(participantTwoSide);
@@ -151,7 +151,7 @@ public sealed class StartGameMenu : MenuViewBase
         var participantTwoSetup = playerTwoControlType == PlayerTwoControlType.Ai
             ? MatchParticipantSetup.CreateAiSetup(participantTwoId)
             : MatchParticipantSetup.CreateHumanSetup(
-                participantTwoId, GetSideDerivedHumanControlScheme(participantTwoSide));
+                participantTwoId, GetSideDerivedHumanInputLayout(participantTwoSide));
 
         var roster = new ParticipantRoster(participantOneSetup, participantTwoSetup);
 
@@ -172,12 +172,12 @@ public sealed class StartGameMenu : MenuViewBase
         };
     }
 
-    private static PlayerControlScheme GetSideDerivedHumanControlScheme(PlayerSide side)
+    private static InputLayout GetSideDerivedHumanInputLayout(PlayerSide side)
     {
         return side switch
         {
-            PlayerSide.Left => PlayerControlScheme.Wasd,
-            PlayerSide.Right => PlayerControlScheme.Arrows,
+            PlayerSide.Left => InputLayout.Wasd,
+            PlayerSide.Right => InputLayout.Arrows,
             _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unsupported player side.")
         };
     }

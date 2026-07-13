@@ -92,7 +92,7 @@ public sealed class RoundController : MonoBehaviour
 
         if (participantSetup.IsHuman)
         {
-            setupContext = new StrikerSetupContext(side, puck, participantSetup.GetRequiredHumanControlScheme());
+            setupContext = new StrikerSetupContext(side, puck, participantSetup.GetRequiredHumanInputLayout());
             striker = gameplayItemPool.TryGetFromPool(playerStrikerPrefab, position, Quaternion.identity);
         }
         else if (participantSetup.IsAi)

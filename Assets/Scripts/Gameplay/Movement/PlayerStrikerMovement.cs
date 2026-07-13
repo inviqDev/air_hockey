@@ -13,7 +13,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
             inputReader = GetComponent<PlayerInputReader>();
     }
 
-    public bool Initialize(PlayerControlScheme controlScheme)
+    public bool Initialize(InputLayout inputLayout)
     {
         if (!inputReader)
             inputReader = GetComponent<PlayerInputReader>();
@@ -29,7 +29,7 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         currentMoveDirection = Vector2.zero;
         SetCurrentMoveDirection(currentMoveDirection);
 
-        inputReader.Initialize(controlScheme);
+        inputReader.Initialize(inputLayout);
         inputReader.MoveInputChanged += HandleMoveInputChanged;
 
         currentMoveDirection = inputReader.CurrentMoveInput;

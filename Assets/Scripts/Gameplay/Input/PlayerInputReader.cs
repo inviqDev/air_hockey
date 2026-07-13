@@ -1,13 +1,6 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
-
-public enum PlayerInputMode
-{
-    Disabled,
-    Gameplay,
-    Intermission
-}
 
 public sealed class PlayerInputReader : MonoBehaviour
 {
@@ -20,46 +13,33 @@ public sealed class PlayerInputReader : MonoBehaviour
     public event Action AbilitySelectionBackPressed;
     public event Action ReadyToggleRequested;
 
-    
     private InputActions inputActions;
-    
-    private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
     private PlayerInputMode currentInputMode = PlayerInputMode.Disabled;
-    
-    private InputAction moveActionPlayerOne;
-    private InputAction moveActionPlayerTwo;
-    
-    private InputAction[] abilitySlotActionsPlayerOne;
-    private InputAction[] abilitySlotActionsPlayerTwo;
-    
-    private InputAction leftAbilitySelectionMenuAction;
-    private InputAction abilityMenuActionPlayerTwo;
-    private InputAction leftAbilitySelectionPreviousAction;
-    private InputAction leftAbilitySelectionNextAction;
-    private InputAction rightAbilitySelectionPreviousAction;
-    private InputAction rightAbilitySelectionNextAction;
-    private InputAction leftAbilitySelectionConfirmAction;
-    private InputAction leftAbilitySelectionBackAction;
-    private InputAction rightAbilitySelectionConfirmAction;
-    private InputAction rightAbilitySelectionBackAction;
-    private InputAction leftReadyToggleAction;
-    private InputAction rightReadyToggleAction;
 
-    private Vector2 playerOneMoveInput;
-    private Vector2 playerTwoMoveInput;
-    
+    private InputAction moveAction;
+    private InputAction[] abilitySlotActions;
+    private InputAction abilitySelectionMenuAction;
+    private InputAction abilitySelectionPreviousAction;
+    private InputAction abilitySelectionNextAction;
+    private InputAction abilitySelectionConfirmAction;
+    private InputAction abilitySelectionBackAction;
+    private InputAction readyToggleAction;
+
+    private Vector2 currentMoveInput;
     private bool isInitialized;
 
-    public Vector2 CurrentMoveInput => ResolveCurrentMoveInput();
+    public Vector2 CurrentMoveInput => currentMoveInput;
 
-    public void Initialize(PlayerControlScheme scheme)
+    public void Initialize(InputLayout layout)
     {
         Shutdown();
 
-        controlScheme = scheme;
         inputActions = new InputActions();
+        inputActions.bindingMask = InputBinding.MaskByGroup(GetBindingGroup(inputActions, layout));
+
         ConfigureActions();
         RefreshCurrentMoveInput();
+
         isInitialized = true;
     }
 
@@ -72,36 +52,25 @@ public sealed class PlayerInputReader : MonoBehaviour
         UnsubscribeAbilitySelectionMenu();
         UnsubscribeAbilitySelectionNavigation();
         UnsubscribeAbilitySelectionDecision();
-        
+
         if (inputActions != null)
         {
             inputActions.Gameplay.Disable();
-            inputActions.Intermission.Disable();
+            inputActions.Preparation.Disable();
             inputActions.Dispose();
             inputActions = null;
         }
 
-        moveActionPlayerOne = null;
-        moveActionPlayerTwo = null;
-        abilitySlotActionsPlayerOne = null;
-        abilitySlotActionsPlayerTwo = null;
-        leftAbilitySelectionMenuAction = null;
-        abilityMenuActionPlayerTwo = null;
-        leftAbilitySelectionPreviousAction = null;
-        leftAbilitySelectionNextAction = null;
-        rightAbilitySelectionPreviousAction = null;
-        rightAbilitySelectionNextAction = null;
-        leftAbilitySelectionConfirmAction = null;
-        leftAbilitySelectionBackAction = null;
-        rightAbilitySelectionConfirmAction = null;
-        rightAbilitySelectionBackAction = null;
-        leftReadyToggleAction = null;
-        rightReadyToggleAction = null;
-        
-        playerOneMoveInput = Vector2.zero;
-        playerTwoMoveInput = Vector2.zero;
+        moveAction = null;
+        abilitySlotActions = null;
+        abilitySelectionMenuAction = null;
+        abilitySelectionPreviousAction = null;
+        abilitySelectionNextAction = null;
+        abilitySelectionConfirmAction = null;
+        abilitySelectionBackAction = null;
+        readyToggleAction = null;
+        currentMoveInput = Vector2.zero;
         currentInputMode = PlayerInputMode.Disabled;
-        
         isInitialized = false;
     }
 
@@ -112,329 +81,165 @@ public sealed class PlayerInputReader : MonoBehaviour
 
     private void ConfigureActions()
     {
-        UnsubscribeMove();
-        UnsubscribeAbilitySlots();
-        UnsubscribeAbilitySelectionMenu();
-        UnsubscribeAbilitySelectionNavigation();
-        UnsubscribeAbilitySelectionDecision();
-
         if (inputActions == null) return;
 
-        moveActionPlayerOne = GetMoveAction(controlScheme);
-        moveActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? inputActions.Gameplay.RightPlayerMove
-            : null;
+        moveAction = inputActions.Gameplay.Move;
 
-        abilitySlotActionsPlayerOne = GetAbilitySlotActions(controlScheme);
-        abilitySlotActionsPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetAbilitySlotActions(PlayerControlScheme.Arrows)
-            : null;
+        abilitySlotActions = new[]
+        {
+            inputActions.Gameplay.AbilitySlot1,
+            inputActions.Gameplay.AbilitySlot2,
+            inputActions.Gameplay.AbilitySlot3,
+            inputActions.Gameplay.AbilitySlot4
+        };
 
-        leftAbilitySelectionMenuAction = GetIntermissionAbilityMenuAction(controlScheme);
-        abilityMenuActionPlayerTwo = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetIntermissionAbilityMenuAction(PlayerControlScheme.Arrows)
-            : null;
-        
-        leftAbilitySelectionPreviousAction = GetIntermissionPreviousAction(controlScheme);
-        leftAbilitySelectionNextAction = GetIntermissionNextAction(controlScheme);
-        
-        rightAbilitySelectionPreviousAction = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetIntermissionPreviousAction(PlayerControlScheme.Arrows)
-            : null;
-        
-        rightAbilitySelectionNextAction = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetIntermissionNextAction(PlayerControlScheme.Arrows)
-            : null;
-        
-        leftAbilitySelectionConfirmAction = GetIntermissionConfirmAction(controlScheme);
-        leftAbilitySelectionBackAction = GetIntermissionBackAction(controlScheme);
-        leftReadyToggleAction = GetIntermissionReadyToggleAction(controlScheme);
-        
-        rightAbilitySelectionConfirmAction = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetIntermissionConfirmAction(PlayerControlScheme.Arrows)
-            : null;
-        
-        rightAbilitySelectionBackAction = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetIntermissionBackAction(PlayerControlScheme.Arrows)
-            : null;
-
-        rightReadyToggleAction = controlScheme == PlayerControlScheme.WasdAndArrows
-            ? GetIntermissionReadyToggleAction(PlayerControlScheme.Arrows)
-            : null;
+        abilitySelectionMenuAction = inputActions.Preparation.AbilityMenu;
+        abilitySelectionPreviousAction = inputActions.Preparation.PreviousOffer;
+        abilitySelectionNextAction = inputActions.Preparation.NextOffer;
+        abilitySelectionConfirmAction = inputActions.Preparation.ConfirmSelection;
+        abilitySelectionBackAction = inputActions.Preparation.BackSelection;
+        readyToggleAction = inputActions.Preparation.ReadyToggle;
 
         SubscribeMove();
         SubscribeAbilitySlots();
-        SubscribeAbilityMenu();
+        SubscribeAbilitySelectionMenu();
         SubscribeAbilitySelectionNavigation();
         SubscribeAbilitySelectionDecision();
     }
 
-    private void UnsubscribeMove()
-    {
-        if (moveActionPlayerOne != null)
-        {
-            moveActionPlayerOne.performed -= OnMovePlayerOneChanged;
-            moveActionPlayerOne.canceled -= OnMovePlayerOneChanged;
-        }
-
-        if (moveActionPlayerTwo != null)
-        {
-            moveActionPlayerTwo.performed -= OnMovePlayerTwoChanged;
-            moveActionPlayerTwo.canceled -= OnMovePlayerTwoChanged;
-        }
-    }
-
     private void SubscribeMove()
     {
-        if (moveActionPlayerOne != null)
-        {
-            moveActionPlayerOne.performed += OnMovePlayerOneChanged;
-            moveActionPlayerOne.canceled += OnMovePlayerOneChanged;
-        }
+        if (moveAction == null) return;
 
-        if (moveActionPlayerTwo != null)
-        {
-            moveActionPlayerTwo.performed += OnMovePlayerTwoChanged;
-            moveActionPlayerTwo.canceled += OnMovePlayerTwoChanged;
-        }
+        moveAction.performed += HandleMoveChanged;
+        moveAction.canceled += HandleMoveChanged;
     }
 
-    private void UnsubscribeAbilitySelectionMenu()
+    private void UnsubscribeMove()
     {
-        if (leftAbilitySelectionMenuAction != null)
-            leftAbilitySelectionMenuAction.performed -= OnLeftAbilitySelectionMenuPerformed;
+        if (moveAction == null) return;
 
-        if (abilityMenuActionPlayerTwo != null)
-            abilityMenuActionPlayerTwo.performed -= OnLeftAbilitySelectionMenuPerformed;
-    }
-
-    private void SubscribeAbilityMenu()
-    {
-        if (leftAbilitySelectionMenuAction != null)
-            leftAbilitySelectionMenuAction.performed += OnLeftAbilitySelectionMenuPerformed;
-
-        if (abilityMenuActionPlayerTwo != null)
-            abilityMenuActionPlayerTwo.performed += OnLeftAbilitySelectionMenuPerformed;
-    }
-
-    private void UnsubscribeAbilitySelectionNavigation()
-    {
-        if (leftAbilitySelectionPreviousAction != null)
-            leftAbilitySelectionPreviousAction.performed -= OnAbilitySelectionPreviousPerformed;
-
-        if (leftAbilitySelectionNextAction != null)
-            leftAbilitySelectionNextAction.performed -= OnAbilitySelectionNextPerformed;
-
-        if (rightAbilitySelectionPreviousAction != null)
-            rightAbilitySelectionPreviousAction.performed -= OnAbilitySelectionPreviousPerformed;
-
-        if (rightAbilitySelectionNextAction != null)
-            rightAbilitySelectionNextAction.performed -= OnAbilitySelectionNextPerformed;
-    }
-
-    private void SubscribeAbilitySelectionNavigation()
-    {
-        if (leftAbilitySelectionPreviousAction != null)
-            leftAbilitySelectionPreviousAction.performed += OnAbilitySelectionPreviousPerformed;
-
-        if (leftAbilitySelectionNextAction != null)
-            leftAbilitySelectionNextAction.performed += OnAbilitySelectionNextPerformed;
-
-        if (rightAbilitySelectionPreviousAction != null)
-            rightAbilitySelectionPreviousAction.performed += OnAbilitySelectionPreviousPerformed;
-
-        if (rightAbilitySelectionNextAction != null)
-            rightAbilitySelectionNextAction.performed += OnAbilitySelectionNextPerformed;
-    }
-
-    private void UnsubscribeAbilitySelectionDecision()
-    {
-        if (leftAbilitySelectionConfirmAction != null)
-            leftAbilitySelectionConfirmAction.performed -= OnAbilitySelectionConfirmPerformed;
-
-        if (leftAbilitySelectionBackAction != null)
-            leftAbilitySelectionBackAction.performed -= OnAbilitySelectionBackPerformed;
-
-        if (rightAbilitySelectionConfirmAction != null)
-            rightAbilitySelectionConfirmAction.performed -= OnAbilitySelectionConfirmPerformed;
-
-        if (rightAbilitySelectionBackAction != null)
-            rightAbilitySelectionBackAction.performed -= OnAbilitySelectionBackPerformed;
-
-        if (leftReadyToggleAction != null)
-            leftReadyToggleAction.performed -= OnReadyTogglePerformed;
-
-        if (rightReadyToggleAction != null)
-            rightReadyToggleAction.performed -= OnReadyTogglePerformed;
-    }
-
-    private void SubscribeAbilitySelectionDecision()
-    {
-        if (leftAbilitySelectionConfirmAction != null)
-            leftAbilitySelectionConfirmAction.performed += OnAbilitySelectionConfirmPerformed;
-
-        if (leftAbilitySelectionBackAction != null)
-            leftAbilitySelectionBackAction.performed += OnAbilitySelectionBackPerformed;
-
-        if (rightAbilitySelectionConfirmAction != null)
-            rightAbilitySelectionConfirmAction.performed += OnAbilitySelectionConfirmPerformed;
-
-        if (rightAbilitySelectionBackAction != null)
-            rightAbilitySelectionBackAction.performed += OnAbilitySelectionBackPerformed;
-
-        if (leftReadyToggleAction != null)
-            leftReadyToggleAction.performed += OnReadyTogglePerformed;
-
-        if (rightReadyToggleAction != null)
-            rightReadyToggleAction.performed += OnReadyTogglePerformed;
-    }
-
-    private void UnsubscribeAbilitySlots()
-    {
-        UnsubscribeAbilitySlots(abilitySlotActionsPlayerOne, HandleAbilitySlotPressedPlayerOne);
-        UnsubscribeAbilitySlots(abilitySlotActionsPlayerTwo, HandleAbilitySlotPressedPlayerTwo);
+        moveAction.performed -= HandleMoveChanged;
+        moveAction.canceled -= HandleMoveChanged;
     }
 
     private void SubscribeAbilitySlots()
     {
-        SubscribeAbilitySlots(abilitySlotActionsPlayerOne, HandleAbilitySlotPressedPlayerOne);
-        SubscribeAbilitySlots(abilitySlotActionsPlayerTwo, HandleAbilitySlotPressedPlayerTwo);
+        if (abilitySlotActions == null) return;
+
+        foreach (var abilitySlotAction in abilitySlotActions)
+            abilitySlotAction.performed += HandleAbilitySlotPressed;
     }
 
-    private InputAction GetMoveAction(PlayerControlScheme scheme)
+    private void UnsubscribeAbilitySlots()
     {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Gameplay.RightPlayerMove
-            : inputActions.Gameplay.LeftPlayerMove;
+        if (abilitySlotActions == null) return;
+
+        foreach (var abilitySlotAction in abilitySlotActions)
+            abilitySlotAction.performed -= HandleAbilitySlotPressed;
     }
 
-    private InputAction[] GetAbilitySlotActions(PlayerControlScheme scheme)
+    private void SubscribeAbilitySelectionMenu()
     {
-        if (scheme == PlayerControlScheme.Arrows)
-        {
-            return new[]
-            {
-                inputActions.Gameplay.RightPlayerAbilitySlot1,
-                inputActions.Gameplay.RightPlayerAbilitySlot2,
-                inputActions.Gameplay.RightPlayerAbilitySlot3,
-                inputActions.Gameplay.RightPlayerAbilitySlot4
-            };
-        }
-
-        return new[]
-        {
-            inputActions.Gameplay.LeftPlayerAbilitySlot1,
-            inputActions.Gameplay.LeftPlayerAbilitySlot2,
-            inputActions.Gameplay.LeftPlayerAbilitySlot3,
-            inputActions.Gameplay.LeftPlayerAbilitySlot4
-        };
+        if (abilitySelectionMenuAction != null)
+            abilitySelectionMenuAction.performed += HandleAbilitySelectionMenuPerformed;
     }
 
-    private InputAction GetIntermissionAbilityMenuAction(PlayerControlScheme scheme)
+    private void UnsubscribeAbilitySelectionMenu()
     {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Intermission.RightPlayerAbilityMenu
-            : inputActions.Intermission.LeftPlayerAbilityMenu;
+        if (abilitySelectionMenuAction != null)
+            abilitySelectionMenuAction.performed -= HandleAbilitySelectionMenuPerformed;
     }
 
-    private InputAction GetIntermissionPreviousAction(PlayerControlScheme scheme)
+    private void SubscribeAbilitySelectionNavigation()
     {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Intermission.RightPlayerPreviousOffer
-            : inputActions.Intermission.LeftPlayerPreviousOffer;
+        if (abilitySelectionPreviousAction != null)
+            abilitySelectionPreviousAction.performed += HandleAbilitySelectionPreviousPerformed;
+
+        if (abilitySelectionNextAction != null)
+            abilitySelectionNextAction.performed += HandleAbilitySelectionNextPerformed;
     }
 
-    private InputAction GetIntermissionNextAction(PlayerControlScheme scheme)
+    private void UnsubscribeAbilitySelectionNavigation()
     {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Intermission.RightPlayerNextOffer
-            : inputActions.Intermission.LeftPlayerNextOffer;
+        if (abilitySelectionPreviousAction != null)
+            abilitySelectionPreviousAction.performed -= HandleAbilitySelectionPreviousPerformed;
+
+        if (abilitySelectionNextAction != null)
+            abilitySelectionNextAction.performed -= HandleAbilitySelectionNextPerformed;
     }
 
-    private InputAction GetIntermissionConfirmAction(PlayerControlScheme scheme)
+    private void SubscribeAbilitySelectionDecision()
     {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Intermission.RightPlayerConfirmSelection
-            : inputActions.Intermission.LeftPlayerConfirmSelection;
+        if (abilitySelectionConfirmAction != null)
+            abilitySelectionConfirmAction.performed += HandleAbilitySelectionConfirmPerformed;
+
+        if (abilitySelectionBackAction != null)
+            abilitySelectionBackAction.performed += HandleAbilitySelectionBackPerformed;
+
+        if (readyToggleAction != null)
+            readyToggleAction.performed += HandleReadyTogglePerformed;
     }
 
-    private InputAction GetIntermissionBackAction(PlayerControlScheme scheme)
+    private void UnsubscribeAbilitySelectionDecision()
     {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Intermission.RightPlayerBackSelection
-            : inputActions.Intermission.LeftPlayerBackSelection;
+        if (abilitySelectionConfirmAction != null)
+            abilitySelectionConfirmAction.performed -= HandleAbilitySelectionConfirmPerformed;
+
+        if (abilitySelectionBackAction != null)
+            abilitySelectionBackAction.performed -= HandleAbilitySelectionBackPerformed;
+
+        if (readyToggleAction != null)
+            readyToggleAction.performed -= HandleReadyTogglePerformed;
     }
 
-    private InputAction GetIntermissionReadyToggleAction(PlayerControlScheme scheme)
+    private void HandleMoveChanged(InputAction.CallbackContext context)
     {
-        return scheme == PlayerControlScheme.Arrows
-            ? inputActions.Intermission.RightPlayerReadyToggle
-            : inputActions.Intermission.LeftPlayerReadyToggle;
+        currentMoveInput = context.ReadValue<Vector2>();
+        MoveInputChanged?.Invoke(currentMoveInput);
     }
 
-    private void OnLeftAbilitySelectionMenuPerformed(InputAction.CallbackContext context)
+    private void HandleAbilitySlotPressed(InputAction.CallbackContext context)
+    {
+        var slotIndex = Array.IndexOf(abilitySlotActions, context.action);
+        if (slotIndex >= 0)
+            AbilitySlotPressed?.Invoke(slotIndex);
+    }
+
+    private void HandleAbilitySelectionMenuPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionMenuPressed?.Invoke();
     }
 
-    private void OnAbilitySelectionPreviousPerformed(InputAction.CallbackContext context)
+    private void HandleAbilitySelectionPreviousPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionPreviousPressed?.Invoke();
     }
 
-    private void OnAbilitySelectionNextPerformed(InputAction.CallbackContext context)
+    private void HandleAbilitySelectionNextPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionNextPressed?.Invoke();
     }
 
-    private void OnAbilitySelectionConfirmPerformed(InputAction.CallbackContext context)
+    private void HandleAbilitySelectionConfirmPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionConfirmPressed?.Invoke();
     }
 
-    private void OnAbilitySelectionBackPerformed(InputAction.CallbackContext context)
+    private void HandleAbilitySelectionBackPerformed(InputAction.CallbackContext context)
     {
         AbilitySelectionBackPressed?.Invoke();
     }
 
-    private void OnReadyTogglePerformed(InputAction.CallbackContext context)
+    private void HandleReadyTogglePerformed(InputAction.CallbackContext context)
     {
         ReadyToggleRequested?.Invoke();
     }
 
-    private void HandleAbilitySlotPressedPlayerOne(InputAction.CallbackContext context)
-    {
-        NotifyAbilitySlotPressed(context, abilitySlotActionsPlayerOne);
-    }
-
-    private void HandleAbilitySlotPressedPlayerTwo(InputAction.CallbackContext context)
-    {
-        NotifyAbilitySlotPressed(context, abilitySlotActionsPlayerTwo);
-    }
-
-    private void OnMovePlayerOneChanged(InputAction.CallbackContext context)
-    {
-        playerOneMoveInput = context.ReadValue<Vector2>();
-        MoveInputChanged?.Invoke(ResolveCurrentMoveInput());
-    }
-
-    private void OnMovePlayerTwoChanged(InputAction.CallbackContext context)
-    {
-        playerTwoMoveInput = context.ReadValue<Vector2>();
-        MoveInputChanged?.Invoke(ResolveCurrentMoveInput());
-    }
-
     private void RefreshCurrentMoveInput()
     {
-        playerOneMoveInput = moveActionPlayerOne != null
-            ? moveActionPlayerOne.ReadValue<Vector2>()
-            : Vector2.zero;
-
-        playerTwoMoveInput = moveActionPlayerTwo != null
-            ? moveActionPlayerTwo.ReadValue<Vector2>()
-            : Vector2.zero;
-
-        MoveInputChanged?.Invoke(ResolveCurrentMoveInput());
+        currentMoveInput = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
+        MoveInputChanged?.Invoke(currentMoveInput);
     }
 
     public void SetInputMode(PlayerInputMode inputMode)
@@ -452,12 +257,10 @@ public sealed class PlayerInputReader : MonoBehaviour
         currentInputMode = inputMode;
 
         inputActions.Gameplay.Disable();
-        inputActions.Intermission.Disable();
+        inputActions.Preparation.Disable();
 
         if (wasGameplayActive && currentInputMode != PlayerInputMode.Gameplay)
-        {
             ClearCurrentMoveInput();
-        }
 
         switch (currentInputMode)
         {
@@ -465,60 +268,25 @@ public sealed class PlayerInputReader : MonoBehaviour
                 inputActions.Gameplay.Enable();
                 RefreshCurrentMoveInput();
                 break;
-            case PlayerInputMode.Intermission:
-                inputActions.Intermission.Enable();
-                break;
-            case PlayerInputMode.Disabled:
-            default:
+            case PlayerInputMode.Preparation:
+                inputActions.Preparation.Enable();
                 break;
         }
     }
 
-    private Vector2 ResolveCurrentMoveInput()
+    private static string GetBindingGroup(InputActions actions, InputLayout layout)
     {
-        var move = playerOneMoveInput;
-        if (moveActionPlayerTwo == null) return move;
-
-        move += playerTwoMoveInput;
-        return Vector2.ClampMagnitude(move, 1f);
+        return layout switch
+        {
+            InputLayout.Wasd => actions.KeyboardWASDScheme.bindingGroup,
+            InputLayout.Arrows => actions.KeyboardArrowsScheme.bindingGroup,
+            _ => throw new ArgumentOutOfRangeException(nameof(layout), layout, "Unsupported input layout.")
+        };
     }
 
     private void ClearCurrentMoveInput()
     {
-        playerOneMoveInput = Vector2.zero;
-        playerTwoMoveInput = Vector2.zero;
-        MoveInputChanged?.Invoke(Vector2.zero);
-    }
-
-    private void NotifyAbilitySlotPressed(InputAction.CallbackContext context, InputAction[] slotActions)
-    {
-        if (slotActions == null) return;
-
-        var slotIndex = Array.IndexOf(slotActions, context.action);
-        if (slotIndex < 0) return;
-
-        AbilitySlotPressed?.Invoke(slotIndex);
-    }
-
-    private static void SubscribeAbilitySlots(InputAction[] slotActions, Action<InputAction.CallbackContext> handler)
-    {
-        if (slotActions == null) return;
-
-        foreach (var slotAction in slotActions)
-        {
-            if (slotAction == null) continue;
-            slotAction.performed += handler;
-        }
-    }
-
-    private static void UnsubscribeAbilitySlots(InputAction[] slotActions, Action<InputAction.CallbackContext> handler)
-    {
-        if (slotActions == null) return;
-
-        foreach (var slotAction in slotActions)
-        {
-            if (slotAction == null) continue;
-            slotAction.performed -= handler;
-        }
+        currentMoveInput = Vector2.zero;
+        MoveInputChanged?.Invoke(currentMoveInput);
     }
 }

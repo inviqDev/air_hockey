@@ -93,16 +93,16 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             ""id"": ""df70fa95-8a34-4494-b137-73ab6b9c7d37"",
             ""actions"": [
                 {
-                    ""name"": ""LeftPlayerMove"",
+                    ""name"": ""Move"",
                     ""type"": ""Value"",
                     ""id"": ""15813dfa-3787-4218-92ea-ec79e4c0e83f"",
-                    ""expectedControlType"": """",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""LeftPlayerAbilitySlot1"",
+                    ""name"": ""AbilitySlot1"",
                     ""type"": ""Button"",
                     ""id"": ""5ce00bb7-2251-49d4-a70d-92d9054cbc9c"",
                     ""expectedControlType"": """",
@@ -111,7 +111,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftPlayerAbilitySlot2"",
+                    ""name"": ""AbilitySlot2"",
                     ""type"": ""Button"",
                     ""id"": ""0bc13d30-fe6b-4c69-b3e7-338a1dbb7b5f"",
                     ""expectedControlType"": """",
@@ -120,7 +120,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftPlayerAbilitySlot3"",
+                    ""name"": ""AbilitySlot3"",
                     ""type"": ""Button"",
                     ""id"": ""e16873cf-86ad-4ce9-b99d-420cf744d6bd"",
                     ""expectedControlType"": """",
@@ -129,54 +129,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftPlayerAbilitySlot4"",
+                    ""name"": ""AbilitySlot4"",
                     ""type"": ""Button"",
                     ""id"": ""8631d3d7-82bd-4ad3-a33b-df3fba25cf68"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerMove"",
-                    ""type"": ""Value"",
-                    ""id"": ""f74e8e15-8999-4df6-b418-d0da01a6ee3e"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""RightPlayerAbilitySlot1"",
-                    ""type"": ""Button"",
-                    ""id"": ""0c4808e5-b9cb-4a86-8596-20e65f29f37b"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerAbilitySlot2"",
-                    ""type"": ""Button"",
-                    ""id"": ""3fc39dfc-1ed2-489f-9a7a-c6f3292fa0c4"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerAbilitySlot3"",
-                    ""type"": ""Button"",
-                    ""id"": ""81723974-1902-427f-bf8f-8363b0886d60"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerAbilitySlot4"",
-                    ""type"": ""Button"",
-                    ""id"": ""fa76ee90-a464-4382-b9f4-c78f1798a7f5"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -190,8 +145,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerMove"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""Move"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -201,8 +156,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerMove"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -212,8 +167,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerMove"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -223,8 +178,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerMove"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -234,8 +189,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerMove"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -245,8 +200,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerAbilitySlot1"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""AbilitySlot1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -256,8 +211,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerAbilitySlot2"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""AbilitySlot2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -267,8 +222,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/3"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerAbilitySlot3"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""AbilitySlot3"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -278,8 +233,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/4"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerAbilitySlot4"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""AbilitySlot4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -289,8 +244,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerMove"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""Move"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -300,8 +255,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/upArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerMove"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -311,8 +266,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/downArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerMove"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -322,8 +277,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/leftArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerMove"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -333,8 +288,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/rightArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerMove"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -344,8 +299,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/numpad4"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerAbilitySlot1"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""AbilitySlot1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -355,8 +310,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/numpad5"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerAbilitySlot2"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""AbilitySlot2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -366,8 +321,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/numpad6"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerAbilitySlot3"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""AbilitySlot3"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -377,19 +332,19 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/numpad8"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerAbilitySlot4"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""AbilitySlot4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
             ]
         },
         {
-            ""name"": ""Intermission"",
+            ""name"": ""Preparation"",
             ""id"": ""4fe67938-3798-4b79-b7ca-57a99f465085"",
             ""actions"": [
                 {
-                    ""name"": ""LeftPlayerAbilityMenu"",
+                    ""name"": ""AbilityMenu"",
                     ""type"": ""Button"",
                     ""id"": ""d08bc474-eab1-4be9-9b53-3aa2a3a5ecb0"",
                     ""expectedControlType"": """",
@@ -398,7 +353,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftPlayerPreviousOffer"",
+                    ""name"": ""PreviousOffer"",
                     ""type"": ""Button"",
                     ""id"": ""514f6694-fbe8-4d11-a5f9-5fbb885d35c0"",
                     ""expectedControlType"": """",
@@ -407,7 +362,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftPlayerNextOffer"",
+                    ""name"": ""NextOffer"",
                     ""type"": ""Button"",
                     ""id"": ""920ebc16-8072-4be2-9130-ee9410dfb13e"",
                     ""expectedControlType"": """",
@@ -416,34 +371,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""RightPlayerAbilityMenu"",
-                    ""type"": ""Button"",
-                    ""id"": ""93f00e86-ac4d-40f6-b0b2-e81987a8d8f5"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerPreviousOffer"",
-                    ""type"": ""Button"",
-                    ""id"": ""8b218531-05f1-4289-a4a9-9330696a0563"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerNextOffer"",
-                    ""type"": ""Button"",
-                    ""id"": ""d8623053-3255-4f6a-a1e4-c5f8d4dfe73b"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""LeftPlayerConfirmSelection"",
+                    ""name"": ""ConfirmSelection"",
                     ""type"": ""Button"",
                     ""id"": ""f5be1a8d-df90-4fd2-b68a-6f2b2dd81752"",
                     ""expectedControlType"": """",
@@ -452,7 +380,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftPlayerBackSelection"",
+                    ""name"": ""BackSelection"",
                     ""type"": ""Button"",
                     ""id"": ""8c414c7b-5fb8-4b98-9528-a27474b73c93"",
                     ""expectedControlType"": """",
@@ -461,36 +389,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""RightPlayerConfirmSelection"",
-                    ""type"": ""Button"",
-                    ""id"": ""7c52d71d-c9f4-4696-b868-eebad0196e56"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerBackSelection"",
-                    ""type"": ""Button"",
-                    ""id"": ""ecb8fbc3-0cdf-46ef-b868-f2ce1dd4c3e1"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""LeftPlayerReadyToggle"",
+                    ""name"": ""ReadyToggle"",
                     ""type"": ""Button"",
                     ""id"": ""f1bb430b-3d99-4254-afbe-e74963f93d31"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RightPlayerReadyToggle"",
-                    ""type"": ""Button"",
-                    ""id"": ""253c67b8-505d-4175-a7a4-b53e6ac40d3d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -504,19 +405,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/tab"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerAbilityMenu"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6dcd3224-3413-4519-9e80-fd34e71de6e5"",
-                    ""path"": ""<Keyboard>/numpad0"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerAbilityMenu"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""AbilityMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -526,8 +416,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerPreviousOffer"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""PreviousOffer"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -537,30 +427,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerNextOffer"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6de4442f-aefb-4fb4-8416-12dcb8577f34"",
-                    ""path"": ""<Keyboard>/leftArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerPreviousOffer"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""359e7985-9f04-4ac9-a97c-4f908dbbfe3e"",
-                    ""path"": ""<Keyboard>/rightArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerNextOffer"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""NextOffer"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -570,8 +438,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerConfirmSelection"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""ConfirmSelection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -581,30 +449,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerBackSelection"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""786c9db9-32cb-456a-b8cc-f3a2e93e0fc2"",
-                    ""path"": ""<Keyboard>/numpadPlus"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerConfirmSelection"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""d6dd1e10-fbb8-4dd1-89d7-cd7c02d13e31"",
-                    ""path"": ""<Keyboard>/numpadMinus"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerBackSelection"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""BackSelection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -614,8 +460,63 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/backquote"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""LeftPlayerReadyToggle"",
+                    ""groups"": ""KeyboardWasd"",
+                    ""action"": ""ReadyToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6dcd3224-3413-4519-9e80-fd34e71de6e5"",
+                    ""path"": ""<Keyboard>/numpad0"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""AbilityMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6de4442f-aefb-4fb4-8416-12dcb8577f34"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""PreviousOffer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""359e7985-9f04-4ac9-a97c-4f908dbbfe3e"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""NextOffer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""786c9db9-32cb-456a-b8cc-f3a2e93e0fc2"",
+                    ""path"": ""<Keyboard>/numpadPlus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""ConfirmSelection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d6dd1e10-fbb8-4dd1-89d7-cd7c02d13e31"",
+                    ""path"": ""<Keyboard>/numpadMinus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""BackSelection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -625,8 +526,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/numpadPeriod"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RightPlayerReadyToggle"",
+                    ""groups"": ""KeyboardArrows"",
+                    ""action"": ""ReadyToggle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -693,41 +594,52 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isOR"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Keyboard WASD"",
+            ""bindingGroup"": ""KeyboardWasd"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Keyboard>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Keyboard Arrows"",
+            ""bindingGroup"": ""KeyboardArrows"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Keyboard>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
         }
     ]
 }");
         // Gameplay
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
-        m_Gameplay_LeftPlayerMove = m_Gameplay.FindAction("LeftPlayerMove", throwIfNotFound: true);
-        m_Gameplay_LeftPlayerAbilitySlot1 = m_Gameplay.FindAction("LeftPlayerAbilitySlot1", throwIfNotFound: true);
-        m_Gameplay_LeftPlayerAbilitySlot2 = m_Gameplay.FindAction("LeftPlayerAbilitySlot2", throwIfNotFound: true);
-        m_Gameplay_LeftPlayerAbilitySlot3 = m_Gameplay.FindAction("LeftPlayerAbilitySlot3", throwIfNotFound: true);
-        m_Gameplay_LeftPlayerAbilitySlot4 = m_Gameplay.FindAction("LeftPlayerAbilitySlot4", throwIfNotFound: true);
-        m_Gameplay_RightPlayerMove = m_Gameplay.FindAction("RightPlayerMove", throwIfNotFound: true);
-        m_Gameplay_RightPlayerAbilitySlot1 = m_Gameplay.FindAction("RightPlayerAbilitySlot1", throwIfNotFound: true);
-        m_Gameplay_RightPlayerAbilitySlot2 = m_Gameplay.FindAction("RightPlayerAbilitySlot2", throwIfNotFound: true);
-        m_Gameplay_RightPlayerAbilitySlot3 = m_Gameplay.FindAction("RightPlayerAbilitySlot3", throwIfNotFound: true);
-        m_Gameplay_RightPlayerAbilitySlot4 = m_Gameplay.FindAction("RightPlayerAbilitySlot4", throwIfNotFound: true);
-        // Intermission
-        m_Intermission = asset.FindActionMap("Intermission", throwIfNotFound: true);
-        m_Intermission_LeftPlayerAbilityMenu = m_Intermission.FindAction("LeftPlayerAbilityMenu", throwIfNotFound: true);
-        m_Intermission_LeftPlayerPreviousOffer = m_Intermission.FindAction("LeftPlayerPreviousOffer", throwIfNotFound: true);
-        m_Intermission_LeftPlayerNextOffer = m_Intermission.FindAction("LeftPlayerNextOffer", throwIfNotFound: true);
-        m_Intermission_RightPlayerAbilityMenu = m_Intermission.FindAction("RightPlayerAbilityMenu", throwIfNotFound: true);
-        m_Intermission_RightPlayerPreviousOffer = m_Intermission.FindAction("RightPlayerPreviousOffer", throwIfNotFound: true);
-        m_Intermission_RightPlayerNextOffer = m_Intermission.FindAction("RightPlayerNextOffer", throwIfNotFound: true);
-        m_Intermission_LeftPlayerConfirmSelection = m_Intermission.FindAction("LeftPlayerConfirmSelection", throwIfNotFound: true);
-        m_Intermission_LeftPlayerBackSelection = m_Intermission.FindAction("LeftPlayerBackSelection", throwIfNotFound: true);
-        m_Intermission_RightPlayerConfirmSelection = m_Intermission.FindAction("RightPlayerConfirmSelection", throwIfNotFound: true);
-        m_Intermission_RightPlayerBackSelection = m_Intermission.FindAction("RightPlayerBackSelection", throwIfNotFound: true);
-        m_Intermission_LeftPlayerReadyToggle = m_Intermission.FindAction("LeftPlayerReadyToggle", throwIfNotFound: true);
-        m_Intermission_RightPlayerReadyToggle = m_Intermission.FindAction("RightPlayerReadyToggle", throwIfNotFound: true);
+        m_Gameplay_Move = m_Gameplay.FindAction("Move", throwIfNotFound: true);
+        m_Gameplay_AbilitySlot1 = m_Gameplay.FindAction("AbilitySlot1", throwIfNotFound: true);
+        m_Gameplay_AbilitySlot2 = m_Gameplay.FindAction("AbilitySlot2", throwIfNotFound: true);
+        m_Gameplay_AbilitySlot3 = m_Gameplay.FindAction("AbilitySlot3", throwIfNotFound: true);
+        m_Gameplay_AbilitySlot4 = m_Gameplay.FindAction("AbilitySlot4", throwIfNotFound: true);
+        // Preparation
+        m_Preparation = asset.FindActionMap("Preparation", throwIfNotFound: true);
+        m_Preparation_AbilityMenu = m_Preparation.FindAction("AbilityMenu", throwIfNotFound: true);
+        m_Preparation_PreviousOffer = m_Preparation.FindAction("PreviousOffer", throwIfNotFound: true);
+        m_Preparation_NextOffer = m_Preparation.FindAction("NextOffer", throwIfNotFound: true);
+        m_Preparation_ConfirmSelection = m_Preparation.FindAction("ConfirmSelection", throwIfNotFound: true);
+        m_Preparation_BackSelection = m_Preparation.FindAction("BackSelection", throwIfNotFound: true);
+        m_Preparation_ReadyToggle = m_Preparation.FindAction("ReadyToggle", throwIfNotFound: true);
     }
 
     ~@InputActions()
     {
         UnityEngine.Debug.Assert(!m_Gameplay.enabled, "This will cause a leak and performance issues, InputActions.Gameplay.Disable() has not been called.");
-        UnityEngine.Debug.Assert(!m_Intermission.enabled, "This will cause a leak and performance issues, InputActions.Intermission.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Preparation.enabled, "This will cause a leak and performance issues, InputActions.Preparation.Disable() has not been called.");
     }
 
     /// <summary>
@@ -803,16 +715,11 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     // Gameplay
     private readonly InputActionMap m_Gameplay;
     private List<IGameplayActions> m_GameplayActionsCallbackInterfaces = new List<IGameplayActions>();
-    private readonly InputAction m_Gameplay_LeftPlayerMove;
-    private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot1;
-    private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot2;
-    private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot3;
-    private readonly InputAction m_Gameplay_LeftPlayerAbilitySlot4;
-    private readonly InputAction m_Gameplay_RightPlayerMove;
-    private readonly InputAction m_Gameplay_RightPlayerAbilitySlot1;
-    private readonly InputAction m_Gameplay_RightPlayerAbilitySlot2;
-    private readonly InputAction m_Gameplay_RightPlayerAbilitySlot3;
-    private readonly InputAction m_Gameplay_RightPlayerAbilitySlot4;
+    private readonly InputAction m_Gameplay_Move;
+    private readonly InputAction m_Gameplay_AbilitySlot1;
+    private readonly InputAction m_Gameplay_AbilitySlot2;
+    private readonly InputAction m_Gameplay_AbilitySlot3;
+    private readonly InputAction m_Gameplay_AbilitySlot4;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -825,45 +732,25 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public GameplayActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/LeftPlayerMove".
+        /// Provides access to the underlying input action "Gameplay/Move".
         /// </summary>
-        public InputAction @LeftPlayerMove => m_Wrapper.m_Gameplay_LeftPlayerMove;
+        public InputAction @Move => m_Wrapper.m_Gameplay_Move;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilitySlot1".
+        /// Provides access to the underlying input action "Gameplay/AbilitySlot1".
         /// </summary>
-        public InputAction @LeftPlayerAbilitySlot1 => m_Wrapper.m_Gameplay_LeftPlayerAbilitySlot1;
+        public InputAction @AbilitySlot1 => m_Wrapper.m_Gameplay_AbilitySlot1;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilitySlot2".
+        /// Provides access to the underlying input action "Gameplay/AbilitySlot2".
         /// </summary>
-        public InputAction @LeftPlayerAbilitySlot2 => m_Wrapper.m_Gameplay_LeftPlayerAbilitySlot2;
+        public InputAction @AbilitySlot2 => m_Wrapper.m_Gameplay_AbilitySlot2;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilitySlot3".
+        /// Provides access to the underlying input action "Gameplay/AbilitySlot3".
         /// </summary>
-        public InputAction @LeftPlayerAbilitySlot3 => m_Wrapper.m_Gameplay_LeftPlayerAbilitySlot3;
+        public InputAction @AbilitySlot3 => m_Wrapper.m_Gameplay_AbilitySlot3;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/LeftPlayerAbilitySlot4".
+        /// Provides access to the underlying input action "Gameplay/AbilitySlot4".
         /// </summary>
-        public InputAction @LeftPlayerAbilitySlot4 => m_Wrapper.m_Gameplay_LeftPlayerAbilitySlot4;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/RightPlayerMove".
-        /// </summary>
-        public InputAction @RightPlayerMove => m_Wrapper.m_Gameplay_RightPlayerMove;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilitySlot1".
-        /// </summary>
-        public InputAction @RightPlayerAbilitySlot1 => m_Wrapper.m_Gameplay_RightPlayerAbilitySlot1;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilitySlot2".
-        /// </summary>
-        public InputAction @RightPlayerAbilitySlot2 => m_Wrapper.m_Gameplay_RightPlayerAbilitySlot2;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilitySlot3".
-        /// </summary>
-        public InputAction @RightPlayerAbilitySlot3 => m_Wrapper.m_Gameplay_RightPlayerAbilitySlot3;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/RightPlayerAbilitySlot4".
-        /// </summary>
-        public InputAction @RightPlayerAbilitySlot4 => m_Wrapper.m_Gameplay_RightPlayerAbilitySlot4;
+        public InputAction @AbilitySlot4 => m_Wrapper.m_Gameplay_AbilitySlot4;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -890,36 +777,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_GameplayActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_GameplayActionsCallbackInterfaces.Add(instance);
-            @LeftPlayerMove.started += instance.OnLeftPlayerMove;
-            @LeftPlayerMove.performed += instance.OnLeftPlayerMove;
-            @LeftPlayerMove.canceled += instance.OnLeftPlayerMove;
-            @LeftPlayerAbilitySlot1.started += instance.OnLeftPlayerAbilitySlot1;
-            @LeftPlayerAbilitySlot1.performed += instance.OnLeftPlayerAbilitySlot1;
-            @LeftPlayerAbilitySlot1.canceled += instance.OnLeftPlayerAbilitySlot1;
-            @LeftPlayerAbilitySlot2.started += instance.OnLeftPlayerAbilitySlot2;
-            @LeftPlayerAbilitySlot2.performed += instance.OnLeftPlayerAbilitySlot2;
-            @LeftPlayerAbilitySlot2.canceled += instance.OnLeftPlayerAbilitySlot2;
-            @LeftPlayerAbilitySlot3.started += instance.OnLeftPlayerAbilitySlot3;
-            @LeftPlayerAbilitySlot3.performed += instance.OnLeftPlayerAbilitySlot3;
-            @LeftPlayerAbilitySlot3.canceled += instance.OnLeftPlayerAbilitySlot3;
-            @LeftPlayerAbilitySlot4.started += instance.OnLeftPlayerAbilitySlot4;
-            @LeftPlayerAbilitySlot4.performed += instance.OnLeftPlayerAbilitySlot4;
-            @LeftPlayerAbilitySlot4.canceled += instance.OnLeftPlayerAbilitySlot4;
-            @RightPlayerMove.started += instance.OnRightPlayerMove;
-            @RightPlayerMove.performed += instance.OnRightPlayerMove;
-            @RightPlayerMove.canceled += instance.OnRightPlayerMove;
-            @RightPlayerAbilitySlot1.started += instance.OnRightPlayerAbilitySlot1;
-            @RightPlayerAbilitySlot1.performed += instance.OnRightPlayerAbilitySlot1;
-            @RightPlayerAbilitySlot1.canceled += instance.OnRightPlayerAbilitySlot1;
-            @RightPlayerAbilitySlot2.started += instance.OnRightPlayerAbilitySlot2;
-            @RightPlayerAbilitySlot2.performed += instance.OnRightPlayerAbilitySlot2;
-            @RightPlayerAbilitySlot2.canceled += instance.OnRightPlayerAbilitySlot2;
-            @RightPlayerAbilitySlot3.started += instance.OnRightPlayerAbilitySlot3;
-            @RightPlayerAbilitySlot3.performed += instance.OnRightPlayerAbilitySlot3;
-            @RightPlayerAbilitySlot3.canceled += instance.OnRightPlayerAbilitySlot3;
-            @RightPlayerAbilitySlot4.started += instance.OnRightPlayerAbilitySlot4;
-            @RightPlayerAbilitySlot4.performed += instance.OnRightPlayerAbilitySlot4;
-            @RightPlayerAbilitySlot4.canceled += instance.OnRightPlayerAbilitySlot4;
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
+            @AbilitySlot1.started += instance.OnAbilitySlot1;
+            @AbilitySlot1.performed += instance.OnAbilitySlot1;
+            @AbilitySlot1.canceled += instance.OnAbilitySlot1;
+            @AbilitySlot2.started += instance.OnAbilitySlot2;
+            @AbilitySlot2.performed += instance.OnAbilitySlot2;
+            @AbilitySlot2.canceled += instance.OnAbilitySlot2;
+            @AbilitySlot3.started += instance.OnAbilitySlot3;
+            @AbilitySlot3.performed += instance.OnAbilitySlot3;
+            @AbilitySlot3.canceled += instance.OnAbilitySlot3;
+            @AbilitySlot4.started += instance.OnAbilitySlot4;
+            @AbilitySlot4.performed += instance.OnAbilitySlot4;
+            @AbilitySlot4.canceled += instance.OnAbilitySlot4;
         }
 
         /// <summary>
@@ -931,36 +803,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="GameplayActions" />
         private void UnregisterCallbacks(IGameplayActions instance)
         {
-            @LeftPlayerMove.started -= instance.OnLeftPlayerMove;
-            @LeftPlayerMove.performed -= instance.OnLeftPlayerMove;
-            @LeftPlayerMove.canceled -= instance.OnLeftPlayerMove;
-            @LeftPlayerAbilitySlot1.started -= instance.OnLeftPlayerAbilitySlot1;
-            @LeftPlayerAbilitySlot1.performed -= instance.OnLeftPlayerAbilitySlot1;
-            @LeftPlayerAbilitySlot1.canceled -= instance.OnLeftPlayerAbilitySlot1;
-            @LeftPlayerAbilitySlot2.started -= instance.OnLeftPlayerAbilitySlot2;
-            @LeftPlayerAbilitySlot2.performed -= instance.OnLeftPlayerAbilitySlot2;
-            @LeftPlayerAbilitySlot2.canceled -= instance.OnLeftPlayerAbilitySlot2;
-            @LeftPlayerAbilitySlot3.started -= instance.OnLeftPlayerAbilitySlot3;
-            @LeftPlayerAbilitySlot3.performed -= instance.OnLeftPlayerAbilitySlot3;
-            @LeftPlayerAbilitySlot3.canceled -= instance.OnLeftPlayerAbilitySlot3;
-            @LeftPlayerAbilitySlot4.started -= instance.OnLeftPlayerAbilitySlot4;
-            @LeftPlayerAbilitySlot4.performed -= instance.OnLeftPlayerAbilitySlot4;
-            @LeftPlayerAbilitySlot4.canceled -= instance.OnLeftPlayerAbilitySlot4;
-            @RightPlayerMove.started -= instance.OnRightPlayerMove;
-            @RightPlayerMove.performed -= instance.OnRightPlayerMove;
-            @RightPlayerMove.canceled -= instance.OnRightPlayerMove;
-            @RightPlayerAbilitySlot1.started -= instance.OnRightPlayerAbilitySlot1;
-            @RightPlayerAbilitySlot1.performed -= instance.OnRightPlayerAbilitySlot1;
-            @RightPlayerAbilitySlot1.canceled -= instance.OnRightPlayerAbilitySlot1;
-            @RightPlayerAbilitySlot2.started -= instance.OnRightPlayerAbilitySlot2;
-            @RightPlayerAbilitySlot2.performed -= instance.OnRightPlayerAbilitySlot2;
-            @RightPlayerAbilitySlot2.canceled -= instance.OnRightPlayerAbilitySlot2;
-            @RightPlayerAbilitySlot3.started -= instance.OnRightPlayerAbilitySlot3;
-            @RightPlayerAbilitySlot3.performed -= instance.OnRightPlayerAbilitySlot3;
-            @RightPlayerAbilitySlot3.canceled -= instance.OnRightPlayerAbilitySlot3;
-            @RightPlayerAbilitySlot4.started -= instance.OnRightPlayerAbilitySlot4;
-            @RightPlayerAbilitySlot4.performed -= instance.OnRightPlayerAbilitySlot4;
-            @RightPlayerAbilitySlot4.canceled -= instance.OnRightPlayerAbilitySlot4;
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
+            @AbilitySlot1.started -= instance.OnAbilitySlot1;
+            @AbilitySlot1.performed -= instance.OnAbilitySlot1;
+            @AbilitySlot1.canceled -= instance.OnAbilitySlot1;
+            @AbilitySlot2.started -= instance.OnAbilitySlot2;
+            @AbilitySlot2.performed -= instance.OnAbilitySlot2;
+            @AbilitySlot2.canceled -= instance.OnAbilitySlot2;
+            @AbilitySlot3.started -= instance.OnAbilitySlot3;
+            @AbilitySlot3.performed -= instance.OnAbilitySlot3;
+            @AbilitySlot3.canceled -= instance.OnAbilitySlot3;
+            @AbilitySlot4.started -= instance.OnAbilitySlot4;
+            @AbilitySlot4.performed -= instance.OnAbilitySlot4;
+            @AbilitySlot4.canceled -= instance.OnAbilitySlot4;
         }
 
         /// <summary>
@@ -995,84 +852,54 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     /// </summary>
     public GameplayActions @Gameplay => new GameplayActions(this);
 
-    // Intermission
-    private readonly InputActionMap m_Intermission;
-    private List<IIntermissionActions> m_IntermissionActionsCallbackInterfaces = new List<IIntermissionActions>();
-    private readonly InputAction m_Intermission_LeftPlayerAbilityMenu;
-    private readonly InputAction m_Intermission_LeftPlayerPreviousOffer;
-    private readonly InputAction m_Intermission_LeftPlayerNextOffer;
-    private readonly InputAction m_Intermission_RightPlayerAbilityMenu;
-    private readonly InputAction m_Intermission_RightPlayerPreviousOffer;
-    private readonly InputAction m_Intermission_RightPlayerNextOffer;
-    private readonly InputAction m_Intermission_LeftPlayerConfirmSelection;
-    private readonly InputAction m_Intermission_LeftPlayerBackSelection;
-    private readonly InputAction m_Intermission_RightPlayerConfirmSelection;
-    private readonly InputAction m_Intermission_RightPlayerBackSelection;
-    private readonly InputAction m_Intermission_LeftPlayerReadyToggle;
-    private readonly InputAction m_Intermission_RightPlayerReadyToggle;
+    // Preparation
+    private readonly InputActionMap m_Preparation;
+    private List<IPreparationActions> m_PreparationActionsCallbackInterfaces = new List<IPreparationActions>();
+    private readonly InputAction m_Preparation_AbilityMenu;
+    private readonly InputAction m_Preparation_PreviousOffer;
+    private readonly InputAction m_Preparation_NextOffer;
+    private readonly InputAction m_Preparation_ConfirmSelection;
+    private readonly InputAction m_Preparation_BackSelection;
+    private readonly InputAction m_Preparation_ReadyToggle;
     /// <summary>
-    /// Provides access to input actions defined in input action map "Intermission".
+    /// Provides access to input actions defined in input action map "Preparation".
     /// </summary>
-    public struct IntermissionActions
+    public struct PreparationActions
     {
         private @InputActions m_Wrapper;
 
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
-        public IntermissionActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        public PreparationActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Intermission/LeftPlayerAbilityMenu".
+        /// Provides access to the underlying input action "Preparation/AbilityMenu".
         /// </summary>
-        public InputAction @LeftPlayerAbilityMenu => m_Wrapper.m_Intermission_LeftPlayerAbilityMenu;
+        public InputAction @AbilityMenu => m_Wrapper.m_Preparation_AbilityMenu;
         /// <summary>
-        /// Provides access to the underlying input action "Intermission/LeftPlayerPreviousOffer".
+        /// Provides access to the underlying input action "Preparation/PreviousOffer".
         /// </summary>
-        public InputAction @LeftPlayerPreviousOffer => m_Wrapper.m_Intermission_LeftPlayerPreviousOffer;
+        public InputAction @PreviousOffer => m_Wrapper.m_Preparation_PreviousOffer;
         /// <summary>
-        /// Provides access to the underlying input action "Intermission/LeftPlayerNextOffer".
+        /// Provides access to the underlying input action "Preparation/NextOffer".
         /// </summary>
-        public InputAction @LeftPlayerNextOffer => m_Wrapper.m_Intermission_LeftPlayerNextOffer;
+        public InputAction @NextOffer => m_Wrapper.m_Preparation_NextOffer;
         /// <summary>
-        /// Provides access to the underlying input action "Intermission/RightPlayerAbilityMenu".
+        /// Provides access to the underlying input action "Preparation/ConfirmSelection".
         /// </summary>
-        public InputAction @RightPlayerAbilityMenu => m_Wrapper.m_Intermission_RightPlayerAbilityMenu;
+        public InputAction @ConfirmSelection => m_Wrapper.m_Preparation_ConfirmSelection;
         /// <summary>
-        /// Provides access to the underlying input action "Intermission/RightPlayerPreviousOffer".
+        /// Provides access to the underlying input action "Preparation/BackSelection".
         /// </summary>
-        public InputAction @RightPlayerPreviousOffer => m_Wrapper.m_Intermission_RightPlayerPreviousOffer;
+        public InputAction @BackSelection => m_Wrapper.m_Preparation_BackSelection;
         /// <summary>
-        /// Provides access to the underlying input action "Intermission/RightPlayerNextOffer".
+        /// Provides access to the underlying input action "Preparation/ReadyToggle".
         /// </summary>
-        public InputAction @RightPlayerNextOffer => m_Wrapper.m_Intermission_RightPlayerNextOffer;
-        /// <summary>
-        /// Provides access to the underlying input action "Intermission/LeftPlayerConfirmSelection".
-        /// </summary>
-        public InputAction @LeftPlayerConfirmSelection => m_Wrapper.m_Intermission_LeftPlayerConfirmSelection;
-        /// <summary>
-        /// Provides access to the underlying input action "Intermission/LeftPlayerBackSelection".
-        /// </summary>
-        public InputAction @LeftPlayerBackSelection => m_Wrapper.m_Intermission_LeftPlayerBackSelection;
-        /// <summary>
-        /// Provides access to the underlying input action "Intermission/RightPlayerConfirmSelection".
-        /// </summary>
-        public InputAction @RightPlayerConfirmSelection => m_Wrapper.m_Intermission_RightPlayerConfirmSelection;
-        /// <summary>
-        /// Provides access to the underlying input action "Intermission/RightPlayerBackSelection".
-        /// </summary>
-        public InputAction @RightPlayerBackSelection => m_Wrapper.m_Intermission_RightPlayerBackSelection;
-        /// <summary>
-        /// Provides access to the underlying input action "Intermission/LeftPlayerReadyToggle".
-        /// </summary>
-        public InputAction @LeftPlayerReadyToggle => m_Wrapper.m_Intermission_LeftPlayerReadyToggle;
-        /// <summary>
-        /// Provides access to the underlying input action "Intermission/RightPlayerReadyToggle".
-        /// </summary>
-        public InputAction @RightPlayerReadyToggle => m_Wrapper.m_Intermission_RightPlayerReadyToggle;
+        public InputAction @ReadyToggle => m_Wrapper.m_Preparation_ReadyToggle;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
-        public InputActionMap Get() { return m_Wrapper.m_Intermission; }
+        public InputActionMap Get() { return m_Wrapper.m_Preparation; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
@@ -1080,9 +907,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
-        /// Implicitly converts an <see ref="IntermissionActions" /> to an <see ref="InputActionMap" /> instance.
+        /// Implicitly converts an <see ref="PreparationActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        public static implicit operator InputActionMap(IntermissionActions set) { return set.Get(); }
+        public static implicit operator InputActionMap(PreparationActions set) { return set.Get(); }
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -1090,47 +917,29 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
         /// </remarks>
-        /// <seealso cref="IntermissionActions" />
-        public void AddCallbacks(IIntermissionActions instance)
+        /// <seealso cref="PreparationActions" />
+        public void AddCallbacks(IPreparationActions instance)
         {
-            if (instance == null || m_Wrapper.m_IntermissionActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_IntermissionActionsCallbackInterfaces.Add(instance);
-            @LeftPlayerAbilityMenu.started += instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.performed += instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.canceled += instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerPreviousOffer.started += instance.OnLeftPlayerPreviousOffer;
-            @LeftPlayerPreviousOffer.performed += instance.OnLeftPlayerPreviousOffer;
-            @LeftPlayerPreviousOffer.canceled += instance.OnLeftPlayerPreviousOffer;
-            @LeftPlayerNextOffer.started += instance.OnLeftPlayerNextOffer;
-            @LeftPlayerNextOffer.performed += instance.OnLeftPlayerNextOffer;
-            @LeftPlayerNextOffer.canceled += instance.OnLeftPlayerNextOffer;
-            @RightPlayerAbilityMenu.started += instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.performed += instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.canceled += instance.OnRightPlayerAbilityMenu;
-            @RightPlayerPreviousOffer.started += instance.OnRightPlayerPreviousOffer;
-            @RightPlayerPreviousOffer.performed += instance.OnRightPlayerPreviousOffer;
-            @RightPlayerPreviousOffer.canceled += instance.OnRightPlayerPreviousOffer;
-            @RightPlayerNextOffer.started += instance.OnRightPlayerNextOffer;
-            @RightPlayerNextOffer.performed += instance.OnRightPlayerNextOffer;
-            @RightPlayerNextOffer.canceled += instance.OnRightPlayerNextOffer;
-            @LeftPlayerConfirmSelection.started += instance.OnLeftPlayerConfirmSelection;
-            @LeftPlayerConfirmSelection.performed += instance.OnLeftPlayerConfirmSelection;
-            @LeftPlayerConfirmSelection.canceled += instance.OnLeftPlayerConfirmSelection;
-            @LeftPlayerBackSelection.started += instance.OnLeftPlayerBackSelection;
-            @LeftPlayerBackSelection.performed += instance.OnLeftPlayerBackSelection;
-            @LeftPlayerBackSelection.canceled += instance.OnLeftPlayerBackSelection;
-            @RightPlayerConfirmSelection.started += instance.OnRightPlayerConfirmSelection;
-            @RightPlayerConfirmSelection.performed += instance.OnRightPlayerConfirmSelection;
-            @RightPlayerConfirmSelection.canceled += instance.OnRightPlayerConfirmSelection;
-            @RightPlayerBackSelection.started += instance.OnRightPlayerBackSelection;
-            @RightPlayerBackSelection.performed += instance.OnRightPlayerBackSelection;
-            @RightPlayerBackSelection.canceled += instance.OnRightPlayerBackSelection;
-            @LeftPlayerReadyToggle.started += instance.OnLeftPlayerReadyToggle;
-            @LeftPlayerReadyToggle.performed += instance.OnLeftPlayerReadyToggle;
-            @LeftPlayerReadyToggle.canceled += instance.OnLeftPlayerReadyToggle;
-            @RightPlayerReadyToggle.started += instance.OnRightPlayerReadyToggle;
-            @RightPlayerReadyToggle.performed += instance.OnRightPlayerReadyToggle;
-            @RightPlayerReadyToggle.canceled += instance.OnRightPlayerReadyToggle;
+            if (instance == null || m_Wrapper.m_PreparationActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PreparationActionsCallbackInterfaces.Add(instance);
+            @AbilityMenu.started += instance.OnAbilityMenu;
+            @AbilityMenu.performed += instance.OnAbilityMenu;
+            @AbilityMenu.canceled += instance.OnAbilityMenu;
+            @PreviousOffer.started += instance.OnPreviousOffer;
+            @PreviousOffer.performed += instance.OnPreviousOffer;
+            @PreviousOffer.canceled += instance.OnPreviousOffer;
+            @NextOffer.started += instance.OnNextOffer;
+            @NextOffer.performed += instance.OnNextOffer;
+            @NextOffer.canceled += instance.OnNextOffer;
+            @ConfirmSelection.started += instance.OnConfirmSelection;
+            @ConfirmSelection.performed += instance.OnConfirmSelection;
+            @ConfirmSelection.canceled += instance.OnConfirmSelection;
+            @BackSelection.started += instance.OnBackSelection;
+            @BackSelection.performed += instance.OnBackSelection;
+            @BackSelection.canceled += instance.OnBackSelection;
+            @ReadyToggle.started += instance.OnReadyToggle;
+            @ReadyToggle.performed += instance.OnReadyToggle;
+            @ReadyToggle.canceled += instance.OnReadyToggle;
         }
 
         /// <summary>
@@ -1139,54 +948,36 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
         /// </remarks>
-        /// <seealso cref="IntermissionActions" />
-        private void UnregisterCallbacks(IIntermissionActions instance)
+        /// <seealso cref="PreparationActions" />
+        private void UnregisterCallbacks(IPreparationActions instance)
         {
-            @LeftPlayerAbilityMenu.started -= instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.performed -= instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerAbilityMenu.canceled -= instance.OnLeftPlayerAbilityMenu;
-            @LeftPlayerPreviousOffer.started -= instance.OnLeftPlayerPreviousOffer;
-            @LeftPlayerPreviousOffer.performed -= instance.OnLeftPlayerPreviousOffer;
-            @LeftPlayerPreviousOffer.canceled -= instance.OnLeftPlayerPreviousOffer;
-            @LeftPlayerNextOffer.started -= instance.OnLeftPlayerNextOffer;
-            @LeftPlayerNextOffer.performed -= instance.OnLeftPlayerNextOffer;
-            @LeftPlayerNextOffer.canceled -= instance.OnLeftPlayerNextOffer;
-            @RightPlayerAbilityMenu.started -= instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.performed -= instance.OnRightPlayerAbilityMenu;
-            @RightPlayerAbilityMenu.canceled -= instance.OnRightPlayerAbilityMenu;
-            @RightPlayerPreviousOffer.started -= instance.OnRightPlayerPreviousOffer;
-            @RightPlayerPreviousOffer.performed -= instance.OnRightPlayerPreviousOffer;
-            @RightPlayerPreviousOffer.canceled -= instance.OnRightPlayerPreviousOffer;
-            @RightPlayerNextOffer.started -= instance.OnRightPlayerNextOffer;
-            @RightPlayerNextOffer.performed -= instance.OnRightPlayerNextOffer;
-            @RightPlayerNextOffer.canceled -= instance.OnRightPlayerNextOffer;
-            @LeftPlayerConfirmSelection.started -= instance.OnLeftPlayerConfirmSelection;
-            @LeftPlayerConfirmSelection.performed -= instance.OnLeftPlayerConfirmSelection;
-            @LeftPlayerConfirmSelection.canceled -= instance.OnLeftPlayerConfirmSelection;
-            @LeftPlayerBackSelection.started -= instance.OnLeftPlayerBackSelection;
-            @LeftPlayerBackSelection.performed -= instance.OnLeftPlayerBackSelection;
-            @LeftPlayerBackSelection.canceled -= instance.OnLeftPlayerBackSelection;
-            @RightPlayerConfirmSelection.started -= instance.OnRightPlayerConfirmSelection;
-            @RightPlayerConfirmSelection.performed -= instance.OnRightPlayerConfirmSelection;
-            @RightPlayerConfirmSelection.canceled -= instance.OnRightPlayerConfirmSelection;
-            @RightPlayerBackSelection.started -= instance.OnRightPlayerBackSelection;
-            @RightPlayerBackSelection.performed -= instance.OnRightPlayerBackSelection;
-            @RightPlayerBackSelection.canceled -= instance.OnRightPlayerBackSelection;
-            @LeftPlayerReadyToggle.started -= instance.OnLeftPlayerReadyToggle;
-            @LeftPlayerReadyToggle.performed -= instance.OnLeftPlayerReadyToggle;
-            @LeftPlayerReadyToggle.canceled -= instance.OnLeftPlayerReadyToggle;
-            @RightPlayerReadyToggle.started -= instance.OnRightPlayerReadyToggle;
-            @RightPlayerReadyToggle.performed -= instance.OnRightPlayerReadyToggle;
-            @RightPlayerReadyToggle.canceled -= instance.OnRightPlayerReadyToggle;
+            @AbilityMenu.started -= instance.OnAbilityMenu;
+            @AbilityMenu.performed -= instance.OnAbilityMenu;
+            @AbilityMenu.canceled -= instance.OnAbilityMenu;
+            @PreviousOffer.started -= instance.OnPreviousOffer;
+            @PreviousOffer.performed -= instance.OnPreviousOffer;
+            @PreviousOffer.canceled -= instance.OnPreviousOffer;
+            @NextOffer.started -= instance.OnNextOffer;
+            @NextOffer.performed -= instance.OnNextOffer;
+            @NextOffer.canceled -= instance.OnNextOffer;
+            @ConfirmSelection.started -= instance.OnConfirmSelection;
+            @ConfirmSelection.performed -= instance.OnConfirmSelection;
+            @ConfirmSelection.canceled -= instance.OnConfirmSelection;
+            @BackSelection.started -= instance.OnBackSelection;
+            @BackSelection.performed -= instance.OnBackSelection;
+            @BackSelection.canceled -= instance.OnBackSelection;
+            @ReadyToggle.started -= instance.OnReadyToggle;
+            @ReadyToggle.performed -= instance.OnReadyToggle;
+            @ReadyToggle.canceled -= instance.OnReadyToggle;
         }
 
         /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="IntermissionActions.UnregisterCallbacks(IIntermissionActions)" />.
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="PreparationActions.UnregisterCallbacks(IPreparationActions)" />.
         /// </summary>
-        /// <seealso cref="IntermissionActions.UnregisterCallbacks(IIntermissionActions)" />
-        public void RemoveCallbacks(IIntermissionActions instance)
+        /// <seealso cref="PreparationActions.UnregisterCallbacks(IPreparationActions)" />
+        public void RemoveCallbacks(IPreparationActions instance)
         {
-            if (m_Wrapper.m_IntermissionActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_PreparationActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
@@ -1196,21 +987,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
         /// </remarks>
-        /// <seealso cref="IntermissionActions.AddCallbacks(IIntermissionActions)" />
-        /// <seealso cref="IntermissionActions.RemoveCallbacks(IIntermissionActions)" />
-        /// <seealso cref="IntermissionActions.UnregisterCallbacks(IIntermissionActions)" />
-        public void SetCallbacks(IIntermissionActions instance)
+        /// <seealso cref="PreparationActions.AddCallbacks(IPreparationActions)" />
+        /// <seealso cref="PreparationActions.RemoveCallbacks(IPreparationActions)" />
+        /// <seealso cref="PreparationActions.UnregisterCallbacks(IPreparationActions)" />
+        public void SetCallbacks(IPreparationActions instance)
         {
-            foreach (var item in m_Wrapper.m_IntermissionActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_PreparationActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_IntermissionActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_PreparationActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
     /// <summary>
-    /// Provides a new <see cref="IntermissionActions" /> instance referencing this action map.
+    /// Provides a new <see cref="PreparationActions" /> instance referencing this action map.
     /// </summary>
-    public IntermissionActions @Intermission => new IntermissionActions(this);
+    public PreparationActions @Preparation => new PreparationActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -1276,6 +1067,32 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_XRSchemeIndex];
         }
     }
+    private int m_KeyboardWASDSchemeIndex = -1;
+    /// <summary>
+    /// Provides access to the input control scheme.
+    /// </summary>
+    /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
+    public InputControlScheme KeyboardWASDScheme
+    {
+        get
+        {
+            if (m_KeyboardWASDSchemeIndex == -1) m_KeyboardWASDSchemeIndex = asset.FindControlSchemeIndex("Keyboard WASD");
+            return asset.controlSchemes[m_KeyboardWASDSchemeIndex];
+        }
+    }
+    private int m_KeyboardArrowsSchemeIndex = -1;
+    /// <summary>
+    /// Provides access to the input control scheme.
+    /// </summary>
+    /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
+    public InputControlScheme KeyboardArrowsScheme
+    {
+        get
+        {
+            if (m_KeyboardArrowsSchemeIndex == -1) m_KeyboardArrowsSchemeIndex = asset.FindControlSchemeIndex("Keyboard Arrows");
+            return asset.controlSchemes[m_KeyboardArrowsSchemeIndex];
+        }
+    }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Gameplay" which allows adding and removing callbacks.
     /// </summary>
@@ -1284,166 +1101,89 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     public interface IGameplayActions
     {
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Move" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerMove(InputAction.CallbackContext context);
+        void OnMove(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerAbilitySlot1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "AbilitySlot1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerAbilitySlot1(InputAction.CallbackContext context);
+        void OnAbilitySlot1(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerAbilitySlot2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "AbilitySlot2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerAbilitySlot2(InputAction.CallbackContext context);
+        void OnAbilitySlot2(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerAbilitySlot3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "AbilitySlot3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerAbilitySlot3(InputAction.CallbackContext context);
+        void OnAbilitySlot3(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerAbilitySlot4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "AbilitySlot4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerAbilitySlot4(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerMove(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerAbilitySlot1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerAbilitySlot1(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerAbilitySlot2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerAbilitySlot2(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerAbilitySlot3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerAbilitySlot3(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerAbilitySlot4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerAbilitySlot4(InputAction.CallbackContext context);
+        void OnAbilitySlot4(InputAction.CallbackContext context);
     }
     /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Intermission" which allows adding and removing callbacks.
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Preparation" which allows adding and removing callbacks.
     /// </summary>
-    /// <seealso cref="IntermissionActions.AddCallbacks(IIntermissionActions)" />
-    /// <seealso cref="IntermissionActions.RemoveCallbacks(IIntermissionActions)" />
-    public interface IIntermissionActions
+    /// <seealso cref="PreparationActions.AddCallbacks(IPreparationActions)" />
+    /// <seealso cref="PreparationActions.RemoveCallbacks(IPreparationActions)" />
+    public interface IPreparationActions
     {
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "AbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerAbilityMenu(InputAction.CallbackContext context);
+        void OnAbilityMenu(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerPreviousOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "PreviousOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerPreviousOffer(InputAction.CallbackContext context);
+        void OnPreviousOffer(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftPlayerNextOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "NextOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerNextOffer(InputAction.CallbackContext context);
+        void OnNextOffer(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "RightPlayerAbilityMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "ConfirmSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerAbilityMenu(InputAction.CallbackContext context);
+        void OnConfirmSelection(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "RightPlayerPreviousOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "BackSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerPreviousOffer(InputAction.CallbackContext context);
+        void OnBackSelection(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "RightPlayerNextOffer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "ReadyToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerNextOffer(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "LeftPlayerConfirmSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerConfirmSelection(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "LeftPlayerBackSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerBackSelection(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerConfirmSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerConfirmSelection(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerBackSelection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerBackSelection(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "LeftPlayerReadyToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftPlayerReadyToggle(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightPlayerReadyToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightPlayerReadyToggle(InputAction.CallbackContext context);
+        void OnReadyToggle(InputAction.CallbackContext context);
     }
 }

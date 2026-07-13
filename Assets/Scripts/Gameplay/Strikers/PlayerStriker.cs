@@ -4,18 +4,18 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerStrikerMovement))]
 public sealed class PlayerStriker : StrikerBase
 {
-    private PlayerControlScheme controlScheme = PlayerControlScheme.Wasd;
+    private InputLayout inputLayout = InputLayout.Wasd;
 
     protected override void ApplySetup(StrikerSetupContext setupContext)
     {
-        controlScheme = setupContext.GetRequiredHumanControlScheme();
+        inputLayout = setupContext.GetRequiredHumanInputLayout();
     }
 
     protected override bool TryInitializeMovement()
     {
         if (Movement is PlayerStrikerMovement movement)
         {
-            var isInitialized = movement.Initialize(controlScheme);
+            var isInitialized = movement.Initialize(inputLayout);
             return isInitialized;
         }
 

@@ -542,7 +542,7 @@ public sealed class MatchManager : MonoBehaviour
         return CurrentPhase switch
         {
             GamePhase.RoundActive => PlayerInputMode.Gameplay,
-            GamePhase.RoundBreak => PlayerInputMode.Intermission,
+            GamePhase.RoundBreak => PlayerInputMode.Preparation,
             GamePhase.NoActiveMatch => PlayerInputMode.Disabled,
             GamePhase.RoundPreparation => PlayerInputMode.Disabled,
             GamePhase.GoalPresentation => PlayerInputMode.Disabled,

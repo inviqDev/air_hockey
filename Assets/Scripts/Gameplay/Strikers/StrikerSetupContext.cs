@@ -2,33 +2,33 @@ using System;
 
 public readonly struct StrikerSetupContext
 {
-    private readonly PlayerControlScheme humanControlScheme;
-    private readonly bool hasHumanControlScheme;
+    private readonly InputLayout inputLayout;
+    private readonly bool hasHumanInputLayout;
 
     public PlayerSide Side { get; }
     public Puck Puck { get; }
 
-    public StrikerSetupContext(PlayerSide side, Puck puck, PlayerControlScheme playerControlScheme)
+    public StrikerSetupContext(PlayerSide side, Puck puck, InputLayout inputLayout)
     {
         Side = side;
         Puck = puck;
-        humanControlScheme = playerControlScheme;
-        hasHumanControlScheme = true;
+        this.inputLayout = inputLayout;
+        hasHumanInputLayout = true;
     }
 
     public StrikerSetupContext(PlayerSide side, Puck puck)
     {
         Side = side;
         Puck = puck;
-        humanControlScheme = default;
-        hasHumanControlScheme = false;
+        inputLayout = default;
+        hasHumanInputLayout = false;
     }
 
-    public PlayerControlScheme GetRequiredHumanControlScheme()
+    public InputLayout GetRequiredHumanInputLayout()
     {
-        if (!hasHumanControlScheme)
-            throw new InvalidOperationException($"{nameof(StrikerSetupContext)} does not contain a human control scheme.");
+        if (!hasHumanInputLayout)
+            throw new InvalidOperationException($"{nameof(StrikerSetupContext)} does not contain a human input layout.");
 
-        return humanControlScheme;
+        return inputLayout;
     }
 }

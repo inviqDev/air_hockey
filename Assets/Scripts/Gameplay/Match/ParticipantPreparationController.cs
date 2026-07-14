@@ -4,19 +4,23 @@ public sealed class ParticipantPreparationController : IDisposable
 {
     private readonly ParticipantAbilitySelectionRuntime abilitySelectionRuntime;
     private readonly ParticipantReadyStatusHandler readyStatusHandler;
-    private readonly HumanPreparationCommandSource preparationCommandSource;
+    private readonly InputReader inputReader;
+    private readonly ParticipantGameplayInputBinding gameplayInputBinding;
 
     public ParticipantPreparationController(
         ParticipantAbilitySelectionRuntime abilitySelectionRuntime,
         ParticipantReadyStatusHandler readyStatusHandler,
-        HumanPreparationCommandSource preparationCommandSource)
+        InputReader inputReader)
     {
         this.abilitySelectionRuntime = abilitySelectionRuntime;
         this.readyStatusHandler = readyStatusHandler;
-        this.preparationCommandSource = preparationCommandSource;
+        this.inputReader = inputReader;
+        gameplayInputBinding = inputReader != null
+            ? new ParticipantGameplayInputBinding(inputReader)
+            : null;
 
-        abilitySelectionRuntime.BindPreparationCommandSource(preparationCommandSource);
-        readyStatusHandler.BindPreparationCommandSource(preparationCommandSource);
+        abilitySelectionRuntime.BindInputReader(inputReader);
+        readyStatusHandler.BindInputReader(inputReader);
     }
 
     public void Enable()
@@ -29,7 +33,7 @@ public sealed class ParticipantPreparationController : IDisposable
     {
         readyStatusHandler.Disable();
         abilitySelectionRuntime.Disable();
-        preparationCommandSource?.Disable();
+        inputReader?.ApplyInputMode(PlayerInputMode.Disabled);
     }
 
     public void Tick(float deltaTime)
@@ -42,25 +46,28 @@ public sealed class ParticipantPreparationController : IDisposable
         abilitySelectionRuntime.BindAbilityController(abilityController);
     }
 
+    public void BindGameplayInputTargets(PlayerStrikerMovement movement, PlayerAbilityController abilityController)
+    {
+        gameplayInputBinding?.Bind(movement, abilityController);
+    }
+
+    public void ClearGameplayInputTargets()
+    {
+        gameplayInputBinding?.Unbind();
+    }
+
     public void ApplyInputMode(PlayerInputMode inputMode)
     {
-        if (preparationCommandSource == null) return;
-
-        if (inputMode == PlayerInputMode.Preparation)
-        {
-            preparationCommandSource.Enable();
-            return;
-        }
-
-        preparationCommandSource.Disable();
+        inputReader?.ApplyInputMode(inputMode);
     }
 
     public void Dispose()
     {
         Disable();
-        abilitySelectionRuntime.BindPreparationCommandSource(null);
-        readyStatusHandler.BindPreparationCommandSource(null);
-        preparationCommandSource?.Dispose();
+        gameplayInputBinding?.Dispose();
+        abilitySelectionRuntime.BindInputReader(null);
+        readyStatusHandler.BindInputReader(null);
+        inputReader?.Dispose();
     }
 
     public void ResetProgression()

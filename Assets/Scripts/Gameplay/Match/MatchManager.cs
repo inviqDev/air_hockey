@@ -109,7 +109,7 @@ public sealed class MatchManager : MonoBehaviour
         {
             participantPreparationCoordinator.Initialize(this);
             participantPreparationCoordinator.Activate();
-            RefreshAbilitySelectionBindings();
+            RefreshParticipantWorldBindings();
         }
 
         SubscribeToGameFlow();
@@ -226,7 +226,7 @@ public sealed class MatchManager : MonoBehaviour
         ConfigureParticipants(configuration);
         ResetCurrentMatchProgress();
         SpawnConfiguredMatch(configuration);
-        RefreshAbilitySelectionBindings();
+        RefreshParticipantWorldBindings();
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
 
         HasActiveMatch = true;
@@ -274,6 +274,8 @@ public sealed class MatchManager : MonoBehaviour
         if (!roundController) return false;
         if (currentParticipantRoster == null) return false;
 
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
+        ClearParticipantWorldBindings();
         roundController.ReturnRoundItemsToPoolForFullMatch();
         return roundController.ActivateRoundItems(configuration);
     }
@@ -284,10 +286,11 @@ public sealed class MatchManager : MonoBehaviour
         ClearCurrentMatchSessionId();
         ResetCurrentMatchProgress();
 
+        ClearParticipantWorldBindings();
+
         if (roundController)
             roundController.ReturnRoundItemsToPoolForFullMatch();
 
-        RefreshAbilitySelectionBindings();
         ClearParticipantCollection();
 
         HasActiveMatch = false;
@@ -382,8 +385,10 @@ public sealed class MatchManager : MonoBehaviour
         if (!hasCurrentConfiguration) return;
         if (currentParticipantRoster == null) return;
 
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
+        ClearParticipantWorldBindings();
         var canStartTurn = roundController && roundController.RebuildRoundItemsForTurn(currentConfiguration);
-        RefreshAbilitySelectionBindings();
+        RefreshParticipantWorldBindings();
         ApplyResolvedPlayerInputMode();
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
@@ -511,20 +516,17 @@ public sealed class MatchManager : MonoBehaviour
 
     private void ApplyPlayerInputMode(PlayerInputMode inputMode)
     {
-        if (roundController)
-            roundController.ApplyPlayerInputMode(inputMode);
-
         if (participantPreparationCoordinator)
             participantPreparationCoordinator.ApplyInputMode(inputMode);
     }
 
-    private void RefreshAbilitySelectionBindings()
+    private void RefreshParticipantWorldBindings()
     {
         if (!participantPreparationCoordinator) return;
 
         if (!roundController || currentParticipantRoster == null)
         {
-            participantPreparationCoordinator.ClearParticipantAbilityControllers();
+            ClearParticipantWorldBindings();
             return;
         }
 
@@ -534,7 +536,34 @@ public sealed class MatchManager : MonoBehaviour
             var participantSlotId = currentConfiguration.SlotAssignments.GetSlotForParticipant(participantId);
             var abilityController = roundController.GetAbilityController(participantSlotId);
             participantPreparationCoordinator.BindParticipantAbilityController(participantId, abilityController);
+
+            if (participant.IsHuman)
+            {
+                if (!roundController.TryGetHumanGameplayTargets(
+                        participantSlotId,
+                        out var movement,
+                        out var gameplayAbilityController))
+                {
+                    throw new InvalidOperationException(
+                        $"{nameof(MatchManager)} could not resolve gameplay targets for human participant " +
+                        $"{participantId} assigned to arena slot {participantSlotId}.");
+                }
+
+                participantPreparationCoordinator.BindParticipantGameplayInputTargets(
+                    participantId, movement, gameplayAbilityController);
+                continue;
+            }
+
+            participantPreparationCoordinator.ClearParticipantGameplayInputTargets(participantId);
         }
+    }
+
+    private void ClearParticipantWorldBindings()
+    {
+        if (!participantPreparationCoordinator) return;
+
+        participantPreparationCoordinator.ClearParticipantGameplayInputTargets();
+        participantPreparationCoordinator.ClearParticipantAbilityControllers();
     }
 
     private PlayerInputMode ResolvePlayerInputMode()
@@ -569,10 +598,12 @@ public sealed class MatchManager : MonoBehaviour
 
         CaptureCompletedMatchResult(result);
 
+        ApplyPlayerInputMode(PlayerInputMode.Disabled);
+        ClearParticipantWorldBindings();
+
         if (roundController)
             roundController.ReturnRoundItemsToPoolForFullMatch();
 
-        RefreshAbilitySelectionBindings();
         ResetParticipantReadyState();
         HasActiveMatch = false;
         ClearParticipantCollection();

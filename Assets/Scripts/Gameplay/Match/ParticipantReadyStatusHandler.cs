@@ -5,7 +5,7 @@ public sealed class ParticipantReadyStatusHandler
     private readonly ParticipantAbilitySelectionRuntime abilitySelectionRuntime;
     private readonly MatchManager matchManager;
 
-    private HumanPreparationCommandSource preparationCommandSource;
+    private InputReader inputReader;
     private bool isEnabled;
 
     public ParticipantReadyStatusHandler(
@@ -27,7 +27,7 @@ public sealed class ParticipantReadyStatusHandler
         isEnabled = true;
 
         abilitySelectionRuntime.MenuOpenStateChanged += HandleMenuOpenStateChanged;
-        SubscribeToPreparationCommandSource();
+        SubscribeToInputReader();
         SubscribeToMatchManager();
 
         RefreshPresentation();
@@ -38,7 +38,7 @@ public sealed class ParticipantReadyStatusHandler
         if (!isEnabled) return;
 
         UnsubscribeFromMatchManager();
-        UnsubscribeFromPreparationCommandSource();
+        UnsubscribeFromInputReader();
         abilitySelectionRuntime.MenuOpenStateChanged -= HandleMenuOpenStateChanged;
 
         isEnabled = false;
@@ -46,27 +46,27 @@ public sealed class ParticipantReadyStatusHandler
         HidePresentation();
     }
 
-    public void BindPreparationCommandSource(HumanPreparationCommandSource nextCommandSource)
+    public void BindInputReader(InputReader nextInputReader)
     {
-        if (preparationCommandSource == nextCommandSource) return;
+        if (inputReader == nextInputReader) return;
 
-        UnsubscribeFromPreparationCommandSource();
-        preparationCommandSource = nextCommandSource;
-        SubscribeToPreparationCommandSource();
+        UnsubscribeFromInputReader();
+        inputReader = nextInputReader;
+        SubscribeToInputReader();
 
         RefreshPresentation();
     }
 
-    private void SubscribeToPreparationCommandSource()
+    private void SubscribeToInputReader()
     {
-        if (!isEnabled || preparationCommandSource == null) return;
-        preparationCommandSource.ReadyToggleRequested += HandleReadyToggleRequested;
+        if (!isEnabled || inputReader == null) return;
+        inputReader.ReadyToggleRequested += HandleReadyToggleRequested;
     }
 
-    private void UnsubscribeFromPreparationCommandSource()
+    private void UnsubscribeFromInputReader()
     {
-        if (preparationCommandSource == null) return;
-        preparationCommandSource.ReadyToggleRequested -= HandleReadyToggleRequested;
+        if (inputReader == null) return;
+        inputReader.ReadyToggleRequested -= HandleReadyToggleRequested;
     }
 
     private void SubscribeToMatchManager()

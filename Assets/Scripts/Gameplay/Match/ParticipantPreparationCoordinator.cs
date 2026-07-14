@@ -128,6 +128,31 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         ForEachParticipantController(controller => controller.BindAbilityController(null));
     }
 
+    public void BindParticipantGameplayInputTargets(
+        ParticipantId participantId,
+        PlayerStrikerMovement movement,
+        PlayerAbilityController abilityController)
+    {
+        if (!isInitialized) return;
+
+        if (!TryGetParticipantController(participantId, out var participantController)) return;
+        participantController.BindGameplayInputTargets(movement, abilityController);
+    }
+
+    public void ClearParticipantGameplayInputTargets()
+    {
+        if (!isInitialized) return;
+        ForEachParticipantController(controller => controller.ClearGameplayInputTargets());
+    }
+
+    public void ClearParticipantGameplayInputTargets(ParticipantId participantId)
+    {
+        if (!isInitialized) return;
+
+        if (!TryGetParticipantController(participantId, out var participantController)) return;
+        participantController.ClearGameplayInputTargets();
+    }
+
     public void ApplyInputMode(PlayerInputMode inputMode)
     {
         if (!isInitialized) return;
@@ -187,11 +212,11 @@ public sealed class ParticipantPreparationCoordinator : MonoBehaviour
         var binding = GetSetupForSlot(slotId);
         var abilitySelectionRuntime = CreateParticipantAbilitySelectionRuntime(participant.ParticipantId, binding);
         var readyStatusHandler = CreateParticipantReadyStatusHandler(participant.ParticipantId, binding, abilitySelectionRuntime);
-        var preparationCommandSource = participant.IsHuman
-            ? new HumanPreparationCommandSource(participant.GetRequiredHumanInputLayout())
+        var inputReader = participant.IsHuman
+            ? new InputReader(participant.GetRequiredHumanInputLayout())
             : null;
 
-        return new ParticipantPreparationController(abilitySelectionRuntime, readyStatusHandler, preparationCommandSource);
+        return new ParticipantPreparationController(abilitySelectionRuntime, readyStatusHandler, inputReader);
     }
 
     private ParticipantAbilitySelectionRuntime CreateParticipantAbilitySelectionRuntime(ParticipantId participantId, ParticipantAbilitySetup binding)

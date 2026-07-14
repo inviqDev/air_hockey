@@ -33,6 +33,7 @@ public sealed class MatchManager : MonoBehaviour
     public event Action<ParticipantId, bool> ParticipantReadyStatusChanged;
 
     private UIManager uiManager;
+    private TemporaryMatchWorld matchWorld;
 
     private MatchConfiguration currentConfiguration;
     private ParticipantRoster currentParticipantRoster;
@@ -56,6 +57,9 @@ public sealed class MatchManager : MonoBehaviour
         matchFlow.PhaseChanged += HandleMatchFlowPhaseChanged;
         matchFlow.RoundStartRequested += HandleRoundStartRequested;
         ValidateReferences();
+
+        if (roundController)
+            matchWorld = new TemporaryMatchWorld(roundController);
     }
 
     private void OnEnable()
@@ -85,7 +89,7 @@ public sealed class MatchManager : MonoBehaviour
         if (isMatchFlowRoundStartPending) return;
         if (turnController.IsTurnActive) return;
 
-        var canStartTurn = roundController && roundController.HasAllRoundItemsActive;
+        var canStartTurn = matchWorld != null && matchWorld.HasAllRoundItemsActive;
         if (hasPreparedTurnState && lastPreparedTurnCanStart == canStartTurn) return;
 
         lastPreparedTurnCanStart = canStartTurn;
@@ -170,7 +174,7 @@ public sealed class MatchManager : MonoBehaviour
 
     private bool PrepareCurrentTurn()
     {
-        var canStartTurn = roundController && roundController.ResetRoundItemsForTurn();
+        var canStartTurn = matchWorld != null && matchWorld.ResetRoundItemsForTurn();
         lastPreparedTurnCanStart = canStartTurn;
         hasPreparedTurnState = true;
 
@@ -271,13 +275,12 @@ public sealed class MatchManager : MonoBehaviour
 
     private bool SpawnConfiguredMatch(MatchConfiguration configuration)
     {
-        if (!roundController) return false;
+        if (matchWorld == null) return false;
         if (currentParticipantRoster == null) return false;
 
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
         ClearParticipantWorldBindings();
-        roundController.ReturnRoundItemsToPoolForFullMatch();
-        return roundController.ActivateRoundItems(configuration);
+        return matchWorld.Activate(configuration);
     }
 
     private void StopCurrentMatch()
@@ -288,8 +291,8 @@ public sealed class MatchManager : MonoBehaviour
 
         ClearParticipantWorldBindings();
 
-        if (roundController)
-            roundController.ReturnRoundItemsToPoolForFullMatch();
+        if (matchWorld != null)
+            matchWorld.ReturnRoundItemsToPoolForFullMatch();
 
         ClearParticipantCollection();
 
@@ -387,7 +390,7 @@ public sealed class MatchManager : MonoBehaviour
 
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
         ClearParticipantWorldBindings();
-        var canStartTurn = roundController && roundController.RebuildRoundItemsForTurn(currentConfiguration);
+        var canStartTurn = matchWorld != null && matchWorld.RebuildRoundItemsForTurn();
         RefreshParticipantWorldBindings();
         ApplyResolvedPlayerInputMode();
         lastPreparedTurnCanStart = canStartTurn;
@@ -505,8 +508,8 @@ public sealed class MatchManager : MonoBehaviour
         if (inGameMenu)
             inGameMenu.ApplyOverlayState(CurrentOverlay);
 
-        if (roundController)
-            roundController.SetAbilityPauseState(CurrentOverlay != GameOverlay.None);
+        if (matchWorld != null)
+            matchWorld.SetAbilityPauseState(CurrentOverlay != GameOverlay.None);
     }
 
     private void ApplyResolvedPlayerInputMode()
@@ -524,7 +527,7 @@ public sealed class MatchManager : MonoBehaviour
     {
         if (!participantPreparationCoordinator) return;
 
-        if (!roundController || currentParticipantRoster == null)
+        if (matchWorld == null || currentParticipantRoster == null)
         {
             ClearParticipantWorldBindings();
             return;
@@ -533,20 +536,19 @@ public sealed class MatchManager : MonoBehaviour
         foreach (var participant in currentParticipantRoster.Participants)
         {
             var participantId = participant.ParticipantId;
-            var participantSlotId = currentConfiguration.SlotAssignments.GetSlotForParticipant(participantId);
-            var abilityController = roundController.GetAbilityController(participantSlotId);
+            var abilityController = matchWorld.GetAbilityController(participantId);
             participantPreparationCoordinator.BindParticipantAbilityController(participantId, abilityController);
 
             if (participant.IsHuman)
             {
-                if (!roundController.TryGetHumanGameplayTargets(
-                        participantSlotId,
+                if (!matchWorld.TryGetHumanGameplayTargets(
+                        participantId,
                         out var movement,
                         out var gameplayAbilityController))
                 {
                     throw new InvalidOperationException(
                         $"{nameof(MatchManager)} could not resolve gameplay targets for human participant " +
-                        $"{participantId} assigned to arena slot {participantSlotId}.");
+                        $"{participantId}.");
                 }
 
                 participantPreparationCoordinator.BindParticipantGameplayInputTargets(
@@ -601,8 +603,8 @@ public sealed class MatchManager : MonoBehaviour
         ApplyPlayerInputMode(PlayerInputMode.Disabled);
         ClearParticipantWorldBindings();
 
-        if (roundController)
-            roundController.ReturnRoundItemsToPoolForFullMatch();
+        if (matchWorld != null)
+            matchWorld.ReturnRoundItemsToPoolForFullMatch();
 
         ResetParticipantReadyState();
         HasActiveMatch = false;

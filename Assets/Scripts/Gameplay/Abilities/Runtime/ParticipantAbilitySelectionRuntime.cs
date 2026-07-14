@@ -63,9 +63,9 @@ public sealed class ParticipantAbilitySelectionRuntime
         RefreshHud();
     }
 
-    public void BindPreparationCommandSource(HumanPreparationCommandSource commandSource)
+    public void BindInputReader(InputReader inputReader)
     {
-        offerSelectionFlow.BindPreparationCommandSource(commandSource);
+        offerSelectionFlow.BindInputReader(inputReader);
         InvalidateHudRenderCache();
         RefreshHud();
     }

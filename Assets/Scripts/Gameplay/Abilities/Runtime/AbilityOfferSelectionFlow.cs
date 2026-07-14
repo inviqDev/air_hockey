@@ -14,7 +14,7 @@ public sealed class AbilityOfferSelectionFlow
     private readonly AbilityOfferSelectionSession offerSelectionSession = new();
 
     private PlayerAbilityController abilityController;
-    private HumanPreparationCommandSource preparationCommandSource;
+    private InputReader inputReader;
     private bool isEnabled;
 
     public event Action<bool> MenuOpenStateChanged;
@@ -45,7 +45,7 @@ public sealed class AbilityOfferSelectionFlow
         isEnabled = true;
 
         SubscribeToHud();
-        SubscribeToPreparationCommandSource();
+        SubscribeToInputReader();
     }
 
     public void Disable()
@@ -53,7 +53,7 @@ public sealed class AbilityOfferSelectionFlow
         if (!isEnabled) return;
 
         CloseMenu();
-        UnsubscribeFromPreparationCommandSource();
+        UnsubscribeFromInputReader();
         UnsubscribeFromHud();
 
         isEnabled = false;
@@ -68,17 +68,17 @@ public sealed class AbilityOfferSelectionFlow
         abilityController = controller;
     }
 
-    public void BindPreparationCommandSource(HumanPreparationCommandSource nextCommandSource)
+    public void BindInputReader(InputReader nextInputReader)
     {
-        if (preparationCommandSource == nextCommandSource) return;
+        if (inputReader == nextInputReader) return;
 
         if (isEnabled)
-            UnsubscribeFromPreparationCommandSource();
+            UnsubscribeFromInputReader();
 
-        preparationCommandSource = nextCommandSource;
+        inputReader = nextInputReader;
 
         if (isEnabled)
-            SubscribeToPreparationCommandSource();
+            SubscribeToInputReader();
     }
 
     public void CloseMenu()
@@ -108,26 +108,26 @@ public sealed class AbilityOfferSelectionFlow
         participantHud.PlusAbilityButtonClicked -= HandleMenuToggleRequested;
     }
 
-    private void SubscribeToPreparationCommandSource()
+    private void SubscribeToInputReader()
     {
-        if (preparationCommandSource == null) return;
+        if (inputReader == null) return;
 
-        preparationCommandSource.AbilityMenuPressed += HandleMenuToggleRequested;
-        preparationCommandSource.PreviousOfferPressed += HandlePreviousSelectionRequested;
-        preparationCommandSource.NextOfferPressed += HandleNextSelectionRequested;
-        preparationCommandSource.ConfirmSelectionPressed += HandleConfirmRequested;
-        preparationCommandSource.BackSelectionPressed += HandleBackRequested;
+        inputReader.AbilityMenuPressed += HandleMenuToggleRequested;
+        inputReader.PreviousOfferPressed += HandlePreviousSelectionRequested;
+        inputReader.NextOfferPressed += HandleNextSelectionRequested;
+        inputReader.ConfirmSelectionPressed += HandleConfirmRequested;
+        inputReader.BackSelectionPressed += HandleBackRequested;
     }
 
-    private void UnsubscribeFromPreparationCommandSource()
+    private void UnsubscribeFromInputReader()
     {
-        if (preparationCommandSource == null) return;
+        if (inputReader == null) return;
 
-        preparationCommandSource.AbilityMenuPressed -= HandleMenuToggleRequested;
-        preparationCommandSource.PreviousOfferPressed -= HandlePreviousSelectionRequested;
-        preparationCommandSource.NextOfferPressed -= HandleNextSelectionRequested;
-        preparationCommandSource.ConfirmSelectionPressed -= HandleConfirmRequested;
-        preparationCommandSource.BackSelectionPressed -= HandleBackRequested;
+        inputReader.AbilityMenuPressed -= HandleMenuToggleRequested;
+        inputReader.PreviousOfferPressed -= HandlePreviousSelectionRequested;
+        inputReader.NextOfferPressed -= HandleNextSelectionRequested;
+        inputReader.ConfirmSelectionPressed -= HandleConfirmRequested;
+        inputReader.BackSelectionPressed -= HandleBackRequested;
     }
 
     private void HandleMenuToggleRequested()
@@ -298,7 +298,7 @@ public sealed class AbilityOfferSelectionFlow
 
     private bool CanInteractWithMenu(bool requireAvailablePoints)
     {
-        if (!isEnabled || preparationCommandSource == null || !abilityController) return false;
+        if (!isEnabled || inputReader == null || !abilityController) return false;
         if (requireAvailablePoints && pointsProgression.AvailableAbilityPoints <= 0) return false;
 
         return isMenuInteractionAllowed();

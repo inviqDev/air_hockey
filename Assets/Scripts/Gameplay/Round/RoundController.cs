@@ -29,7 +29,6 @@ public sealed class RoundController : MonoBehaviour
     private StrikerBase leftStriker;
     private StrikerBase rightStriker;
     private bool isAbilityPauseStateActive;
-    private PlayerInputMode currentInputMode = PlayerInputMode.Disabled;
 
     private readonly Pool gameplayItemPool = new();
 
@@ -74,7 +73,6 @@ public sealed class RoundController : MonoBehaviour
         rightStriker = ActivateStrikerFromPool(participantSetup, PlayerSide.Right, spawnPosition);
         BindAbilityHud(PlayerSide.Right, rightStriker);
 
-        ApplyPlayerInputContextToActiveReaders();
     }
 
     private static MatchParticipantSetup GetParticipantForSlot(MatchConfiguration configuration, ArenaSlotId slotId)
@@ -92,7 +90,7 @@ public sealed class RoundController : MonoBehaviour
 
         if (participantSetup.IsHuman)
         {
-            setupContext = new StrikerSetupContext(side, puck, participantSetup.GetRequiredHumanInputLayout());
+            setupContext = new StrikerSetupContext(side, puck);
             striker = gameplayItemPool.TryGetFromPool(playerStrikerPrefab, position, Quaternion.identity);
         }
         else if (participantSetup.IsAi)
@@ -160,17 +158,29 @@ public sealed class RoundController : MonoBehaviour
         ApplyAbilityPauseState(rightStriker);
     }
 
-    public void ApplyPlayerInputMode(PlayerInputMode inputMode)
-    {
-        currentInputMode = inputMode;
-        ApplyPlayerInputContextToActiveReaders();
-    }
-
     public PlayerAbilityController GetAbilityController(ArenaSlotId slotId)
     {
         var side = GetSideForSlot(slotId);
         var striker = side == PlayerSide.Left ? leftStriker : rightStriker;
         return striker ? striker.AbilityController : null;
+    }
+
+    public bool TryGetHumanGameplayTargets(
+        ArenaSlotId slotId,
+        out PlayerStrikerMovement movement,
+        out PlayerAbilityController abilityController)
+    {
+        var side = GetSideForSlot(slotId);
+        var striker = side == PlayerSide.Left ? leftStriker : rightStriker;
+
+        movement = null;
+        abilityController = null;
+
+        if (!striker) return false;
+        if (!striker.TryGetComponent(out movement)) return false;
+
+        abilityController = striker.AbilityController;
+        return abilityController;
     }
 
     public void ResetRoundItemsToStartPositions()
@@ -315,26 +325,6 @@ public sealed class RoundController : MonoBehaviour
 
         var abilityController = striker.AbilityController;
         abilityController?.SetPaused(isAbilityPauseStateActive);
-    }
-
-    private void ApplyPlayerInputContextToActiveReaders()
-    {
-        var leftReader = GetPlayerInputReader(leftStriker);
-        var rightReader = GetPlayerInputReader(rightStriker);
-
-        if (leftReader)
-            leftReader.SetInputMode(currentInputMode);
-
-        if (rightReader && rightReader != leftReader)
-            rightReader.SetInputMode(currentInputMode);
-    }
-
-    private static PlayerInputReader GetPlayerInputReader(StrikerBase striker)
-    {
-        if (!striker) return null;
-
-        var abilityController = striker.AbilityController;
-        return abilityController ? abilityController.InputReader : null;
     }
 
     private void ValidateReferences()

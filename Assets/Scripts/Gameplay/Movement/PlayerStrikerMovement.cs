@@ -1,45 +1,16 @@
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerInputReader))]
 public sealed class PlayerStrikerMovement : StrikerMovement
 {
-    [SerializeField] private PlayerInputReader inputReader;
-
     private Vector2 currentMoveDirection;
 
-    private void Reset()
+    public bool Initialize()
     {
-        if (!inputReader)
-            inputReader = GetComponent<PlayerInputReader>();
-    }
-
-    public bool Initialize(InputLayout inputLayout)
-    {
-        if (!inputReader)
-            inputReader = GetComponent<PlayerInputReader>();
-
-        if (!inputReader)
-        {
-            Debug.LogError($"{nameof(PlayerStrikerMovement)} on {name} requires a {nameof(PlayerInputReader)} component.", this);
-            return false;
-        }
-
-        DisconnectInputEvents();
-
         currentMoveDirection = Vector2.zero;
         SetCurrentMoveDirection(currentMoveDirection);
 
-        inputReader.Initialize(inputLayout);
-        inputReader.MoveInputChanged += HandleMoveInputChanged;
-
-        currentMoveDirection = inputReader.CurrentMoveInput;
-        SetCurrentMoveDirection(currentMoveDirection);
-
         if (!base.InitializeStrikerMovement())
-        {
-            DisconnectInputEvents();
             return false;
-        }
 
         UpdateMovementLoopState();
         return true;
@@ -54,9 +25,25 @@ public sealed class PlayerStrikerMovement : StrikerMovement
         UpdateMovementLoopState();
     }
 
-    private void OnDestroy()
+    public void SetMoveInput(Vector2 moveDirection)
     {
-        DisconnectInputEvents();
+        currentMoveDirection = moveDirection;
+        SetCurrentMoveDirection(currentMoveDirection);
+
+        if (!IsMovementAllowed) return;
+
+        if (moveDirection.sqrMagnitude <= 0.0001f && !IsDashActive)
+            StopMovement();
+
+        UpdateMovementLoopState();
+    }
+
+    public void ClearMoveInput()
+    {
+        currentMoveDirection = Vector2.zero;
+        SetCurrentMoveDirection(currentMoveDirection);
+        StopMovement();
+        UpdateMovementLoopState();
     }
 
     protected override void UpdateMovementLoopState()
@@ -81,32 +68,12 @@ public sealed class PlayerStrikerMovement : StrikerMovement
 
     protected override void HandleMovementStopped()
     {
+        ClearMoveInput();
     }
 
     protected override void HandleMovementReset()
     {
-        base.HandleMovementReset();
-    }
-
-    private void HandleMoveInputChanged(Vector2 moveDirection)
-    {
-        currentMoveDirection = moveDirection;
-        SetCurrentMoveDirection(currentMoveDirection);
-
-        if (!IsMovementAllowed) return;
-
-        if (moveDirection.sqrMagnitude <= 0.0001f && !IsDashActive)
-            StopMovement();
-
-        UpdateMovementLoopState();
-    }
-
-    private void DisconnectInputEvents()
-    {
-        if (!inputReader) return;
-
-        inputReader.MoveInputChanged -= HandleMoveInputChanged;
-        inputReader.Shutdown();
+        ClearMoveInput();
     }
 
     private bool CanMoveThisFrame()

@@ -19,9 +19,14 @@ public sealed class AiStriker : StrikerBase
 
         if (aiCommandSource)
         {
-            aiCommandSource.SetStrikerSide(setupContext.Side);
-            aiCommandSource.SetCurrentPuck(setupContext.Puck);
+            aiCommandSource.BindWorld(setupContext.Side, setupContext.Puck);
         }
+    }
+
+    protected override void OnBeforeReturnToPool()
+    {
+        if (aiCommandSource)
+            aiCommandSource.UnbindWorld();
     }
 
     protected override void ResetCustomState()

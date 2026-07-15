@@ -65,6 +65,10 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
     {
     }
 
+    protected virtual void OnBeforeReturnToPool()
+    {
+    }
+
     protected abstract bool TryInitializeMovement();
     protected abstract void ApplySetup(StrikerSetupContext setupContext);
 
@@ -78,6 +82,8 @@ public abstract class StrikerBase : MonoBehaviour, IPoolable
 
     public void OnMoveToPool()
     {
+        OnBeforeReturnToPool();
+
         if (!TryCacheReferences()) return;
 
         if (strikerTweenAnimator)

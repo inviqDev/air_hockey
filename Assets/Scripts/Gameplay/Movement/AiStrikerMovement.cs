@@ -27,6 +27,12 @@ public sealed class AiStrikerMovement : StrikerMovement
 
     private void FixedUpdate()
     {
+        if (!aiCommandSource || !aiCommandSource.IsWorldBound)
+        {
+            UpdateMovementLoopState();
+            return;
+        }
+
         var command = aiCommandSource.ReadCommand();
         ExecuteMovementStep(command);
         UpdateMovementLoopState();
@@ -34,6 +40,6 @@ public sealed class AiStrikerMovement : StrikerMovement
 
     protected override void UpdateMovementLoopState()
     {
-        enabled = IsInitialized && IsMovementAllowed && aiCommandSource;
+        enabled = IsInitialized && IsMovementAllowed && aiCommandSource && aiCommandSource.IsWorldBound;
     }
 }

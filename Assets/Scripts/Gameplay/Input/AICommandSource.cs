@@ -3,27 +3,25 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class AICommandSource : MonoBehaviour
 {
-    [Header("References")] [SerializeField]
-    private Puck puck;
-
-    [Header("Positions")] [SerializeField] private Vector2 defensivePosition = new(-7.5f, 0f);
+    [Header("Positions")]
+    [SerializeField] private Vector2 defensivePosition = new(-7.5f, 0f);
     [SerializeField] private float centerX = 0f;
 
-    [Header("AI Tuning")] [SerializeField, Range(0f, 1f)]
-    private float aggression = 0.95f;
+    [Header("AI Tuning")]
+    [SerializeField, Range(0f, 1f)] private float aggression = 0.95f;
 
     [SerializeField] private float predictionTime = 0.28f;
     [SerializeField] private float threatTrackSpeedThreshold = 0.08f;
     [SerializeField] private float commitDistance = 3f;
 
-    [Header("Guard Position")] [SerializeField]
-    private float guardForwardOffset = 0.85f;
+    [Header("Guard Position")]
+    [SerializeField] private float guardForwardOffset = 0.85f;
 
     [SerializeField] private float guardYFollow = 0.45f;
     [SerializeField] private float guardYDeadZone = 0.9f;
 
-    [Header("Strike Logic")] [SerializeField]
-    private Vector2 attackDirection = Vector2.right;
+    [Header("Strike Logic")]
+    [SerializeField] private Vector2 attackDirection = Vector2.right;
 
     [SerializeField] private float setupDistance = 0.7f;
     [SerializeField] private float behindPuckTolerance = 0.3f;
@@ -31,15 +29,20 @@ public sealed class AICommandSource : MonoBehaviour
     [SerializeField] private float sideStepDistance = 0.95f;
     [SerializeField] private float goalCenteringWeight = 0.35f;
 
-    [Header("Dash")] [SerializeField] private float dashDistance = 1.35f;
+    [Header("Dash")]
+    [SerializeField] private float dashDistance = 1.35f;
     [SerializeField] private float dashCooldown = 0.55f;
     [SerializeField, Range(-1f, 1f)] private float dashDirectionThreshold = 0.25f;
+
+    private Rigidbody2D aiRigidbody;
+    private CircleCollider2D aiCircleCollider;
 
     private PlayerSide side = PlayerSide.Left;
     private float remainingDashCooldown;
 
-    private Rigidbody2D aiRigidbody;
-    private CircleCollider2D aiCircleCollider;
+    private Puck puck;
+
+    public bool IsWorldBound { get; private set; }
 
     private void Awake()
     {
@@ -49,32 +52,38 @@ public sealed class AICommandSource : MonoBehaviour
         if (!aiCircleCollider)
             aiCircleCollider = GetComponent<CircleCollider2D>();
 
-        attackDirection = attackDirection.sqrMagnitude > 0.001f 
-            ? attackDirection.normalized 
+        attackDirection = attackDirection.sqrMagnitude > 0.001f
+            ? attackDirection.normalized
             : Vector2.right;
-    }
-
-    private void OnValidate()
-    {
-        ValidateReferences();
     }
 
     public MovementCommand ReadCommand()
     {
+        if (!IsWorldBound)
+        {
+            return new MovementCommand(Vector2.zero, false);
+        }
+
         TickCooldown();
 
         if (!puck || !puck.PuckRigidbody)
+        {
             return MoveToward(defensivePosition, false);
+        }
 
         var puckPosition = puck.Position;
         var puckVelocity = puck.Velocity;
         var predictedPuckPosition = PredictPuckPosition(puckPosition, puckVelocity);
 
         if (!ShouldReactToPuck(puckPosition, puckVelocity))
+        {
             return MoveToward(GetGuardTarget(puckPosition), false);
+        }
 
         if (!ShouldCommitToPuck(puckPosition, puckVelocity))
+        {
             return MoveToward(GetGuardTarget(predictedPuckPosition), false);
+        }
 
         var aiIsBehindPuck = IsBehindPuck(aiRigidbody.position, puckPosition);
 
@@ -95,7 +104,21 @@ public sealed class AICommandSource : MonoBehaviour
         return MoveToward(approachTarget, false);
     }
 
-    public void SetCurrentPuck(Puck puckComponent) => puck = puckComponent;
+    public void BindWorld(PlayerSide playerSide, Puck puck)
+    {
+        if (!puck)
+            throw new System.ArgumentNullException(nameof(puck));
+
+        SetStrikerSide(playerSide);
+        this.puck = puck;
+        IsWorldBound = true;
+    }
+
+    public void UnbindWorld()
+    {
+        IsWorldBound = false;
+        puck = null;
+    }
 
     public void ResetState()
     {
@@ -334,13 +357,5 @@ public sealed class AICommandSource : MonoBehaviour
         }
 
         return puck.Radius;
-    }
-
-    private void ValidateReferences()
-    {
-        if (!puck)
-        {
-            Debug.LogError($"{nameof(AICommandSource)} on {name} requires a Puck reference.", this);
-        }
     }
 }
